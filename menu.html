@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uzdevumi – OL Mat Sagatavošana</title>
+<script src="/main/auth.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #f4d5bb; color: #000; font-family: Arial, Helvetica, sans-serif; font-size: 20px; min-height: 100vh; }
+  .page { max-width: 700px; margin: 0 auto; padding: 56px 40px 80px; }
+  h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
+  .sub { font-size: 0.82rem; color: #666; margin-bottom: 36px; }
+  .grid { display: flex; flex-direction: column; gap: 10px; }
+  .task-btn { display: block; width: 100%; padding: 14px 18px; border: 1.5px solid #000; background: #fff; color: #000; font-size: 0.95rem; font-family: Arial, sans-serif; text-decoration: none; text-align: left; cursor: pointer; }
+  .task-btn:hover { background: #000; color: #fff; }
+  .logout { margin-top: 40px; display: inline-block; font-size: 0.78rem; color: #999; cursor: pointer; border: none; background: none; font-family: Arial, sans-serif; }
+  .logout:hover { color: #000; }
+  @media (max-width: 500px) { .page { padding: 32px 20px 60px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Uzdevumu saraksts</h1>
+  <div class="sub">Izvēlies uzdevumu, lai sāktu</div>
+
+  <div class="grid">
+    <a href="/main/task1/index.html" class="task-btn">1. uzdevums</a>
+    <a href="/main/task2/index.html" class="task-btn">2. uzdevums</a>
+    <a href="/main/task3/index.html" class="task-btn">3. uzdevums</a>
+    <a href="/main/task4/index.html" class="task-btn">4. uzdevums</a>
+    <a href="/main/task5/index.html" class="task-btn">5. uzdevums</a>
+    <a href="/main/task6/index.html" class="task-btn">6. uzdevums</a>
+    <a href="/main/task7/index.html" class="task-btn">7. uzdevums</a>
+    <a href="/main/task8/index.html" class="task-btn">8. uzdevums</a>
+    <a href="/main/task9/index.html" class="task-btn">9. uzdevums</a>
+    <a href="/main/task10/index.html" class="task-btn">10. uzdevums</a>
+    <a href="/main/task11/index.html" class="task-btn">11. uzdevums</a>
+    <a href="/main/task12/index.html" class="task-btn">12. uzdevums</a>
+    <a href="/main/task13/index.html" class="task-btn">13. uzdevums</a>
+    <a href="/main/task14/index.html" class="task-btn">14. uzdevums</a>
+    <a href="/main/task15/index.html" class="task-btn">15. uzdevums</a>
+    <a href="/main/task16/index.html" class="task-btn">16. uzdevums</a>
+    <a href="/main/task17/index.html" class="task-btn">17. uzdevums</a>
+    <a href="/main/task18/index.html" class="task-btn">18. uzdevums</a>
+    <a href="/main/task19/index.html" class="task-btn">19. uzdevums</a>
+    <a href="/main/task20/index.html" class="task-btn">20. uzdevums</a>
+    <a href="/main/task21/index.html" class="task-btn">21. uzdevums</a>
+    <a href="/main/task22/index.html" class="task-btn">22. uzdevums</a>
+    <a href="/main/task23/index.html" class="task-btn">23. uzdevums</a>
+    <a href="/main/task24/index.html" class="task-btn">24. uzdevums</a>
+    <a href="/main/task25/index.html" class="task-btn">25. uzdevums</a>
+    <a href="/main/task26/index.html" class="task-btn">26. uzdevums</a>
+    <a href="/main/task27/index.html" class="task-btn">27. uzdevums</a>
+    <a href="/main/task28/index.html" class="task-btn">28. uzdevums</a>
+    <a href="/main/task29/index.html" class="task-btn">29. uzdevums</a>
+    <a href="/main/task30/index.html" class="task-btn">30. uzdevums</a>
+  </div>
+
+  <button class="logout" id="logout-btn">Iziet no konta</button>
+</div>
+
+<script>
+document.getElementById("logout-btn").addEventListener("click", function() {
+  localStorage.removeItem("session_token");
+  window.location.href = "/main/login.html";
+});
+</script>
+</body>
+</html>
