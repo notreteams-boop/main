@@ -4,7 +4,7 @@
   var token = localStorage.getItem("session_token");
 
   if (!token) {
-    window.location.href = "/login.html";
+    window.location.href = "/main/login.html";
     return;
   }
 
@@ -21,7 +21,7 @@
 
     if (res.status === 401 || res.status === 403) {
       localStorage.removeItem("session_token");
-      window.location.href = "/login.html?expired=1";
+      window.location.href = "/main/login.html?expired=1";
       return;
     }
   } catch(e) {
@@ -37,7 +37,7 @@ window.callGemini = async function(prompt, generationConfig) {
   var GEMINI_MODEL = "gemini-2.5-flash";
 
   if (!token) {
-    window.location.href = "/login.html";
+    window.location.href = "/main/login.html";
     throw new Error("Нет токена");
   }
 
@@ -62,7 +62,7 @@ window.callGemini = async function(prompt, generationConfig) {
 
     if (res.status === 401 || res.status === 403) {
       localStorage.removeItem("session_token");
-      window.location.href = "/login.html?expired=1";
+      window.location.href = "/main/login.html?expired=1";
       throw new Error("Сессия истекла");
     }
 
@@ -83,3 +83,4 @@ window.callGemini = async function(prompt, generationConfig) {
     throw e;
   }
 };
+
