@@ -54,7 +54,7 @@ if (params.get("expired") === "1") {
 
 // Если уже залогинен — редирект на меню
 if (localStorage.getItem("session_token")) {
-  window.location.href = "/menu.html";
+  window.location.href = "/main/menu.html";
 }
 
 function showError(msg) {
@@ -94,7 +94,7 @@ document.getElementById("login-btn").addEventListener("click", async function() 
     }
 
     localStorage.setItem("session_token", data.token);
-    window.location.href = "/menu.html";
+    window.location.href = "/main/menu.html";
 
   } catch(e) {
     showError("Savienojuma kļūda. Pārbaudi internetu.");
@@ -112,3 +112,4 @@ document.getElementById("login-btn").addEventListener("click", async function() 
 </script>
 </body>
 </html>
+
