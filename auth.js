@@ -1,4 +1,7 @@
 // auth.js — подключать первой строкой в <head> на каждой закрытой странице
+// Сразу скрываем страницу до проверки токена
+document.documentElement.style.visibility = "hidden";
+
 (async function() {
   var WORKER_URL = "https://floral-tree-d2cb.eusjs56999.workers.dev/";
   var token = localStorage.getItem("session_token");
@@ -28,6 +31,9 @@
     // Если сеть недоступна — пускаем, токен есть локально
     console.warn("Auth check failed, proceeding offline:", e.message);
   }
+
+  // Показываем страницу только после успешной проверки
+  document.documentElement.style.visibility = "visible";
 })();
 
 // Функция для вызова Gemini через Worker — используй вместо прямого fetch
@@ -83,4 +89,3 @@ window.callGemini = async function(prompt, generationConfig) {
     throw e;
   }
 };
-
