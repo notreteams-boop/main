@@ -1,1834 +1,1103 @@
 <!DOCTYPE html>
 <html lang="lv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MathOL — Matemātikas CE Trenažieris</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OL Mat Trenažieris – VISC CE Sagatavošana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-:root {
-  --bg: #0d0d14;
-  --bg2: #12121c;
-  --bg3: #1a1a28;
-  --surface: #1e1e30;
-  --surface2: #252540;
-  --border: rgba(255,255,255,0.08);
-  --text: #f0eeff;
-  --text2: #9896b8;
-  --text3: #6664a0;
-  --lime: #c8ff57;
-  --lime2: #a8e040;
-  --orange: #ff7b45;
-  --purple: #8b7fff;
-  --purple2: #6c5fff;
-  --blue: #4dc9ff;
-  --red: #ff5a5a;
-  --radius: 20px;
-  --radius-sm: 12px;
-}
-
+/* ============================================================
+   RESET & TOKENS
+   ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { scroll-behavior: smooth; }
 
+:root {
+  --bg:        #06010e;
+  --bg2:       #0f0422;
+  --glass:     rgba(255,255,255,0.045);
+  --glass-hi:  rgba(255,255,255,0.08);
+  --border:    rgba(255,255,255,0.09);
+  --border-hi: rgba(255,255,255,0.16);
+  --lime:      #a8e635;
+  --lime-glow: rgba(168,230,53,0.28);
+  --lime-dim:  rgba(168,230,53,0.12);
+  --purple:    #c4b5fd;
+  --orange:    #fb923c;
+  --text:      #eee8ff;
+  --muted:     rgba(238,232,255,0.5);
+  --r-card:    22px;
+  --r-btn:     100px;
+  --r-sm:      12px;
+}
+
 body {
+  font-family: 'Figtree', sans-serif;
   background: var(--bg);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
+  min-height: 100vh;
   overflow-x: hidden;
+  /* subtle noise grain overlay */
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(120,40,200,0.22), transparent),
+    radial-gradient(ellipse 60% 40% at 90% 50%, rgba(80,20,160,0.12), transparent);
 }
 
-/* NOISE TEXTURE OVERLAY */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 999;
-  opacity: 0.4;
-}
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1, h2, h3, .logo { font-family: 'Syne', sans-serif; }
+h1 { font-size: clamp(2rem, 6vw, 3.4rem); font-weight: 800; line-height: 1.12; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -0.02em; }
+h3 { font-size: 1rem; font-weight: 700; }
 
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
-
-/* ─── TYPOGRAPHY ─── */
-h1, h2, h3, .display { font-family: 'Syne', sans-serif; }
-
-/* ─── HEADER ─── */
-.header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 0 24px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(13,13,20,0.8);
-  backdrop-filter: blur(20px);
+/* ============================================================
+   HEADER
+   ============================================================ */
+header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px;
+  background: rgba(6,1,14,0.78);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid var(--border);
 }
 
 .logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.1rem;
-  color: var(--text);
-  text-decoration: none;
+  font-size: 1.05rem; font-weight: 800; letter-spacing: -0.5px;
+  background: linear-gradient(120deg, var(--lime) 0%, var(--purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-r { display: flex; align-items: center; gap: 10px; }
+
+.lang-sw {
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.logo-dot {
-  width: 8px; height: 8px;
-  background: var(--lime);
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Language switcher */
-.lang-switcher {
-  display: flex;
-  gap: 2px;
-  background: var(--surface);
-  border-radius: 10px;
-  padding: 3px;
-}
-.lang-btn {
-  padding: 4px 10px;
-  border: none;
-  background: transparent;
-  color: var(--text2);
-  font-size: 0.75rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 7px;
-  transition: all 0.2s;
-  letter-spacing: 0.05em;
-}
-.lang-btn.active {
-  background: var(--purple);
-  color: #fff;
-}
-.lang-btn:hover:not(.active) { color: var(--text); }
-
-/* Login button */
-.btn-login {
-  padding: 8px 18px;
-  background: transparent;
-  border: 1.5px solid var(--border);
-  color: var(--text);
-  font-size: 0.85rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: all 0.2s;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.btn-login:hover {
-  border-color: var(--purple);
-  color: var(--purple);
-  background: rgba(139,127,255,0.08);
-}
-
-/* Burger */
-.burger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  padding: 4px;
-  background: none;
-  border: none;
-}
-.burger span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--text);
-  border-radius: 2px;
-  transition: all 0.3s;
-}
-
-/* Mobile menu */
-.mobile-menu {
-  display: none;
-  position: fixed;
-  top: 64px; left: 0; right: 0;
-  background: rgba(13,13,20,0.97);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  padding: 20px 24px;
-  z-index: 99;
-  flex-direction: column;
-  gap: 16px;
-}
-.mobile-menu.open { display: flex; }
-
-/* ─── SECTIONS ─── */
-section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
-
-/* ─── HERO ─── */
-.hero-section {
-  padding-top: 140px;
-  padding-bottom: 60px;
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 60px;
-  align-items: center;
-}
-
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(200,255,87,0.08);
-  border: 1px solid rgba(200,255,87,0.2);
-  color: var(--lime);
-  font-size: 0.75rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  padding: 6px 14px;
-  border-radius: 100px;
-  margin-bottom: 24px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-.hero-badge::before {
-  content: '';
-  width: 6px; height: 6px;
-  background: var(--lime);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%,100% { opacity:1; transform:scale(1); }
-  50% { opacity:0.4; transform:scale(0.8); }
-}
-
-.hero-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  line-height: 1.1;
-  margin-bottom: 20px;
-  letter-spacing: -0.02em;
-}
-.hero-title .accent { color: var(--lime); }
-
-.hero-sub {
-  color: var(--text2);
-  font-size: 1rem;
-  line-height: 1.7;
-  margin-bottom: 36px;
-  max-width: 480px;
-}
-
-/* FOMO BAR */
-.fomo-bar {
-  background: var(--surface);
+  background: var(--glass);
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px 18px;
-  margin-bottom: 28px;
+  border-radius: var(--r-btn);
+  padding: 3px;
+  gap: 2px;
 }
-.fomo-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 0.82rem;
+
+.lbtn {
+  padding: 5px 11px; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.4px; background: transparent; border: none;
+  color: var(--muted); border-radius: var(--r-btn);
+  cursor: pointer; transition: all 0.2s; min-height: 30px;
 }
-.fomo-left { color: var(--text2); }
-.fomo-count {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  color: var(--lime);
-  font-size: 0.9rem;
+.lbtn.active { background: var(--lime); color: #000; }
+
+.btn-login {
+  padding: 8px 18px; font-size: 0.84rem; font-weight: 700;
+  font-family: 'Figtree', sans-serif;
+  background: transparent;
+  border: 1px solid rgba(168,230,53,0.45);
+  color: var(--lime); border-radius: var(--r-btn);
+  text-decoration: none; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+  min-height: 38px; display: flex; align-items: center;
 }
-.fomo-track {
-  background: var(--surface2);
-  border-radius: 100px;
-  height: 8px;
+.btn-login:hover { background: var(--lime); color: #000; }
+
+/* ============================================================
+   LAYOUT HELPERS
+   ============================================================ */
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+.sec  { padding: 80px 0; }
+.sec-sm { padding: 56px 0; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px;
+  background: var(--lime-dim); border: 1px solid rgba(168,230,53,0.28);
+  color: var(--lime); border-radius: var(--r-btn);
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.4px;
+  margin-bottom: 22px;
+}
+
+.card {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 24px;
+  transition: background 0.25s, border-color 0.25s;
+}
+.card:hover { background: var(--glass-hi); border-color: var(--border-hi); }
+
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 15px 34px; min-height: 52px;
+  background: var(--lime); color: #000;
+  border: none; border-radius: var(--r-btn);
+  font-family: 'Figtree', sans-serif; font-size: 1rem; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+  transition: all 0.22s;
+  box-shadow: 0 0 28px var(--lime-glow);
+}
+.btn-primary:hover { background: #bef060; transform: translateY(-2px); box-shadow: 0 0 44px rgba(168,230,53,0.45); }
+
+.sec-label { text-align: center; }
+.sec-label h2 { margin-bottom: 10px; }
+.sec-label p  { color: var(--muted); font-size: 0.97rem; line-height: 1.7; max-width: 560px; margin: 0 auto 48px; }
+
+.text-lime { color: var(--lime); }
+.text-purple { color: var(--purple); }
+.text-orange { color: var(--orange); }
+
+/* ============================================================
+   SECTION 1: HERO
+   ============================================================ */
+#hero {
+  padding: 148px 0 80px;
+  text-align: center;
+  position: relative;
   overflow: hidden;
+}
+
+/* Glow blobs */
+#hero::before {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 700px; height: 400px;
+  background: radial-gradient(ellipse, rgba(130,50,220,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+#hero h1 { max-width: 820px; margin: 0 auto 20px; }
+.hero-sub {
+  color: var(--muted); font-size: 1.05rem; line-height: 1.75;
+  max-width: 580px; margin: 0 auto 40px;
+}
+
+/* FOMO Widget */
+.fomo {
+  max-width: 420px; margin: 0 auto 36px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card); padding: 18px 22px;
+}
+.fomo-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.fomo-top span:first-child { font-size: 0.82rem; color: var(--muted); }
+.fomo-top span:last-child  { font-size: 0.82rem; font-weight: 700; color: var(--lime); }
+.fomo-track {
+  background: rgba(255,255,255,0.07); border-radius: 100px; height: 7px;
+  overflow: hidden; margin-bottom: 14px;
 }
 .fomo-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--purple), var(--lime));
-  border-radius: 100px;
-  width: 83%;
-  position: relative;
-  transition: width 0.5s ease;
+  background: linear-gradient(90deg, #74d400, var(--lime));
+  border-radius: 100px; width: 0%;
+  transition: width 1.6s cubic-bezier(.34,1.56,.64,1);
 }
-.fomo-fill::after {
-  content: '';
-  position: absolute;
-  right: 0; top: 0; bottom: 0;
-  width: 20px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
-  animation: shimmer 1.5s infinite;
+.fomo-prices {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-@keyframes shimmer { 0%,100%{opacity:0.3}50%{opacity:1} }
-
-.price-row {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-.price-main {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 2.2rem;
-  color: var(--lime);
-}
-.price-period { color: var(--text2); font-size: 0.9rem; }
-.price-old {
-  font-size: 1rem;
-  color: var(--text3);
-  text-decoration: line-through;
+.price-main { font-family: 'Syne', sans-serif; font-size: 1.75rem; font-weight: 800; color: var(--lime); }
+.price-unit { font-size: 0.85rem; color: var(--muted); }
+.price-old  { font-size: 0.9rem; color: var(--muted); text-decoration: line-through; }
+.price-tag  {
+  padding: 3px 9px; font-size: 0.72rem; font-weight: 800;
+  background: rgba(251,146,60,0.14); border: 1px solid rgba(251,146,60,0.3);
+  color: var(--orange); border-radius: var(--r-btn);
 }
 
-/* CTA Button */
-.btn-cta {
+/* ============================================================
+   SECTION 2: AUDIENCE TOGGLE
+   ============================================================ */
+#audience { padding: 64px 0; }
+
+.aud-toggle-wrap {
+  display: flex; justify-content: center; margin-bottom: 36px;
+}
+.aud-toggle {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 16px 32px;
-  background: var(--lime);
-  color: #0d0d14;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 1rem;
-  border: none;
-  border-radius: 14px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-  letter-spacing: 0.01em;
-}
-.btn-cta:hover {
-  background: var(--lime2);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(200,255,87,0.25);
-}
-.btn-cta .arrow {
-  transition: transform 0.2s;
-}
-.btn-cta:hover .arrow { transform: translateX(4px); }
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  padding: 16px 24px;
-  background: transparent;
-  color: var(--text2);
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem;
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-.btn-secondary:hover { border-color: var(--text3); color: var(--text); }
-
-.hero-btns {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-/* ─── HERO MOCKUP ─── */
-.mockup-card {
-  background: var(--surface);
+  background: var(--glass);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+  border-radius: var(--r-btn); padding: 4px; gap: 3px;
 }
-.mockup-bar {
-  background: var(--surface2);
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.abtn {
+  padding: 10px 30px; min-height: 44px;
+  background: transparent; border: none; border-radius: var(--r-btn);
+  font-family: 'Figtree', sans-serif; font-size: 0.95rem; font-weight: 700;
+  color: var(--muted); cursor: pointer; transition: all 0.22s;
+}
+.abtn.active { background: var(--lime); color: #000; }
+
+.aud-panel { display: none; }
+.aud-panel.on { display: grid; }
+.grid3 { grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 640px) { .grid3 { grid-template-columns: repeat(3,1fr); } }
+
+.pain-icon { font-size: 2rem; margin-bottom: 14px; }
+.pain-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin-top: 7px; }
+.benefit-card { border-color: rgba(168,230,53,0.18); }
+
+/* ============================================================
+   SECTION 3: PLATFORM PREVIEW
+   ============================================================ */
+#platform { padding: 64px 0; }
+
+.plat-wrap {
+  display: grid; grid-template-columns: 1fr; gap: 36px; align-items: center;
+}
+@media (min-width: 768px) { .plat-wrap { grid-template-columns: 1fr 1fr; } }
+
+.plat-txt h2 { margin-bottom: 16px; }
+.plat-txt p  { color: var(--muted); font-size: 0.95rem; line-height: 1.75; }
+
+/* Phone mock */
+.phone {
+  background: rgba(14,5,30,0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(168,230,53,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.ph-head {
+  background: rgba(255,255,255,0.035);
   border-bottom: 1px solid var(--border);
+  padding: 12px 16px; display: flex; align-items: center; gap: 8px;
 }
-.dot-red { width:10px;height:10px;border-radius:50%;background:#ff5f57; }
-.dot-yellow { width:10px;height:10px;border-radius:50%;background:#febc2e; }
-.dot-green { width:10px;height:10px;border-radius:50%;background:#28c840; }
-.mock-title { color: var(--text2); font-size:0.75rem; margin-left:8px; font-family:'Syne',sans-serif; font-weight:600; }
+.ph-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(168,230,53,0.55); }
+.ph-title { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+.ph-body { padding: 18px 16px; }
+.task-topic {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.8px;
+  color: var(--lime); text-transform: uppercase; margin-bottom: 12px;
+}
+.task-q {
+  font-size: 0.88rem; line-height: 1.65;
+  margin-bottom: 16px; color: var(--text);
+}
+.task-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.task-in {
+  flex: 1; padding: 9px 12px; min-height: 44px;
+  background: rgba(255,255,255,0.065);
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  color: var(--text); font-size: 0.88rem;
+  font-family: 'Figtree', sans-serif; outline: none;
+}
+.task-in:focus { border-color: var(--lime); }
+.task-chk {
+  padding: 9px 16px; min-height: 44px;
+  background: var(--lime); color: #000;
+  border: none; border-radius: var(--r-sm);
+  font-family: 'Figtree', sans-serif;
+  font-size: 0.85rem; font-weight: 700; cursor: pointer;
+  transition: background 0.2s; white-space: nowrap;
+}
+.task-chk:hover { background: #bef060; }
 
-.mockup-body { padding: 20px; }
-.mock-topic {
-  font-size: 0.7rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  color: var(--purple);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 10px;
-}
-.mock-question {
-  font-size: 0.9rem;
-  color: var(--text);
-  line-height: 1.6;
-  margin-bottom: 16px;
-}
-.mock-formula {
-  background: var(--bg);
-  border-left: 3px solid var(--purple);
-  padding: 10px 14px;
-  border-radius: 0 8px 8px 0;
-  font-family: 'Syne', sans-serif;
-  font-size: 0.95rem;
-  color: var(--blue);
-  margin-bottom: 16px;
-  letter-spacing: 0.03em;
-}
-.mock-input {
-  background: var(--bg);
-  border: 1.5px solid var(--surface2);
-  border-radius: 10px;
-  padding: 10px 14px;
-  color: var(--text);
-  font-size: 0.9rem;
-  width: 100%;
-  margin-bottom: 12px;
-  outline: none;
-  transition: border-color 0.2s;
-  font-family: 'DM Sans', sans-serif;
-}
-.mock-input:focus { border-color: var(--purple); }
+.fb-line { font-size: 0.8rem; font-weight: 700; margin-bottom: 10px; display: none; }
+.fb-ok  { color: var(--lime); }
+.fb-err { color: var(--orange); }
 
-.mock-btn-row { display:flex;gap:8px; }
-.mock-btn-check {
-  flex: 1;
-  padding: 9px;
-  background: var(--purple);
-  color:#fff;
-  border:none;
-  border-radius:9px;
-  font-family:'Syne',sans-serif;
-  font-size:0.82rem;
-  font-weight:700;
-  cursor:pointer;
-  transition:all 0.2s;
-}
-.mock-btn-skip {
-  padding: 9px 14px;
-  background: var(--surface2);
-  color:var(--text2);
-  border:none;
-  border-radius:9px;
-  font-size:0.78rem;
-  cursor:pointer;
-  font-family:'DM Sans',sans-serif;
-}
-
-.mock-answer {
-  margin-top:14px;
-  background: rgba(200,255,87,0.06);
-  border: 1px solid rgba(200,255,87,0.15);
-  border-radius: 12px;
-  padding: 12px 14px;
-}
-.mock-ans-label {
-  font-size:0.7rem;
-  font-family:'Syne',sans-serif;
-  font-weight:700;
-  color:var(--lime);
-  letter-spacing:0.08em;
-  text-transform:uppercase;
-  margin-bottom:6px;
-}
-.mock-step {
-  font-size: 0.78rem;
-  color: var(--text2);
-  margin-bottom: 3px;
-  line-height: 1.5;
-}
-.mock-step strong { color: var(--text); }
-
-/* ─── AUDIENCE TOGGLE ─── */
-.toggle-section { padding: 60px 24px; max-width: 1100px; margin: 0 auto; }
-.toggle-header { text-align: center; margin-bottom: 36px; }
-.section-label {
-  font-size: 0.75rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  color: var(--purple);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-bottom: 12px;
-}
-.section-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: clamp(1.6rem, 3vw, 2.4rem);
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-.section-sub {
-  color: var(--text2);
-  margin-top: 10px;
-  font-size: 0.95rem;
-}
-
-.audience-toggle {
-  display: flex;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 5px;
-  width: fit-content;
-  margin: 0 auto 40px;
-}
-.aud-btn {
-  padding: 10px 28px;
-  background: transparent;
-  border: none;
-  color: var(--text2);
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 0.9rem;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: all 0.25s;
-}
-.aud-btn.active {
-  background: var(--purple);
-  color: #fff;
-  box-shadow: 0 4px 20px rgba(139,127,255,0.3);
-}
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.pain-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-.pain-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 3px;
-  background: var(--grad);
-}
-.pain-card:hover {
-  border-color: rgba(255,255,255,0.15);
-  transform: translateY(-3px);
-}
-.card-emoji { font-size: 1.8rem; margin-bottom: 12px; }
-.card-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-  color: var(--text);
-}
-.card-desc { font-size: 0.82rem; color: var(--text2); line-height: 1.6; }
-
-/* ─── COMPARISON TABLE ─── */
-.compare-section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
-.compare-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px;
-  margin-top: 48px;
-}
-.compare-col {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.compare-col.featured {
-  border-color: var(--lime);
-  box-shadow: 0 0 40px rgba(200,255,87,0.08);
-}
-.col-header {
-  padding: 20px 20px 16px;
-  border-bottom: 1px solid var(--border);
-}
-.col-label {
-  font-size: 0.7rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text3);
-  margin-bottom: 6px;
-}
-.col-name {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-  color: var(--text);
-}
-.col-name.lime { color: var(--lime); }
-.col-price {
-  font-size: 1.4rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  margin-top: 6px;
-}
-.col-price.lime { color: var(--lime); }
-.col-price.red { color: var(--red); }
-.col-price.gray { color: var(--text2); }
-
-.col-features { padding: 16px 20px; }
-.feat-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.82rem;
-}
-.feat-row:last-child { border-bottom: none; }
-.feat-icon { flex-shrink: 0; margin-top: 2px; font-size: 1rem; }
-.feat-label { color: var(--text3); font-size:0.7rem; font-family:'Syne',sans-serif; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:2px; }
-.feat-val { color: var(--text); line-height:1.4; }
-.feat-val.green { color: var(--lime); }
-.feat-val.red { color: var(--red); }
-.feat-val.muted { color: var(--text2); }
-
-/* ─── HOW IT WORKS ─── */
-.how-section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-top: 48px;
-  position: relative;
-}
-.steps-grid::before {
-  content: '';
-  position: absolute;
-  top: 28px;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--surface2), var(--purple2), var(--surface2), transparent);
-  z-index: 0;
-}
-.step-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px 20px;
-  text-align: center;
-  position: relative;
-  z-index: 1;
-  transition: all 0.3s;
-}
-.step-card:hover { transform: translateY(-4px); border-color: var(--purple); }
-.step-num {
-  width: 44px; height: 44px;
-  background: var(--bg);
-  border: 2px solid var(--surface2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1rem;
-  color: var(--purple);
-}
-.step-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-}
-.step-desc { font-size: 0.78rem; color: var(--text2); line-height: 1.6; }
-
-/* ─── REVIEWS ─── */
-.reviews-section { padding: 80px 24px; max-width: 1100px; margin: 0 auto; overflow: hidden; }
-.reviews-track {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 48px;
-}
-.review-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  transition: all 0.3s;
-}
-.review-card:hover { border-color: var(--purple); transform: translateY(-3px); }
-.review-top {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.review-avatar {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 0.9rem;
-  color: #fff;
-  flex-shrink: 0;
-}
-.review-info { flex: 1; }
-.review-name {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 0.88rem;
-}
-.review-meta { font-size: 0.72rem; color: var(--text3); }
-.review-stars { color: #ffc44d; font-size: 0.8rem; letter-spacing: 1px; }
-.review-text { font-size: 0.84rem; color: var(--text2); line-height: 1.7; }
-
-/* Blurred proof */
-.review-proof {
-  margin-top: 16px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.proof-blur {
-  flex: 1;
-  height: 14px;
-  background: linear-gradient(90deg, var(--lime), var(--blue));
-  border-radius: 4px;
-  filter: blur(4px);
-  opacity: 0.7;
-}
-.proof-label {
-  font-size: 0.65rem;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  color: var(--text3);
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
-
-/* ─── FAQ ─── */
-.faq-section { padding: 80px 24px; max-width: 700px; margin: 0 auto; }
-.faq-list { margin-top: 48px; }
-.faq-item {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  margin-bottom: 10px;
-  overflow: hidden;
-  transition: border-color 0.2s;
-}
-.faq-item.open { border-color: var(--purple); }
-.faq-q {
-  padding: 18px 20px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  font-family: 'Syne', sans-serif;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text);
-  background: var(--surface);
-  user-select: none;
-  transition: background 0.2s;
-}
-.faq-q:hover { background: var(--surface2); }
-.faq-arrow {
-  flex-shrink: 0;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  background: var(--surface2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  transition: all 0.3s;
-  color: var(--text2);
-}
-.faq-item.open .faq-arrow { background: var(--purple); color: #fff; transform: rotate(180deg); }
-.faq-a {
+.expl {
   display: none;
-  padding: 0 20px 18px;
-  font-size: 0.85rem;
-  color: var(--text2);
-  line-height: 1.7;
-  background: var(--surface);
+  background: rgba(168,230,53,0.045);
+  border: 1px solid rgba(168,230,53,0.18);
+  border-radius: var(--r-sm); padding: 14px;
 }
-.faq-item.open .faq-a { display: block; }
+.expl.show { display: block; }
+.estep { display: flex; gap: 10px; margin-bottom: 10px; }
+.estep:last-child { margin-bottom: 0; }
+.esnum {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--lime); color: #000;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.68rem; font-weight: 800; flex-shrink: 0; margin-top: 2px;
+}
+.estxt { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+.estxt strong { color: var(--lime); }
 
-/* ─── FOOTER CTA ─── */
-.footer-cta {
-  padding: 80px 24px;
-  max-width: 1100px;
-  margin: 0 auto;
-  text-align: center;
+/* ============================================================
+   SECTION 4: COMPARISON TABLE
+   ============================================================ */
+#compare { padding: 64px 0; }
+.tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cmp {
+  width: 100%; min-width: 560px;
+  border-collapse: separate; border-spacing: 0;
 }
-.footer-cta-box {
-  background: linear-gradient(135deg, var(--surface) 0%, var(--bg3) 100%);
+.cmp th {
+  padding: 16px 18px; font-family: 'Syne', sans-serif;
+  font-size: 0.88rem; font-weight: 700; text-align: center;
+  background: rgba(255,255,255,0.035);
+  border-bottom: 1px solid var(--border);
+}
+.cmp th.our {
+  background: rgba(168,230,53,0.09);
+  color: var(--lime);
+  border: 1px solid rgba(168,230,53,0.22);
+  border-bottom: none;
+  border-radius: 18px 18px 0 0;
+}
+.cmp td {
+  padding: 13px 18px; font-size: 0.86rem; color: var(--muted);
+  text-align: center; border-bottom: 1px solid var(--border);
+}
+.cmp td.lbl {
+  text-align: left; font-weight: 600; color: var(--text);
+  font-size: 0.84rem;
+}
+.cmp td.our {
+  background: rgba(168,230,53,0.04); color: var(--text); font-weight: 600;
+  border-left: 1px solid rgba(168,230,53,0.14);
+  border-right: 1px solid rgba(168,230,53,0.14);
+}
+.cmp tr:last-child td.our {
+  border-bottom: 1px solid rgba(168,230,53,0.22);
+  border-radius: 0 0 18px 18px;
+}
+.ic-ok  { color: var(--lime); font-weight: 700; }
+.ic-no  { color: #f87171; }
+
+/* ============================================================
+   SECTION 5: REVIEWS SLIDER
+   ============================================================ */
+#reviews { padding: 64px 0; }
+
+.slider-outer { overflow: hidden; }
+.slider-track {
+  display: flex; gap: 14px;
+  transition: transform 0.42s cubic-bezier(.25,.46,.45,.94);
+}
+.rev-card { min-width: 100%; flex-shrink: 0; }
+@media (min-width: 768px) { .rev-card { min-width: calc(50% - 7px); } }
+
+.rev-inner {
+  background: var(--glass);
   border: 1px solid var(--border);
-  border-radius: 28px;
-  padding: 60px 40px;
-  position: relative;
-  overflow: hidden;
+  border-radius: var(--r-card); padding: 22px;
+  height: 100%; display: flex; flex-direction: column; gap: 14px;
 }
-.footer-cta-box::before {
-  content: '';
-  position: absolute;
-  top: -100px; right: -100px;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(139,127,255,0.12) 0%, transparent 70%);
-  pointer-events: none;
+.rev-top { display: flex; gap: 12px; align-items: flex-start; }
+.ava {
+  width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--purple), #7c3aed);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: #fff;
 }
-.footer-cta-box::after {
-  content: '';
-  position: absolute;
-  bottom: -100px; left: -100px;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(200,255,87,0.06) 0%, transparent 70%);
-  pointer-events: none;
+.rev-meta h4 { font-size: 0.92rem; font-weight: 700; font-family: 'Syne', sans-serif; }
+.rev-meta .sub { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+.stars { color: #fbbf24; font-size: 0.82rem; margin-top: 3px; }
+.rev-text { font-size: 0.87rem; color: var(--muted); line-height: 1.68; flex: 1; }
+.proof {
+  background: rgba(255,255,255,0.035);
+  border: 1px solid var(--border); border-radius: 12px;
+  padding: 10px 13px; display: flex; align-items: center; gap: 12px;
 }
-.footer-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-  line-height: 1.15;
-  margin-bottom: 14px;
-  letter-spacing: -0.02em;
-  position: relative;
-  z-index: 1;
+.proof-num {
+  width: 48px; height: 34px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; color: #fff;
+  filter: blur(1.5px);
 }
-.footer-sub { color: var(--text2); font-size: 0.95rem; margin-bottom: 32px; position: relative; z-index: 1; }
+.proof-txt { font-size: 0.74rem; color: var(--muted); line-height: 1.45; }
+.proof-txt strong { color: var(--text); font-size: 0.79rem; display: block; }
 
-.messenger-btns {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 20px;
+.slider-nav {
+  display: flex; align-items: center; justify-content: center;
+  gap: 12px; margin-top: 22px;
+}
+.sdot {
+  width: 7px; height: 7px; border-radius: 100px;
+  background: rgba(255,255,255,0.18); cursor: pointer;
+  transition: all 0.22s;
+}
+.sdot.on { background: var(--lime); width: 22px; }
+.sarr {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--glass); border: 1px solid var(--border);
+  color: var(--text); cursor: pointer; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; min-height: 40px;
+}
+.sarr:hover { background: var(--glass-hi); }
+
+/* ============================================================
+   SECTION 6: FAQ
+   ============================================================ */
+#faq { padding: 64px 0; }
+
+.faq-wrap { max-width: 700px; margin: 0 auto; }
+.faq-item { border-bottom: 1px solid var(--border); }
+.faq-item:first-child { border-top: 1px solid var(--border); }
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 0; cursor: pointer; gap: 16px; list-style: none;
+}
+.faq-q span { font-size: 0.95rem; font-weight: 600; font-family: 'Syne', sans-serif; }
+.faq-ic { color: var(--lime); font-size: 1.25rem; flex-shrink: 0; transition: transform 0.25s; line-height: 1; }
+.faq-item.open .faq-ic { transform: rotate(45deg); }
+.faq-a { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+.faq-ai { padding: 0 0 18px; font-size: 0.89rem; color: var(--muted); line-height: 1.75; }
+
+/* ============================================================
+   SECTION 7: FOOTER CTA
+   ============================================================ */
+#fcta {
+  padding: 80px 0;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: linear-gradient(180deg, transparent, rgba(168,230,53,0.03));
+}
+#fcta h2 { margin-bottom: 12px; }
+#fcta .sub { color: var(--muted); margin-bottom: 32px; font-size: 0.97rem; }
+
+.msg-row {
+  display: flex; gap: 10px; justify-content: center;
+  flex-wrap: wrap; margin: 24px 0;
 }
 .msg-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  color: var(--text2);
-  font-size: 0.85rem;
-  font-family: 'DM Sans', sans-serif;
-  text-decoration: none;
-  transition: all 0.2s;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 11px 20px; min-height: 44px;
+  border-radius: var(--r-btn); font-family: 'Figtree', sans-serif;
+  font-size: 0.88rem; font-weight: 700; cursor: pointer;
+  text-decoration: none; border: 1px solid; transition: all 0.2s;
 }
-.msg-btn:hover { border-color: var(--text3); color: var(--text); }
-.msg-btn.tg:hover { border-color: #29b6f6; color: #29b6f6; }
-.msg-btn.wa:hover { border-color: #4caf50; color: #4caf50; }
+.tg { background: rgba(39,174,254,0.09); border-color: rgba(39,174,254,0.28); color: #27aefe; }
+.tg:hover { background: rgba(39,174,254,0.18); }
+.wa { background: rgba(37,211,102,0.09); border-color: rgba(37,211,102,0.28); color: #25d366; }
+.wa:hover { background: rgba(37,211,102,0.18); }
 
-/* ─── FOOTER BAR ─── */
-.footer-bar {
+footer {
+  padding: 28px 20px; text-align: center;
   border-top: 1px solid var(--border);
-  padding: 24px;
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
 }
-.footer-legal { font-size: 0.75rem; color: var(--text3); }
-.footer-links { display: flex; gap: 20px; }
-.footer-links a {
-  font-size: 0.75rem;
-  color: var(--text3);
-  text-decoration: none;
-  transition: color 0.2s;
+.ft-links {
+  display: flex; gap: 20px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 10px;
 }
-.footer-links a:hover { color: var(--text2); }
+.ft-links a { font-size: 0.78rem; color: var(--muted); text-decoration: none; }
+.ft-links a:hover { color: var(--text); }
+.ft-copy { font-size: 0.74rem; color: rgba(238,232,255,0.25); }
 
-/* ─── GLOW EFFECTS ─── */
-.glow-line {
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, var(--purple2) 30%, var(--lime) 70%, transparent 100%);
-  opacity: 0.3;
-  max-width: 1100px;
-  margin: 0 auto;
+/* ============================================================
+   MOBILE OVERRIDES
+   ============================================================ */
+@media (max-width: 640px) {
+  #hero { padding-top: 120px; padding-bottom: 60px; }
+  .header-r gap: { gap: 7px; }
+  .lbtn { padding: 5px 8px; }
+  h1 { font-size: 1.9rem; }
 }
 
-/* ─── STATS BAR ─── */
-.stats-bar {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0 24px 60px;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
+/* ============================================================
+   LOAD ANIMATION
+   ============================================================ */
+.fade-up {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
 }
-.stat-item {
-  background: var(--surface);
-  padding: 28px 20px;
-  text-align: center;
-}
-.stat-num {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 2rem;
-  color: var(--text);
-  display: block;
-}
-.stat-num span { color: var(--lime); }
-.stat-label { font-size: 0.75rem; color: var(--text3); margin-top: 4px; }
-
-/* ─── HIDDEN / VISIBLE PER LANG ─── */
-[data-lang] { display: none; }
-[data-lang].active { display: block; }
-[data-lang-inline] { display: none; }
-[data-lang-inline].active { display: inline; }
-
-/* ─── AUDIENCE CONTENT ─── */
-.audience-content { display: none; }
-.audience-content.active { display: block; }
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 900px) {
-  .hero-section {
-    grid-template-columns: 1fr;
-    padding: 120px 24px 40px;
-    gap: 40px;
-  }
-  .mockup-card { max-width: 480px; margin: 0 auto; }
-  .cards-grid { grid-template-columns: 1fr; }
-  .compare-grid { grid-template-columns: 1fr; }
-  .steps-grid { grid-template-columns: repeat(2, 1fr); }
-  .steps-grid::before { display: none; }
-  .reviews-track { grid-template-columns: 1fr; }
-  .stats-bar { grid-template-columns: repeat(2, 1fr); }
-  .burger { display: flex; }
-  .header-right .lang-switcher,
-  .header-right .btn-login { display: none; }
-}
-@media (max-width: 600px) {
-  .steps-grid { grid-template-columns: 1fr; }
-  .stats-bar { grid-template-columns: 1fr 1fr; }
-  .footer-bar { flex-direction: column; text-align: center; }
-  .footer-cta-box { padding: 40px 24px; }
-}
-
-/* Entrance animation */
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(24px); }
-  to { opacity:1; transform:translateY(0); }
-}
-.hero-left > * { animation: fadeUp 0.6s ease both; }
-.hero-left > *:nth-child(1) { animation-delay: 0.1s; }
-.hero-left > *:nth-child(2) { animation-delay: 0.2s; }
-.hero-left > *:nth-child(3) { animation-delay: 0.3s; }
-.hero-left > *:nth-child(4) { animation-delay: 0.4s; }
-.hero-left > *:nth-child(5) { animation-delay: 0.5s; }
-.hero-left > *:nth-child(6) { animation-delay: 0.6s; }
-.hero-right { animation: fadeUp 0.7s 0.4s ease both; }
+.fade-up.vis { opacity: 1; transform: none; }
 </style>
 </head>
 <body>
 
-<!-- ─── HEADER ─── -->
-<header class="header">
-  <a href="#" class="logo">
-    <span class="logo-dot"></span>MathOL
-  </a>
-  <div class="header-right">
-    <div class="lang-switcher">
-      <button class="lang-btn active" onclick="setLang('lv')">LV</button>
-      <button class="lang-btn" onclick="setLang('ru')">RU</button>
-      <button class="lang-btn" onclick="setLang('en')">ENG</button>
+<!-- ════ AUTH CHECK ════ -->
+<script>
+  /* Если уже авторизован — сразу в меню, ничего не меняем в логике */
+  if (localStorage.getItem("session_token")) {
+    window.location.href = "/main/menu.html";
+  }
+</script>
+
+<!-- ════ HEADER ════ -->
+<header>
+  <div class="logo">OL Mat</div>
+  <div class="header-r">
+    <div class="lang-sw">
+      <button class="lbtn active" data-lang="lv">LV</button>
+      <button class="lbtn" data-lang="ru">RU</button>
+      <button class="lbtn" data-lang="en">ENG</button>
     </div>
-    <a href="/main/login.html" class="btn-login">
-      <span data-lang="lv" class="active">Ienākt</span>
-      <span data-lang="ru">Войти</span>
-      <span data-lang="en">Log In</span>
-      →
-    </a>
+    <a href="/main/login.html" class="btn-login" data-i18n="nav.login">Ienākt</a>
   </div>
-  <button class="burger" onclick="toggleMenu()" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
 </header>
 
-<!-- Mobile menu -->
-<div class="mobile-menu" id="mobileMenu">
-  <div class="lang-switcher" style="width:fit-content">
-    <button class="lang-btn active" onclick="setLang('lv')">LV</button>
-    <button class="lang-btn" onclick="setLang('ru')">RU</button>
-    <button class="lang-btn" onclick="setLang('en')">ENG</button>
+<!-- ════ HERO ════ -->
+<section id="hero">
+  <div class="wrap">
+    <div class="pill" data-i18n="hero.pill">🚀 Skola2030 · Optimālais Līmenis · VISC CE</div>
+    <h1 data-i18n="hero.h1">Bezgalīgs matemātikas OL trenažieris veiksmīgai CE nokārtošanai</h1>
+    <p class="hero-sub" data-i18n="hero.sub">Tūkstošiem aktuālu uzdevumu pēc Skola2030 standartiem ar tūlītēju kļūdu analīzi un soli pa solim skaidrojumu katrai atbildei. Sāc gatavoties savā tempā bez privātskolotājiem.</p>
+
+    <!-- FOMO widget -->
+    <div class="fomo fade-up">
+      <div class="fomo-top">
+        <span data-i18n="fomo.lbl">Aizņemtas vietas</span>
+        <span data-i18n="fomo.cnt">83 / 100</span>
+      </div>
+      <div class="fomo-track"><div class="fomo-fill" id="fomoBar"></div></div>
+      <div class="fomo-prices">
+        <span class="price-main">8.99 €</span>
+        <span class="price-unit" data-i18n="fomo.unit">/mēnesī</span>
+        <span class="price-old">25 €</span>
+        <span class="price-tag" data-i18n="fomo.disc">−64%</span>
+      </div>
+    </div>
+
+    <a href="/main/login.html" class="btn-primary fade-up" data-i18n="hero.cta">Izmēģināt bez maksas →</a>
   </div>
-  <a href="/main/login.html" class="btn-login" style="width:100%;justify-content:center">
-    <span id="mobile-login-text">Ienākt</span> →
-  </a>
-</div>
+</section>
 
-<!-- ─── HERO ─── -->
-<div class="hero-section" style="padding:140px 24px 60px">
-  <div class="hero-left">
-    <div class="hero-badge">
-      <span data-lang="lv" class="active">🇱🇻 Skola2030 · OL Matemātika</span>
-      <span data-lang="ru">🇱🇻 Skola2030 · OL Математика</span>
-      <span data-lang="en">🇱🇻 Skola2030 · OL Mathematics</span>
+<!-- ════ AUDIENCE TOGGLE ════ -->
+<section id="audience" class="sec-sm">
+  <div class="wrap">
+    <div class="sec-label fade-up">
+      <h2 data-i18n="aud.h2">Šis trenažieris ir domāts tev</h2>
     </div>
 
-    <h1 class="hero-title">
-      <span data-lang="lv" class="active">Bezgalīgs matemātikas OL trenažieris <span class="accent">veiksmīgai CE nokārtošanai</span></span>
-      <span data-lang="ru">Бесконечный тренажер по математике OL для <span class="accent">успешной сдачи VISC</span></span>
-      <span data-lang="en">Infinite Math OL trainer for <span class="accent">acing your VISC exam</span></span>
-    </h1>
-
-    <p class="hero-sub">
-      <span data-lang="lv" class="active">Tūkstošiem aktuālu uzdevumu pēc Skola2030 standartiem ar tūlītēju kļūdu izskaidrojumu un detalizētu soli pa solim analīzi katrai atbildei.</span>
-      <span data-lang="ru">Тысячи актуальных заданий по стандартам Skola2030 с мгновенным разбором ошибок и пошаговым объяснением к каждому ответу.</span>
-      <span data-lang="en">Thousands of up-to-date tasks based on Skola2030 standards with instant error breakdowns and step-by-step solutions for every answer.</span>
-    </p>
-
-    <div class="fomo-bar">
-      <div class="fomo-label">
-        <span class="fomo-left" id="fomo-txt">
-          <span data-lang="lv" class="active">Aizņemtas vietas palaišanas cenai</span>
-          <span data-lang="ru">Мест по цене запуска занято</span>
-          <span data-lang="en">Launch price spots taken</span>
-        </span>
-        <span class="fomo-count" id="fomo-count">83 / 100</span>
-      </div>
-      <div class="fomo-track">
-        <div class="fomo-fill" id="fomoFill"></div>
+    <div class="aud-toggle-wrap">
+      <div class="aud-toggle">
+        <button class="abtn active" data-aud="student" data-i18n="aud.s">Skolēnam</button>
+        <button class="abtn" data-aud="parent" data-i18n="aud.p">Vecākiem</button>
       </div>
     </div>
 
-    <div class="price-row">
-      <span class="price-main">8.99€</span>
-      <span class="price-period">
-        / <span data-lang="lv" class="active">mēnesī</span><span data-lang="ru">мес.</span><span data-lang="en">mo.</span>
-      </span>
-      <span class="price-old">25€</span>
+    <!-- Student pains -->
+    <div class="aud-panel on grid3" id="panel-student">
+      <div class="card pain-card fade-up">
+        <div class="pain-icon">😩</div>
+        <h3 data-i18n="s1.t">Grūti piespiest sevi mācīties sausu teoriju</h3>
+        <p data-i18n="s1.d">Klasiskās mācību grāmatas nogurdina. Mūsu trenažieris ir kā spēle — katrs uzdevums ir jauns izaicinājums un progress ir taustāms.</p>
+      </div>
+      <div class="card pain-card fade-up">
+        <div class="pain-icon">🤯</div>
+        <h3 data-i18n="s2.t">Pārsātināts ar nesaprotamām formulām</h3>
+        <p data-i18n="s2.d">Katram atrisinājumam — vienkāršs, cilvēciskā valodā skaidrojums. Ne akadēmiskās frāzes, bet īsts saprotams teksts.</p>
+      </div>
+      <div class="card pain-card fade-up">
+        <div class="pain-icon">😰</div>
+        <h3 data-i18n="s3.t">Baidies neiziet eksāmenu</h3>
+        <p data-i18n="s3.d">Algoritms pielāgojas tavai kļūdu dinamikai un sūta atkārtoti tieši to, kas vēl nav nostiprinājies — līdz pilnīgai apgūšanai.</p>
+      </div>
     </div>
 
-    <div class="hero-btns">
-      <a href="/main/login.html" class="btn-cta">
-        <span data-lang="lv" class="active">Izmēģināt bez maksas</span>
-        <span data-lang="ru">Попробовать бесплатно</span>
-        <span data-lang="en">Try for free</span>
-        <span class="arrow">→</span>
-      </a>
-      <a href="#how" class="btn-secondary">
-        <span data-lang="lv" class="active">Kā tas strādā?</span>
-        <span data-lang="ru">Как это работает?</span>
-        <span data-lang="en">How it works</span>
-      </a>
+    <!-- Parent benefits -->
+    <div class="aud-panel grid3" id="panel-parent">
+      <div class="card pain-card benefit-card fade-up">
+        <div class="pain-icon">💰</div>
+        <h3 data-i18n="p1.t">Ietaupi līdz 200 € mēnesī uz repetitoriem</h3>
+        <p data-i18n="p1.d">Vidējā repetitora stunda Rīgā maksā 25–30 €. Mūsu platforma mēnesī — tikai 8.99 €. Pilnvērtīga sagatavošana par kafijas cenu dienā.</p>
+      </div>
+      <div class="card pain-card benefit-card fade-up">
+        <div class="pain-icon">🧾</div>
+        <h3 data-i18n="p2.t">Oficiāls rēķins VID izdevumu atskaitīšanai</h3>
+        <p data-i18n="p2.d">Visi maksājumi ir oficiāli. Saņem rēķinu uz e-pastu un atskaitī 20% IIN par bērna izglītību — nauda atgriežas atpakaļ.</p>
+      </div>
+      <div class="card pain-card benefit-card fade-up">
+        <div class="pain-icon">🕐</div>
+        <h3 data-i18n="p3.t">Pilnīga neatkarība no grafika</h3>
+        <p data-i18n="p3.d">Bērns mācās kad vēlas — vakarā, brīvdienās, ceļā. Neviens neatceļ nodarbību pēdējā brīdī un nav jābraukā pa pilsētu.</p>
+      </div>
     </div>
   </div>
+</section>
 
-  <!-- MOCKUP -->
-  <div class="hero-right">
-    <div class="mockup-card">
-      <div class="mockup-bar">
-        <div class="dot-red"></div>
-        <div class="dot-yellow"></div>
-        <div class="dot-green"></div>
-        <span class="mock-title">MathOL — Trenažieris</span>
+<!-- ════ PLATFORM PREVIEW ════ -->
+<section id="platform" class="sec-sm">
+  <div class="wrap">
+    <div class="plat-wrap">
+      <div class="plat-txt fade-up">
+        <div class="pill" data-i18n="plat.pill">Kā tas strādā?</div>
+        <h2 data-i18n="plat.h2">Kā izskatās trenažieris iekšā?</h2>
+        <p data-i18n="plat.p">Uzdevumi nekad nebeidzas. Mūsu algoritms ģenerē jaunus nosacījumus, kamēr tu ideāli apgūsi tēmu. Katram uzdevumam — tūlītējs soli pa solim skaidrojums.</p>
       </div>
-      <div class="mockup-body">
-        <div class="mock-topic">Kombinatorika · Uzdevums #47</div>
-        <div class="mock-question">
-          Cik veidos var izvēlēties 3 studentus no 8, ja vienam no viņiem jābūt noteiktam?
+
+      <div class="phone fade-up">
+        <div class="ph-head">
+          <div class="ph-dot"></div>
+          <div class="ph-title" data-i18n="ph.title">OL Mat · Kombinatorika</div>
         </div>
-        <div class="mock-formula">C(7,2) = 7! / (2! · 5!) = ?</div>
-        <input class="mock-input" type="text" placeholder="Ievadi atbildi..." value="21">
-        <div class="mock-btn-row">
-          <button class="mock-btn-check">✓ Pārbaudīt</button>
-          <button class="mock-btn-skip">Nākamais →</button>
-        </div>
-        <div class="mock-answer">
-          <div class="mock-ans-label">✅ Pareizi! Risinājums:</div>
-          <div class="mock-step"><strong>1. solis:</strong> Noteiktais students jau iekļauts → atlasām 2 no atlikušajiem 7</div>
-          <div class="mock-step"><strong>2. solis:</strong> C(7,2) = 7!/(2!·5!) = (7×6)/2 = <strong>21</strong></div>
-          <div class="mock-step"><strong>3. solis:</strong> Atbilde: 21 veids ✓</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- STATS BAR -->
-<div style="padding: 0 24px 60px; max-width:1100px; margin:0 auto;">
-  <div class="stats-bar" style="padding:0;margin:0">
-    <div class="stat-item">
-      <span class="stat-num">30<span>+</span></span>
-      <div class="stat-label">
-        <span data-lang="lv" class="active">OL temati</span>
-        <span data-lang="ru">Тем OL</span>
-        <span data-lang="en">OL topics</span>
-      </div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">∞</span>
-      <div class="stat-label">
-        <span data-lang="lv" class="active">Uzdevumu skaits</span>
-        <span data-lang="ru">Заданий</span>
-        <span data-lang="en">Tasks available</span>
-      </div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">8.99<span>€</span></span>
-      <div class="stat-label">
-        <span data-lang="lv" class="active">Palaišanas cena / mēn.</span>
-        <span data-lang="ru">Цена запуска / мес.</span>
-        <span data-lang="en">Launch price / mo.</span>
-      </div>
-    </div>
-    <div class="stat-item">
-      <span class="stat-num">24<span>/7</span></span>
-      <div class="stat-label">
-        <span data-lang="lv" class="active">Pieejamība</span>
-        <span data-lang="ru">Доступность</span>
-        <span data-lang="en">Availability</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="glow-line"></div>
-
-<!-- ─── AUDIENCE TOGGLE ─── -->
-<div class="toggle-section">
-  <div class="toggle-header">
-    <div class="section-label">
-      <span data-lang="lv" class="active">Kam domāts?</span>
-      <span data-lang="ru">Для кого?</span>
-      <span data-lang="en">Who is this for?</span>
-    </div>
-    <h2 class="section-title">
-      <span data-lang="lv" class="active">Izvēlies savu ceļu</span>
-      <span data-lang="ru">Выбери свой путь</span>
-      <span data-lang="en">Choose your path</span>
-    </h2>
-  </div>
-
-  <div class="audience-toggle">
-    <button class="aud-btn active" onclick="setAudience('student')">
-      <span data-lang="lv" class="active">👨‍🎓 Skolēnam</span>
-      <span data-lang="ru">👨‍🎓 Ученику</span>
-      <span data-lang="en">👨‍🎓 Student</span>
-    </button>
-    <button class="aud-btn" onclick="setAudience('parent')">
-      <span data-lang="lv" class="active">👨‍👩‍👧 Vecākiem</span>
-      <span data-lang="ru">👨‍👩‍👧 Родителю</span>
-      <span data-lang="en">👨‍👩‍👧 Parent</span>
-    </button>
-  </div>
-
-  <!-- STUDENT CARDS -->
-  <div class="audience-content active" id="student-content">
-    <div class="cards-grid">
-      <div class="pain-card" style="--grad: linear-gradient(90deg,var(--red),var(--orange))">
-        <div class="card-emoji">😩</div>
-        <div class="card-title" data-lv="Grūti piespiest sevi mācīties sauso teoriju" data-ru="Сложно заставить себя учить сухую теорию" data-en="Hard to force yourself through dry theory">
-          <span data-lang="lv" class="active">Grūti piespiest sevi mācīties sauso teoriju</span>
-          <span data-lang="ru">Сложно заставить себя учить сухую теорию</span>
-          <span data-lang="en">Hard to force yourself through dry theory</span>
-        </div>
-        <p class="card-desc">
-          <span data-lang="lv" class="active">Mūsu platforma ir kā spēle — klikšķini, risini, saņem punktus. Tu nepamanīsi, kā iemācīsies.</span>
-          <span data-lang="ru">Наша платформа как игра — кликай, решай, получай очки. Ты не заметишь, как научишься.</span>
-          <span data-lang="en">Our platform is like a game — click, solve, score points. You'll learn without even noticing.</span>
-        </p>
-      </div>
-      <div class="pain-card" style="--grad: linear-gradient(90deg,var(--orange),var(--purple))">
-        <div class="card-emoji">🤯</div>
-        <div class="card-title">
-          <span data-lang="lv" class="active">Nogurdinošas formulas bez skaidrojuma</span>
-          <span data-lang="ru">Непонятные формулы без объяснений</span>
-          <span data-lang="en">Confusing formulas with no explanation</span>
-        </div>
-        <p class="card-desc">
-          <span data-lang="lv" class="active">Katram uzdevumam ir soli pa solim paskaidrojums cilvēku valodā — nevis akadēmiski teksti.</span>
-          <span data-lang="ru">К каждому заданию — пошаговое объяснение на человеческом языке, не академические тексты.</span>
-          <span data-lang="en">Every task has a step-by-step explanation in plain language — not academic gibberish.</span>
-        </p>
-      </div>
-      <div class="pain-card" style="--grad: linear-gradient(90deg,var(--purple),var(--blue))">
-        <div class="card-emoji">😰</div>
-        <div class="card-title">
-          <span data-lang="lv" class="active">Bailes neizturēt eksāmenu</span>
-          <span data-lang="ru">Страх провалить экзамен</span>
-          <span data-lang="en">Fear of failing the exam</span>
-        </div>
-        <p class="card-desc">
-          <span data-lang="lv" class="active">Trenē VISC formātā. Pēc 30 dienām būsi gatavs katram uzdevumu tipam, kas parādās CE.</span>
-          <span data-lang="ru">Тренируйся в формате VISC. Через 30 дней будешь готов к каждому типу задания на CE.</span>
-          <span data-lang="en">Train in VISC format. After 30 days you'll be ready for every task type that appears on CE.</span>
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <!-- PARENT CARDS -->
-  <div class="audience-content" id="parent-content">
-    <div class="cards-grid">
-      <div class="pain-card" style="--grad: linear-gradient(90deg,var(--lime),var(--blue))">
-        <div class="card-emoji">💶</div>
-        <div class="card-title">
-          <span data-lang="lv" class="active">Ietaupiet līdz 200€ mēnesī</span>
-          <span data-lang="ru">Экономия до 200€ в месяц</span>
-          <span data-lang="en">Save up to €200/month</span>
-        </div>
-        <p class="card-desc">
-          <span data-lang="lv" class="active">Repetitors Rīgā — 20–30€/stundā. Mūsu platforma — 8.99€ mēnesī par neierobežotu piekļuvi.</span>
-          <span data-lang="ru">Репетитор в Риге — 20–30€/час. Наша платформа — 8.99€/мес за безлимитный доступ.</span>
-          <span data-lang="en">A tutor in Riga costs €20–30/hour. Our platform — €8.99/month for unlimited access.</span>
-        </p>
-      </div>
-      <div class="pain-card" style="--grad: linear-gradient(90deg,var(--orange),var(--lime))">
-        <div class="card-emoji">🧾</div>
-        <div class="card-title">
-          <span data-lang="lv" class="active">Rēķins VID nodokļa atgriešanai</span>
-          <span data-lang="ru">Официальный инвойс для VID (20% возврат)</span>
-          <span data-lang="en">Official invoice for VID (20% tax return)</span>
-        </div>
-        <p class="card-desc">
-          <span data-lang="lv" class="active">Visi maksājumi ir oficiāli. Saņemiet rēķinu e-pastā, lai iesniegtu VID izglītības izdevumu atmaksai.</span>
-          <span data-lang="ru">Все платежи официальные. Получайте инвойс на email для подачи в VID на возврат 20% подоходного налога.</span>
-          <span data-lang="en">All payments are official. Receive an invoice by email to submit to VID for a 20% income tax return.</span>
-        </p>
-      </div>
-      <div class="pain-card" style="--grad: linear-gradient(90deg,var(--purple),var(--orange))">
-        <div class="card-emoji">📱</div>
-        <div class="card-title">
-          <span data-lang="lv" class="active">Pilnīga neatkarība no grafika</span>
-          <span data-lang="ru">Полная независимость от расписания</span>
-          <span data-lang="en">Completely schedule-independent</span>
-        </div>
-        <p class="card-desc">
-          <span data-lang="lv" class="active">Bērns mācās savā tempā — autobusā, vakaros, brīvdienās. Nekādas fiksētas nodarbību reizes.</span>
-          <span data-lang="ru">Ребёнок учится в своём темпе — в автобусе, вечером, в выходные. Никаких фиксированных уроков.</span>
-          <span data-lang="en">Your child learns at their own pace — on the bus, in the evening, on weekends. No fixed lesson times.</span>
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="glow-line"></div>
-
-<!-- ─── HOW IT WORKS ─── -->
-<div class="how-section" id="how">
-  <div style="text-align:center;margin-bottom:0">
-    <div class="section-label">
-      <span data-lang="lv" class="active">Kā tas strādā</span>
-      <span data-lang="ru">Как это работает</span>
-      <span data-lang="en">How it works</span>
-    </div>
-    <h2 class="section-title">
-      <span data-lang="lv" class="active">4 soļi līdz panākumiem</span>
-      <span data-lang="ru">4 шага к успеху</span>
-      <span data-lang="en">4 steps to success</span>
-    </h2>
-  </div>
-  <div class="steps-grid">
-    <div class="step-card">
-      <div class="step-num">1</div>
-      <div class="step-title">
-        <span data-lang="lv" class="active">Izvēlies tēmu</span>
-        <span data-lang="ru">Выбери тему</span>
-        <span data-lang="en">Choose a topic</span>
-      </div>
-      <div class="step-desc">
-        <span data-lang="lv" class="active">Iztriangulē savas vājās vietas un fokusējies uz tām</span>
-        <span data-lang="ru">Определи слабые места и сфокусируйся на них</span>
-        <span data-lang="en">Identify your weak spots and focus on them</span>
-      </div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">2</div>
-      <div class="step-title">
-        <span data-lang="lv" class="active">Risini uzdevumus</span>
-        <span data-lang="ru">Решай задания</span>
-        <span data-lang="en">Solve tasks</span>
-      </div>
-      <div class="step-desc">
-        <span data-lang="lv" class="active">Algoritms ģenerē jaunus nosacījumus katru reizi — bezgalīgi</span>
-        <span data-lang="ru">Алгоритм генерирует новые условия каждый раз — бесконечно</span>
-        <span data-lang="en">Algorithm generates new conditions each time — infinitely</span>
-      </div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">3</div>
-      <div class="step-title">
-        <span data-lang="lv" class="active">Saņem skaidrojumu</span>
-        <span data-lang="ru">Получи объяснение</span>
-        <span data-lang="en">Get explanation</span>
-      </div>
-      <div class="step-desc">
-        <span data-lang="lv" class="active">Soli pa solim analīze ar formulām un komentāriem</span>
-        <span data-lang="ru">Пошаговый разбор с формулами и комментариями</span>
-        <span data-lang="en">Step-by-step breakdown with formulas and comments</span>
-      </div>
-    </div>
-    <div class="step-card">
-      <div class="step-num">4</div>
-      <div class="step-title">
-        <span data-lang="lv" class="active">Apgūsti pilnībā</span>
-        <span data-lang="ru">Освой полностью</span>
-        <span data-lang="en">Master completely</span>
-      </div>
-      <div class="step-desc">
-        <span data-lang="lv" class="active">Turpini, līdz kļūdas izzūd. CE kļūst paredzams.</span>
-        <span data-lang="ru">Продолжай, пока ошибки не исчезнут. CE становится предсказуемым.</span>
-        <span data-lang="en">Keep going until errors disappear. CE becomes predictable.</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="glow-line"></div>
-
-<!-- ─── COMPARISON TABLE ─── -->
-<div class="compare-section">
-  <div style="text-align:center">
-    <div class="section-label">
-      <span data-lang="lv" class="active">Salīdzinājums</span>
-      <span data-lang="ru">Сравнение</span>
-      <span data-lang="en">Comparison</span>
-    </div>
-    <h2 class="section-title">
-      <span data-lang="lv" class="active">Kur efektīvāk gatavoties?</span>
-      <span data-lang="ru">Где эффективнее готовиться?</span>
-      <span data-lang="en">Where to prep most effectively?</span>
-    </h2>
-  </div>
-
-  <div class="compare-grid">
-    <!-- OUR PRODUCT -->
-    <div class="compare-col featured">
-      <div class="col-header">
-        <div class="col-label">
-          <span data-lang="lv" class="active">Ieteicams</span>
-          <span data-lang="ru">Рекомендуем</span>
-          <span data-lang="en">Recommended</span>
-        </div>
-        <div class="col-name lime">MathOL Trenažieris</div>
-        <div class="col-price lime">8.99€<small style="font-size:0.5em;color:var(--text2)">/mēn.</small></div>
-      </div>
-      <div class="col-features">
-        <div class="feat-row">
-          <span class="feat-icon">♾️</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Uzdevumi</span><span data-lang="ru">Задания</span><span data-lang="en">Tasks</span></div>
-            <div class="feat-val green">
-              <span data-lang="lv" class="active">Bezgalīgi (visas OL tēmas)</span>
-              <span data-lang="ru">Бесконечно (все темы OL)</span>
-              <span data-lang="en">Infinite (all OL topics)</span>
-            </div>
+        <div class="ph-body">
+          <div class="task-topic" data-i18n="ph.topic">📐 KOMBINATORIKA · UZDEVUMS 1/∞</div>
+          <div class="task-q" data-i18n="ph.q">Komitejā jāievēl <strong>3 cilvēki</strong> no <strong>7 kandidātiem</strong>. Kārtība nav svarīga. Cik iespējamo komitejas sastāvu var izveidot?</div>
+          <div class="task-row">
+            <input class="task-in" id="taskIn" type="number" data-ph-key="ph.inp" placeholder="Tava atbilde..." />
+            <button class="task-chk" id="chkBtn" data-i18n="ph.chk">Pārbaudīt</button>
           </div>
-        </div>
-        <div class="feat-row">
-          <span class="feat-icon">💡</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Skaidrojumi</span><span data-lang="ru">Объяснения</span><span data-lang="en">Explanations</span></div>
-            <div class="feat-val green">
-              <span data-lang="lv" class="active">Tūlītēji pie katra uzdevuma</span>
-              <span data-lang="ru">Мгновенно к каждому заданию</span>
-              <span data-lang="en">Instant for every task</span>
+          <div class="fb-line" id="fbLine"></div>
+          <div class="expl" id="explBlock">
+            <div class="estep">
+              <div class="esnum">1</div>
+              <div class="estxt" data-i18n="ph.s1">Kārtība nav svarīga → izmantojam <strong>kombināciju formulu</strong>: C(n,k) = n! / (k! · (n−k)!)</div>
             </div>
-          </div>
-        </div>
-        <div class="feat-row">
-          <span class="feat-icon">📱</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Piekļuve</span><span data-lang="ru">Доступ</span><span data-lang="en">Access</span></div>
-            <div class="feat-val green">
-              <span data-lang="lv" class="active">Jebkur no telefona</span>
-              <span data-lang="ru">Везде с телефона</span>
-              <span data-lang="en">Anywhere from phone</span>
+            <div class="estep">
+              <div class="esnum">2</div>
+              <div class="estxt" data-i18n="ph.s2">Aizpildam: <strong>C(7,3) = 7! / (3! · 4!) = (7·6·5) / (3·2·1) = 210 / 6</strong></div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TUTOR -->
-    <div class="compare-col">
-      <div class="col-header">
-        <div class="col-label">
-          <span data-lang="lv" class="active">Repetitors</span>
-          <span data-lang="ru">Репетитор</span>
-          <span data-lang="en">Private tutor</span>
-        </div>
-        <div class="col-name">
-          <span data-lang="lv" class="active">Repetitors Latvijā</span>
-          <span data-lang="ru">Репетитор в Латвии</span>
-          <span data-lang="en">Tutor in Latvia</span>
-        </div>
-        <div class="col-price red">20–30€<small style="font-size:0.5em;color:var(--text2)">/stundā</small></div>
-      </div>
-      <div class="col-features">
-        <div class="feat-row">
-          <span class="feat-icon">⏰</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Uzdevumi</span><span data-lang="ru">Задания</span><span data-lang="en">Tasks</span></div>
-            <div class="feat-val red">
-              <span data-lang="lv" class="active">Cik paspējat 60 min.</span>
-              <span data-lang="ru">Сколько успеете за 60 мин.</span>
-              <span data-lang="en">Whatever fits in 60 min</span>
-            </div>
-          </div>
-        </div>
-        <div class="feat-row">
-          <span class="feat-icon">📅</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Skaidrojumi</span><span data-lang="ru">Объяснения</span><span data-lang="en">Explanations</span></div>
-            <div class="feat-val red">
-              <span data-lang="lv" class="active">Tikai nodarbībā. Aizmirsi — gaidi</span>
-              <span data-lang="ru">Только на уроке. Забыл — жди</span>
-              <span data-lang="en">Only during lesson. Forgot — wait</span>
-            </div>
-          </div>
-        </div>
-        <div class="feat-row">
-          <span class="feat-icon">📍</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Piekļuve</span><span data-lang="ru">Доступ</span><span data-lang="en">Access</span></div>
-            <div class="feat-val red">
-              <span data-lang="lv" class="active">Fiksēts laiks un vieta</span>
-              <span data-lang="ru">Фиксированное время и место</span>
-              <span data-lang="en">Fixed time and location</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- OLD PDFs -->
-    <div class="compare-col">
-      <div class="col-header">
-        <div class="col-label">PDF</div>
-        <div class="col-name">
-          <span data-lang="lv" class="active">Veco gadu PDF</span>
-          <span data-lang="ru">Старые PDF файлы</span>
-          <span data-lang="en">Old PDF archives</span>
-        </div>
-        <div class="col-price gray">0€</div>
-      </div>
-      <div class="col-features">
-        <div class="feat-row">
-          <span class="feat-icon">📄</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Uzdevumi</span><span data-lang="ru">Задания</span><span data-lang="en">Tasks</span></div>
-            <div class="feat-val muted">
-              <span data-lang="lv" class="active">Ierobežoti ar iepriekšējiem gadiem</span>
-              <span data-lang="ru">Ограничены прошлыми годами</span>
-              <span data-lang="en">Limited to past years only</span>
-            </div>
-          </div>
-        </div>
-        <div class="feat-row">
-          <span class="feat-icon">❌</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Skaidrojumi</span><span data-lang="ru">Объяснения</span><span data-lang="en">Explanations</span></div>
-            <div class="feat-val red">
-              <span data-lang="lv" class="active">Nav. Tikai sausa atbilde beigās</span>
-              <span data-lang="ru">Нет. Только сухой ответ в конце</span>
-              <span data-lang="en">None. Just a bare answer at the end</span>
-            </div>
-          </div>
-        </div>
-        <div class="feat-row">
-          <span class="feat-icon">💻</span>
-          <div>
-            <div class="feat-label"><span data-lang="lv" class="active">Piekļuve</span><span data-lang="ru">Доступ</span><span data-lang="en">Access</span></div>
-            <div class="feat-val muted">
-              <span data-lang="lv" class="active">PDF lasīšana, nav interaktivitātes</span>
-              <span data-lang="ru">Чтение PDF, нет интерактива</span>
-              <span data-lang="en">PDF reading, no interactivity</span>
+            <div class="estep">
+              <div class="esnum">3</div>
+              <div class="estxt" data-i18n="ph.s3">Atbilde: <strong>35</strong> iespējamie komitejas sastāvi ✓</div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<div class="glow-line"></div>
-
-<!-- ─── REVIEWS ─── -->
-<div class="reviews-section">
-  <div style="text-align:center;margin-bottom:0">
-    <div class="section-label">
-      <span data-lang="lv" class="active">Atsauksmes</span>
-      <span data-lang="ru">Отзывы</span>
-      <span data-lang="en">Reviews</span>
+<!-- ════ COMPARISON TABLE ════ -->
+<section id="compare" class="sec-sm">
+  <div class="wrap">
+    <div class="sec-label fade-up">
+      <h2 data-i18n="cmp.h2">Kur gatavoties efektīvāk?</h2>
+      <p data-i18n="cmp.sub">Salīdzini objektīvi — skaitļi runā paši par sevi</p>
     </div>
-    <h2 class="section-title">
-      <span data-lang="lv" class="active">Ko saka beta testētāji</span>
-      <span data-lang="ru">Что говорят бета-тестеры</span>
-      <span data-lang="en">What beta testers say</span>
-    </h2>
+    <div class="tbl-scroll fade-up">
+      <table class="cmp">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="our" data-i18n="cmp.c1">⚡ Mūsu Trenažieris</th>
+            <th data-i18n="cmp.c2">Repetitors Latvijā</th>
+            <th data-i18n="cmp.c3">PDF pašmācība</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="lbl" data-i18n="cmp.r1">Cena</td>
+            <td class="our"><strong class="text-lime" data-i18n="cmp.o1">8.99 € / mēn.</strong></td>
+            <td data-i18n="cmp.t1">20–30 € / stundā</td>
+            <td data-i18n="cmp.p1">Bezmaksas</td>
+          </tr>
+          <tr>
+            <td class="lbl" data-i18n="cmp.r2">Uzdevumu skaits</td>
+            <td class="our"><span class="ic-ok">✓</span> <span data-i18n="cmp.o2">Bezgalīgi (visas OL tēmas)</span></td>
+            <td data-i18n="cmp.t2">~10–15 nodarbībā</td>
+            <td data-i18n="cmp.p2">Ierobežoti — tikai pagātne</td>
+          </tr>
+          <tr>
+            <td class="lbl" data-i18n="cmp.r3">Skaidrojums</td>
+            <td class="our"><span class="ic-ok">✓</span> <span data-i18n="cmp.o3">Uzreiz, 24/7</span></td>
+            <td data-i18n="cmp.t3">Tikai nodarbībā</td>
+            <td><span class="ic-no">✗</span> <span data-i18n="cmp.p3">Nav — tikai sauss atrisinājums</span></td>
+          </tr>
+          <tr>
+            <td class="lbl" data-i18n="cmp.r4">Pieejamība</td>
+            <td class="our"><span class="ic-ok">✓</span> <span data-i18n="cmp.o4">No jebkuras ierīces</span></td>
+            <td data-i18n="cmp.t4">Piesaistīts laikam un vietai</td>
+            <td data-i18n="cmp.p4">Lokāli failā</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-  <div class="reviews-track">
-    <div class="review-card">
-      <div class="review-top">
-        <div class="review-avatar" style="background:linear-gradient(135deg,#8b7fff,#4dc9ff)">K</div>
-        <div class="review-info">
-          <div class="review-name">Kristaps M.</div>
-          <div class="review-meta">11. klase · Rīga</div>
+</section>
+
+<!-- ════ REVIEWS ════ -->
+<section id="reviews" class="sec-sm">
+  <div class="wrap">
+    <div class="sec-label fade-up">
+      <h2 data-i18n="rev.h2">Ko saka tie, kas jau izmēģināja</h2>
+    </div>
+
+    <div class="slider-outer">
+      <div class="slider-track" id="sTrack">
+
+        <div class="rev-card">
+          <div class="rev-inner">
+            <div class="rev-top">
+              <div class="ava">M</div>
+              <div class="rev-meta">
+                <h4>Marta K.</h4>
+                <div class="sub">11. klase · Rīga</div>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="rev-text" data-i18n="r1">"Sagatavajos 3 nedēļu laikā un ieguvu 72 punktus eksāmenā. Soļi pa soļiem skaidrojumi bija daudz labāki nekā jebkurš YouTube video — es tiešām sapratu, ko daru."</p>
+            <div class="proof">
+              <div class="proof-num" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">8</div>
+              <div class="proof-txt"><strong>E-klase · Matemātika</strong>Sekmes uzlabojās no 5 uz 8 divās nedēļās</div>
+            </div>
+          </div>
         </div>
-        <div class="review-stars">★★★★★</div>
-      </div>
-      <div class="review-text">
-        <span data-lang="lv" class="active">Izmantoju katru dienu 20 minūtes. Pēc mēneša kontroldarbā par kombinatoriku saņēmu 9. Iepriekš šī tēma man bija pilnīgs melnais caurums.</span>
-        <span data-lang="ru">Использую каждый день по 20 минут. Через месяц на контрольной по комбинаторике получил 9. Раньше эта тема была для меня полным провалом.</span>
-        <span data-lang="en">Use it every day for 20 minutes. After a month I got a 9 on my combinatorics test. Before this topic was a complete black hole for me.</span>
-      </div>
-      <div class="review-proof">
-        <span class="proof-label">E-klase ✓</span>
-        <div class="proof-blur"></div>
-        <span style="font-size:0.75rem;color:var(--lime);font-family:'Syne',sans-serif;font-weight:700">9</span>
-      </div>
-    </div>
 
-    <div class="review-card">
-      <div class="review-top">
-        <div class="review-avatar" style="background:linear-gradient(135deg,#ff7b45,#c8ff57)">A</div>
-        <div class="review-info">
-          <div class="review-name">Anastasija K.</div>
-          <div class="review-meta">12. klase · Jūrmala</div>
+        <div class="rev-card">
+          <div class="rev-inner">
+            <div class="rev-top">
+              <div class="ava" style="background:linear-gradient(135deg,#fb923c,#ef4444)">А</div>
+              <div class="rev-meta">
+                <h4>Артём В.</h4>
+                <div class="sub">12. klase · Jūrmala</div>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="rev-text" data-i18n="r2">"Раньше я боялся комбинаторики — теперь это мой любимый раздел. Алгоритм точно знает, что нужно повторять. Объяснения простые и понятные, не как в учебнике."</p>
+            <div class="proof">
+              <div class="proof-num" style="background:linear-gradient(135deg,#7c3aed,#4f46e5)">9</div>
+              <div class="proof-txt"><strong>Mykoob · Matemātika</strong>Uzlabojās par 3 atzīmēm 2 mēnešos</div>
+            </div>
+          </div>
         </div>
-        <div class="review-stars">★★★★★</div>
-      </div>
-      <div class="review-text">
-        <span data-lang="lv" class="active">Man patīk, ka katram uzdevumam ir skaidrojums. Ar PDF es stundu meklēju kļūdu, bet šeit — uzreiz redzu, kur nogāju greizi.</span>
-        <span data-lang="ru">Мне нравится, что к каждому заданию есть объяснение. С PDF я час искала ошибку, а здесь — сразу вижу, где свернула не туда.</span>
-        <span data-lang="en">I love that every task has an explanation. With PDFs I'd spend an hour finding my mistake, but here I see immediately where I went wrong.</span>
-      </div>
-      <div class="review-proof">
-        <span class="proof-label">Mykoob ✓</span>
-        <div class="proof-blur" style="background:linear-gradient(90deg,#ff7b45,#ffd700)"></div>
-        <span style="font-size:0.75rem;color:var(--lime);font-family:'Syne',sans-serif;font-weight:700">8</span>
-      </div>
-    </div>
 
-    <div class="review-card">
-      <div class="review-top">
-        <div class="review-avatar" style="background:linear-gradient(135deg,#c8ff57,#4dc9ff)">L</div>
-        <div class="review-info">
-          <div class="review-name">Linards B.</div>
-          <div class="review-meta">11. klase · Daugavpils</div>
+        <div class="rev-card">
+          <div class="rev-inner">
+            <div class="rev-top">
+              <div class="ava" style="background:linear-gradient(135deg,#22d3ee,#0ea5e9)">D</div>
+              <div class="rev-meta">
+                <h4>Diāna P.</h4>
+                <div class="sub">Meitas māte · Ogre</div>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="rev-text" data-i18n="r3">"Ietaupīja mums 180 € mēnesī. Meita uzlaboja sekmes no 4 uz 7 E-klasē divās nedēļās. Un vēl dabūsim IIN atskaitījumu — lieliski! Ieteiktu visiem vecākiem."</p>
+            <div class="proof">
+              <div class="proof-num" style="background:linear-gradient(135deg,#10b981,#059669)">7</div>
+              <div class="proof-txt"><strong>E-klase · Matemātika</strong>No 4 uz 7 — 3 nedēļās</div>
+            </div>
+          </div>
         </div>
-        <div class="review-stars">★★★★★</div>
+
+        <div class="rev-card">
+          <div class="rev-inner">
+            <div class="rev-top">
+              <div class="ava" style="background:linear-gradient(135deg,#f472b6,#ec4899)">L</div>
+              <div class="rev-meta">
+                <h4>Laura M.</h4>
+                <div class="sub">11. klase · Liepāja</div>
+                <div class="stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="rev-text" data-i18n="r4">"Izmantoju telefonu autobusā pa ceļam uz skolu. Ideāls veids kā izmantot brīvos brīžus. 20 minūtes dienā — un progress ir redzams jau pēc nedēļas!"</p>
+            <div class="proof">
+              <div class="proof-num" style="background:linear-gradient(135deg,#f59e0b,#d97706)">8</div>
+              <div class="proof-txt"><strong>E-klase · Matemātika</strong>Stabila augsta atzīme pēdējos 2 mēnešos</div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="review-text">
-        <span data-lang="lv" class="active">Atcelām repetitoru pēc pirmā mēneša. Ietaupījām 120€ un mans CE rezultāts testa darbā izauga no 54% uz 78%.</span>
-        <span data-lang="ru">Отменили репетитора после первого месяца. Сэкономили 120€ и мой результат в пробном CE вырос с 54% до 78%.</span>
-        <span data-lang="en">We cancelled the tutor after the first month. Saved €120 and my CE score in the mock test went from 54% to 78%.</span>
-      </div>
-      <div class="review-proof">
-        <span class="proof-label">E-klase ✓</span>
-        <div class="proof-blur" style="background:linear-gradient(90deg,var(--purple),var(--lime))"></div>
-        <span style="font-size:0.75rem;color:var(--lime);font-family:'Syne',sans-serif;font-weight:700">78%</span>
-      </div>
+    </div>
+
+    <div class="slider-nav">
+      <button class="sarr" id="sPrev">←</button>
+      <div id="sDots"></div>
+      <button class="sarr" id="sNext">→</button>
     </div>
   </div>
-</div>
+</section>
 
-<div class="glow-line"></div>
-
-<!-- ─── FAQ ─── -->
-<div class="faq-section">
-  <div style="text-align:center">
-    <div class="section-label">FAQ</div>
-    <h2 class="section-title">
-      <span data-lang="lv" class="active">Biežāk uzdotie jautājumi</span>
-      <span data-lang="ru">Часто задаваемые вопросы</span>
-      <span data-lang="en">Frequently asked questions</span>
-    </h2>
-  </div>
-
-  <div class="faq-list">
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span>
-          <span data-lang="lv" class="active">Vai trenažieris atbilst jaunajām Skola2030 prasībām?</span>
-          <span data-lang="ru">Подходит ли тренажер под новые требования Skola2030?</span>
-          <span data-lang="en">Does the trainer meet the new Skola2030 requirements?</span>
-        </span>
-        <span class="faq-arrow">▼</span>
-      </div>
-      <div class="faq-a">
-        <span data-lang="lv" class="active">Jā, uzdevumu bāze ir pilnībā atjaunināta atbilstoši jaunākajiem VISC standartiem un specifikācijām Optimālais līmenis eksāmenam.</span>
-        <span data-lang="ru">Да, база данных полностью обновлена под последние стандарты и спецификации VISC для Optimālais līmenis.</span>
-        <span data-lang="en">Yes, the task database is fully updated to the latest VISC standards and specifications for the Optimālais līmenis exam.</span>
-      </div>
+<!-- ════ FAQ ════ -->
+<section id="faq" class="sec-sm">
+  <div class="wrap">
+    <div class="sec-label fade-up">
+      <h2 data-i18n="faq.h2">Biežāk uzdotie jautājumi</h2>
     </div>
+    <div class="faq-wrap fade-up">
 
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span>
-          <span data-lang="lv" class="active">Vai var atcelt abonementu?</span>
-          <span data-lang="ru">Можно ли отменить подписку?</span>
-          <span data-lang="en">Can I cancel the subscription?</span>
-        </span>
-        <span class="faq-arrow">▼</span>
+      <div class="faq-item">
+        <div class="faq-q">
+          <span data-i18n="faq.q1">Vai trenažieris atbilst jaunajām Skola2030 prasībām?</span>
+          <span class="faq-ic">+</span>
+        </div>
+        <div class="faq-a"><div class="faq-ai" data-i18n="faq.a1">Jā, uzdevumu bāze ir pilnībā atjaunināta pēc jaunākajiem VISC standartiem un specifikācijām Optimālajam līmenim. Mēs regulāri sekojam līdzi izmaiņām un atjauninām saturu, lai tas vienmēr atbilstu aktuālajām CE prasībām.</div></div>
       </div>
-      <div class="faq-a">
-        <span data-lang="lv" class="active">Jā, jebkurā brīdī personīgajā kontā ar vienu klikšķi. Nekādu slēptu norakstīšanu vai soda maksu.</span>
-        <span data-lang="ru">Да, в любой момент в личном кабинете в один клик. Никаких скрытых списаний или штрафных платежей.</span>
-        <span data-lang="en">Yes, anytime in your account with one click. No hidden charges or penalties.</span>
-      </div>
-    </div>
 
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span>
-          <span data-lang="lv" class="active">Vai izsniedz rēķinu VID iesniegšanai?</span>
-          <span data-lang="ru">Выдаете ли вы чек для VID?</span>
-          <span data-lang="en">Do you provide an invoice for VID?</span>
-        </span>
-        <span class="faq-arrow">▼</span>
+      <div class="faq-item">
+        <div class="faq-q">
+          <span data-i18n="faq.q2">Vai var atcelt abonementu?</span>
+          <span class="faq-ic">+</span>
+        </div>
+        <div class="faq-a"><div class="faq-ai" data-i18n="faq.a2">Jā, jebkurā brīdī personīgajā kabinetā ar vienu klikšķi. Nekādu slēpto maksājumu, sodiem par atteikšanos vai papildu nosacījumu. Atceli — un nekāda turpmāka norakstīšana.</div></div>
       </div>
-      <div class="faq-a">
-        <span data-lang="lv" class="active">Jā, visi maksājumi ir oficiāli. Saņemiet rēķinu e-pastā izglītības izdevumu atgriešanai caur VID.</span>
-        <span data-lang="ru">Да, все платежи официальные. Вы получаете инвойс на e-mail для возврата налога через VID.</span>
-        <span data-lang="en">Yes, all payments are official. You receive an invoice by email for the education tax return through VID.</span>
-      </div>
-    </div>
 
-    <div class="faq-item" onclick="toggleFaq(this)">
-      <div class="faq-q">
-        <span>
-          <span data-lang="lv" class="active">Kādas tēmas ir iekļautas?</span>
-          <span data-lang="ru">Какие темы включены?</span>
-          <span data-lang="en">What topics are included?</span>
-        </span>
-        <span class="faq-arrow">▼</span>
+      <div class="faq-item">
+        <div class="faq-q">
+          <span data-i18n="faq.q3">Vai jūs izsniedz čeku VID?</span>
+          <span class="faq-ic">+</span>
+        </div>
+        <div class="faq-a"><div class="faq-ai" data-i18n="faq.a3">Jā, visi maksājumi ir oficiāli. Pēc katra maksājuma tu saņemsi rēķinu (invoice) uz e-pastu. To var izmantot, lai atskaitītu 20% IIN par izglītības izdevumiem saskaņā ar Latvijas nodokļu likumdošanu.</div></div>
       </div>
-      <div class="faq-a">
-        <span data-lang="lv" class="active">Visas OL obligātās tēmas: algebra, ģeometrija, kombinatorika, statistika, trigonometrija, funkcijas, varbūtību teorija un citas — saskaņā ar VISC OL specifikāciju.</span>
-        <span data-lang="ru">Все обязательные темы OL: алгебра, геометрия, комбинаторика, статистика, тригонометрия, функции, теория вероятностей и другие — по спецификации VISC OL.</span>
-        <span data-lang="en">All mandatory OL topics: algebra, geometry, combinatorics, statistics, trigonometry, functions, probability theory, and more — per VISC OL specification.</span>
-      </div>
+
     </div>
   </div>
-</div>
+</section>
 
-<div class="glow-line"></div>
+<!-- ════ FOOTER CTA ════ -->
+<section id="fcta">
+  <div class="wrap">
+    <h2 class="fade-up" data-i18n="fcta.h2">Sāc gatavošanos jau šodien</h2>
+    <p class="sub fade-up" data-i18n="fcta.p">Tikai 8.99 € / mēnesī. Atlikušas 17 vietas ar īpašo cenu.</p>
 
-<!-- ─── FOOTER CTA ─── -->
-<div class="footer-cta">
-  <div class="footer-cta-box">
-    <div class="fomo-bar" style="max-width:400px;margin:0 auto 28px;">
-      <div class="fomo-label">
-        <span class="fomo-left">
-          <span data-lang="lv" class="active">Atlikušas vietas palaišanas cenai</span>
-          <span data-lang="ru">Осталось мест по цене запуска</span>
-          <span data-lang="en">Spots left at launch price</span>
-        </span>
-        <span class="fomo-count">17 / 100</span>
+    <!-- FOMO repeat -->
+    <div class="fomo fade-up" style="max-width:380px; margin:0 auto 32px;">
+      <div class="fomo-top">
+        <span data-i18n="fomo.lbl">Aizņemtas vietas</span>
+        <span data-i18n="fomo.cnt">83 / 100</span>
       </div>
-      <div class="fomo-track">
-        <div class="fomo-fill" style="width:83%"></div>
-      </div>
+      <div class="fomo-track"><div class="fomo-fill" style="width:83%"></div></div>
+      <div style="text-align:center; margin-top:10px; font-size:0.79rem; color:var(--orange); font-weight:700" data-i18n="fomo.warn">⚠ Atlikušas tikai 17 vietas!</div>
     </div>
 
-    <h2 class="footer-title">
-      <span data-lang="lv" class="active">Sāc gatavot CE šodien<br><span style="color:var(--lime)">par 8.99€/mēnesī</span></span>
-      <span data-lang="ru">Начни готовиться к CE сегодня<br><span style="color:var(--lime)">за 8.99€/месяц</span></span>
-      <span data-lang="en">Start preparing for CE today<br><span style="color:var(--lime)">for 8.99€/month</span></span>
-    </h2>
-    <p class="footer-sub">
-      <span data-lang="lv" class="active">Bez riska · Atcelt var jebkad · Rēķins VID iesniegšanai</span>
-      <span data-lang="ru">Без риска · Отменить можно в любой момент · Инвойс для VID</span>
-      <span data-lang="en">Risk-free · Cancel anytime · Invoice for VID</span>
-    </p>
+    <a href="/main/login.html" class="btn-primary fade-up" data-i18n="hero.cta">Izmēģināt bez maksas →</a>
 
-    <div style="position:relative;z-index:1">
-      <a href="/main/login.html" class="btn-cta" style="font-size:1.05rem;padding:18px 40px">
-        <span data-lang="lv" class="active">Izmēģināt bez maksas →</span>
-        <span data-lang="ru">Попробовать бесплатно →</span>
-        <span data-lang="en">Try for free →</span>
-      </a>
-    </div>
-
-    <div class="messenger-btns">
-      <span style="font-size:0.8rem;color:var(--text3);align-self:center">
-        <span data-lang="lv" class="active">Vai ir jautājumi?</span>
-        <span data-lang="ru">Есть вопросы?</span>
-        <span data-lang="en">Have questions?</span>
-      </span>
-      <a href="https://t.me/notreteams" class="msg-btn tg" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.249l-1.97 9.289c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.932z"/></svg>
-        Telegram
-      </a>
-      <a href="https://wa.me/37120000000" class="msg-btn wa" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        WhatsApp
-      </a>
+    <div style="margin-top:28px; font-size:0.85rem; color:var(--muted)" data-i18n="fcta.msg">Jautājumi? Raksti mums:</div>
+    <div class="msg-row">
+      <a href="https://t.me/olmat_lv" class="msg-btn tg" target="_blank" rel="noopener">✈ Telegram</a>
+      <a href="https://wa.me/37100000000" class="msg-btn wa" target="_blank" rel="noopener">💬 WhatsApp</a>
     </div>
   </div>
-</div>
+</section>
 
-<!-- FOOTER BAR -->
-<div class="footer-bar">
-  <div class="footer-legal">
-    © 2025 MathOL SIA · Rīga, Latvija · <a href="#" style="color:inherit">reg. nr. LV</a>
+<footer>
+  <div class="ft-links">
+    <a href="#" data-i18n="ft.pp">Privātuma politika</a>
+    <a href="#" data-i18n="ft.tos">Lietošanas noteikumi</a>
+    <a href="mailto:info@olmat.lv">info@olmat.lv</a>
   </div>
-  <div class="footer-links">
-    <a href="#">
-      <span data-lang="lv" class="active">Privātuma politika</span>
-      <span data-lang="ru">Политика конфиденц.</span>
-      <span data-lang="en">Privacy Policy</span>
-    </a>
-    <a href="#">
-      <span data-lang="lv" class="active">Lietošanas noteikumi</span>
-      <span data-lang="ru">Условия использования</span>
-      <span data-lang="en">Terms of Service</span>
-    </a>
-    <a href="#">
-      <span data-lang="lv" class="active">Kontakti</span>
-      <span data-lang="ru">Контакты</span>
-      <span data-lang="en">Contact</span>
-    </a>
-  </div>
-</div>
+  <div class="ft-copy" data-i18n="ft.copy">© 2025 OL Mat SIA. Visi tiesības aizsargātas.</div>
+</footer>
 
+<!-- ════════════════════════════════════════════
+     JAVASCRIPT
+     ════════════════════════════════════════════ -->
 <script>
-// ─── LANG SYSTEM ───
-var currentLang = 'lv';
+/* ── TRANSLATIONS ─────────────────────────────────────────── */
+var T = {
+lv: {
+  "nav.login":"Ienākt","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
+  "hero.h1":"Bezgalīgs matemātikas OL trenažieris veiksmīgai CE nokārtošanai",
+  "hero.sub":"Tūkstošiem aktuālu uzdevumu pēc Skola2030 standartiem ar tūlītēju kļūdu analīzi un soli pa solim skaidrojumu katrai atbildei. Sāc gatavoties savā tempā bez privātskolotājiem.",
+  "fomo.lbl":"Aizņemtas vietas","fomo.cnt":"83 / 100","fomo.unit":"/mēnesī","fomo.disc":"−64%","fomo.warn":"⚠ Atlikušas tikai 17 vietas!",
+  "hero.cta":"Izmēģināt bez maksas →",
+  "aud.h2":"Šis trenažieris ir domāts tev","aud.s":"Skolēnam","aud.p":"Vecākiem",
+  "s1.t":"Grūti piespiest sevi mācīties sausu teoriju","s1.d":"Klasiskās mācību grāmatas nogurdina. Mūsu trenažieris ir kā spēle — katrs uzdevums ir jauns izaicinājums un progress ir taustāms.",
+  "s2.t":"Pārsātināts ar nesaprotamām formulām","s2.d":"Katram atrisinājumam — vienkāršs, cilvēciskā valodā skaidrojums. Ne akadēmiskās frāzes, bet īsts saprotams teksts.",
+  "s3.t":"Baidies neiziet eksāmenu","s3.d":"Algoritms pielāgojas tavai kļūdu dinamikai un sūta atkārtoti tieši to, kas vēl nav nostiprinājies — līdz pilnīgai apgūšanai.",
+  "p1.t":"Ietaupi līdz 200 € mēnesī uz repetitoriem","p1.d":"Vidējā repetitora stunda Rīgā maksā 25–30 €. Mūsu platforma mēnesī — tikai 8.99 €. Pilnvērtīga sagatavošana par kafijas cenu dienā.",
+  "p2.t":"Oficiāls rēķins VID izdevumu atskaitīšanai","p2.d":"Visi maksājumi ir oficiāli. Saņem rēķinu uz e-pastu un atskaitī 20% IIN par bērna izglītību — nauda atgriežas atpakaļ.",
+  "p3.t":"Pilnīga neatkarība no grafika","p3.d":"Bērns mācās kad vēlas — vakarā, brīvdienās, ceļā. Neviens neatceļ nodarbību pēdējā brīdī.",
+  "plat.pill":"Kā tas strādā?","plat.h2":"Kā izskatās trenažieris iekšā?","plat.p":"Uzdevumi nekad nebeidzas. Mūsu algoritms ģenerē jaunus nosacījumus, kamēr tu ideāli apgūsi tēmu. Katram uzdevumam — tūlītējs soli pa solim skaidrojums.",
+  "ph.title":"OL Mat · Kombinatorika","ph.topic":"📐 KOMBINATORIKA · UZDEVUMS 1/∞",
+  "ph.q":"Komitejā jāievēl <strong>3 cilvēki</strong> no <strong>7 kandidātiem</strong>. Kārtība nav svarīga. Cik iespējamo komitejas sastāvu var izveidot?",
+  "ph.inp":"Tava atbilde...","ph.chk":"Pārbaudīt","ph.ok":"✓ Pareizi!","ph.err":"✗ Nav pareizi. Lūk, skaidrojums:",
+  "ph.s1":"Kārtība nav svarīga → izmantojam <strong>kombināciju formulu</strong>: C(n,k) = n! / (k! · (n−k)!)","ph.s2":"Aizpildam: <strong>C(7,3) = 7! / (3! · 4!) = (7·6·5) / (3·2·1) = 210 / 6</strong>","ph.s3":"Atbilde: <strong>35</strong> iespējamie komitejas sastāvi ✓",
+  "cmp.h2":"Kur gatavoties efektīvāk?","cmp.sub":"Salīdzini objektīvi — skaitļi runā paši par sevi",
+  "cmp.c1":"⚡ Mūsu Trenažieris","cmp.c2":"Repetitors Latvijā","cmp.c3":"PDF pašmācība",
+  "cmp.r1":"Cena","cmp.o1":"8.99 € / mēn.","cmp.t1":"20–30 € / stundā","cmp.p1":"Bezmaksas",
+  "cmp.r2":"Uzdevumu skaits","cmp.o2":"Bezgalīgi (visas OL tēmas)","cmp.t2":"~10–15 nodarbībā","cmp.p2":"Ierobežoti — tikai pagātne",
+  "cmp.r3":"Skaidrojums","cmp.o3":"Uzreiz, 24/7","cmp.t3":"Tikai nodarbībā","cmp.p3":"Nav — tikai sauss atrisinājums",
+  "cmp.r4":"Pieejamība","cmp.o4":"No jebkuras ierīces","cmp.t4":"Piesaistīts laikam un vietai","cmp.p4":"Lokāli failā",
+  "rev.h2":"Ko saka tie, kas jau izmēģināja",
+  "r1":"\"Sagatavajos 3 nedēļu laikā un ieguvu 72 punktus eksāmenā. Soļi pa soļiem skaidrojumi bija daudz labāki nekā jebkurš YouTube video — es tiešām sapratu, ko daru.\"",
+  "r2":"\"Раньше я боялся комбинаторики — теперь это мой любимый раздел. Алгоритм точно знает, что нужно повторять.\"",
+  "r3":"\"Ietaupīja mums 180 € mēnesī. Meita uzlaboja sekmes no 4 uz 7 E-klasē divās nedēļās. Un vēl dabūsim IIN atskaitījumu!\"",
+  "r4":"\"Izmantoju telefonu autobusā pa ceļam uz skolu. 20 minūtes dienā — un progress ir redzams jau pēc nedēļas!\"",
+  "faq.h2":"Biežāk uzdotie jautājumi",
+  "faq.q1":"Vai trenažieris atbilst jaunajām Skola2030 prasībām?","faq.a1":"Jā, uzdevumu bāze ir pilnībā atjaunināta pēc jaunākajiem VISC standartiem un specifikācijām Optimālajam līmenim. Mēs regulāri sekojam līdzi izmaiņām un atjauninām saturu, lai tas vienmēr atbilstu aktuālajām CE prasībām.",
+  "faq.q2":"Vai var atcelt abonementu?","faq.a2":"Jā, jebkurā brīdī personīgajā kabinetā ar vienu klikšķi. Nekādu slēpto maksājumu, sodiem par atteikšanos vai papildu nosacījumu. Atceli — un nekāda turpmāka norakstīšana.",
+  "faq.q3":"Vai jūs izsniedz čeku VID?","faq.a3":"Jā, visi maksājumi ir oficiāli. Pēc katra maksājuma tu saņemsi rēķinu (invoice) uz e-pastu. To var izmantot, lai atskaitītu 20% IIN par izglītības izdevumiem saskaņā ar Latvijas nodokļu likumdošanu.",
+  "fcta.h2":"Sāc gatavošanos jau šodien","fcta.p":"Tikai 8.99 € / mēnesī. Atlikušas 17 vietas ar īpašo cenu.","fcta.msg":"Jautājumi? Raksti mums:",
+  "ft.pp":"Privātuma politika","ft.tos":"Lietošanas noteikumi","ft.copy":"© 2025 OL Mat SIA. Visi tiesības aizsargātas."
+},
+ru: {
+  "nav.login":"Войти","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
+  "hero.h1":"Бесконечный тренажёр по математике OL для успешной сдачи экзамена VISC",
+  "hero.sub":"Тысячи актуальных заданий по стандартам Skola2030 с мгновенным разбором ошибок и подробным пошаговым объяснением каждого ответа. Начни готовиться в своём темпе без репетиторов.",
+  "fomo.lbl":"Занятых мест","fomo.cnt":"83 / 100","fomo.unit":"/месяц","fomo.disc":"−64%","fomo.warn":"⚠ Осталось только 17 мест!",
+  "hero.cta":"Попробовать бесплатно →",
+  "aud.h2":"Этот тренажёр создан для тебя","aud.s":"Ученику","aud.p":"Родителю",
+  "s1.t":"Сложно заставить себя учить сухую теорию","s1.d":"Классические учебники утомляют. Наш тренажёр — как игра: каждое задание — новый вызов и прогресс ощутим.",
+  "s2.t":"Устал от непонятных формул","s2.d":"К каждому решению — простое объяснение человеческим языком. Не академические фразы, а реальный понятный текст.",
+  "s3.t":"Боишься завалить экзамен","s3.d":"Алгоритм адаптируется к твоим ошибкам и снова присылает именно то, что ещё не закрепилось — до полного усвоения.",
+  "p1.t":"Экономия до 200 € в месяц на репетиторах","p1.d":"Средний час репетитора в Риге стоит 25–30 €. Наша платформа в месяц — всего 8.99 €. Полноценная подготовка за цену чашки кофе в день.",
+  "p2.t":"Официальный инвойс для VID","p2.d":"Все платежи официальные. Получи инвойс на e-mail и верни 20% подоходного налога за образование ребёнка.",
+  "p3.t":"Полная независимость от расписания","p3.d":"Ребёнок учится когда хочет — вечером, на выходных, в дороге. Никто не отменяет занятие в последний момент.",
+  "plat.pill":"Как это работает?","plat.h2":"Как выглядит тренажёр изнутри?","plat.p":"Задания никогда не кончаются. Алгоритм генерирует новые условия, пока ты идеально не освоишь тему. К каждому заданию — мгновенное пошаговое объяснение.",
+  "ph.title":"OL Mat · Комбинаторика","ph.topic":"📐 КОМБИНАТОРИКА · ЗАДАНИЕ 1/∞",
+  "ph.q":"В комитет нужно избрать <strong>3 человека</strong> из <strong>7 кандидатов</strong>. Порядок не важен. Сколько возможных составов комитета?",
+  "ph.inp":"Твой ответ...","ph.chk":"Проверить","ph.ok":"✓ Правильно!","ph.err":"✗ Неверно. Вот объяснение:",
+  "ph.s1":"Порядок не важен → используем <strong>формулу сочетаний</strong>: C(n,k) = n! / (k! · (n−k)!)","ph.s2":"Подставляем: <strong>C(7,3) = 7! / (3! · 4!) = (7·6·5) / (3·2·1) = 210 / 6</strong>","ph.s3":"Ответ: <strong>35</strong> возможных составов комитета ✓",
+  "cmp.h2":"Где эффективнее готовиться?","cmp.sub":"Сравни объективно — цифры говорят сами за себя",
+  "cmp.c1":"⚡ Наш Тренажёр","cmp.c2":"Репетитор в Латвии","cmp.c3":"Старые PDF",
+  "cmp.r1":"Цена","cmp.o1":"8.99 € / мес.","cmp.t1":"20–30 € / час","cmp.p1":"Бесплатно",
+  "cmp.r2":"Количество заданий","cmp.o2":"Бесконечно (все темы OL)","cmp.t2":"~10–15 / занятие","cmp.p2":"Ограничено — только прошлые",
+  "cmp.r3":"Объяснения","cmp.o3":"Мгновенно, 24/7","cmp.t3":"Только на уроке","cmp.p3":"Нет — только голый ответ",
+  "cmp.r4":"Доступность","cmp.o4":"С любого устройства","cmp.t4":"Привязан к времени","cmp.p4":"Только локально",
+  "rev.h2":"Что говорят те, кто уже попробовал",
+  "r1":"\"Подготовился за 3 недели и получил 72 балла на экзамене. Пошаговые объяснения были намного лучше любого видео — я реально понял, что делаю.\"",
+  "r2":"\"Раньше я боялся комбинаторики — теперь это мой любимый раздел. Алгоритм точно знает, что нужно повторять.\"",
+  "r3":"\"Сэкономила нам 180 € в месяц. Дочь улучшила оценки с 4 до 7 в E-klase за две недели. И ещё получим налоговый вычет!\"",
+  "r4":"\"Использую телефон в автобусе по дороге в школу. 20 минут в день — и прогресс виден уже через неделю!\"",
+  "faq.h2":"Часто задаваемые вопросы",
+  "faq.q1":"Подходит ли тренажёр под новые требования Skola2030?","faq.a1":"Да, база заданий полностью обновлена под последние стандарты и спецификации VISC для Optimālais līmenis. Мы регулярно следим за изменениями и обновляем контент.",
+  "faq.q2":"Можно ли отменить подписку?","faq.a2":"Да, в любой момент в личном кабинете в один клик. Никаких скрытых списаний, штрафов или дополнительных условий. Отменил — и больше никаких платежей.",
+  "faq.q3":"Выдаёте ли вы чек для VID?","faq.a3":"Да, все платежи официальные. После каждого платежа вы получите инвойс на e-mail, который можно использовать для возврата 20% подоходного налога за образование.",
+  "fcta.h2":"Начни подготовку сегодня","fcta.p":"Всего 8.99 € / месяц. Осталось 17 мест по специальной цене.","fcta.msg":"Вопросы? Напиши нам:",
+  "ft.pp":"Политика конфиденциальности","ft.tos":"Условия использования","ft.copy":"© 2025 OL Mat SIA. Все права защищены."
+},
+en: {
+  "nav.login":"Log In","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
+  "hero.h1":"Infinite Math OL Trainer for Successful VISC Exam Preparation",
+  "hero.sub":"Thousands of current tasks aligned with Skola2030 standards, with instant error analysis and step-by-step explanations for every answer. Start preparing at your own pace without tutors.",
+  "fomo.lbl":"Spots taken","fomo.cnt":"83 / 100","fomo.unit":"/month","fomo.disc":"−64%","fomo.warn":"⚠ Only 17 spots left!",
+  "hero.cta":"Try for free →",
+  "aud.h2":"This trainer is made for you","aud.s":"For Student","aud.p":"For Parent",
+  "s1.t":"Hard to force yourself to study dry theory","s1.d":"Classic textbooks are exhausting. Our trainer is like a game — each task is a new challenge and progress is tangible.",
+  "s2.t":"Tired of incomprehensible formulas","s2.d":"Every solution has a simple, human-language explanation. Not academic jargon, but real understandable text.",
+  "s3.t":"Afraid of failing the exam","s3.d":"The algorithm adapts to your mistakes and sends back exactly what hasn't been mastered yet — until fully learned.",
+  "p1.t":"Save up to €200/month on tutors","p1.d":"The average tutor hour in Riga costs 25–30 €. Our platform costs just 8.99 € per month. Full preparation for the price of a daily coffee.",
+  "p2.t":"Official invoice for VID tax deduction","p2.d":"All payments are official. Get an invoice by email and reclaim 20% income tax for your child's education.",
+  "p3.t":"Complete schedule independence","p3.d":"Your child studies whenever they want — evening, weekends, commuting. No last-minute cancellations or travelling across town.",
+  "plat.pill":"How it works","plat.h2":"What does the trainer look like inside?","plat.p":"Tasks never run out. Our algorithm generates new conditions until you've perfectly mastered the topic. Every task has instant step-by-step explanations.",
+  "ph.title":"OL Mat · Combinatorics","ph.topic":"📐 COMBINATORICS · TASK 1/∞",
+  "ph.q":"<strong>3 people</strong> must be elected to a committee from <strong>7 candidates</strong>. Order doesn't matter. How many possible committee compositions are there?",
+  "ph.inp":"Your answer...","ph.chk":"Check","ph.ok":"✓ Correct!","ph.err":"✗ Not quite. Here's the explanation:",
+  "ph.s1":"Order doesn't matter → use the <strong>combination formula</strong>: C(n,k) = n! / (k! · (n−k)!)","ph.s2":"Substitute: <strong>C(7,3) = 7! / (3! · 4!) = (7·6·5) / (3·2·1) = 210 / 6</strong>","ph.s3":"Answer: <strong>35</strong> possible committee compositions ✓",
+  "cmp.h2":"Where is it more effective to prepare?","cmp.sub":"Compare objectively — the numbers speak for themselves",
+  "cmp.c1":"⚡ Our Trainer","cmp.c2":"Tutor in Latvia","cmp.c3":"Old PDF files",
+  "cmp.r1":"Price","cmp.o1":"8.99 € / mo.","cmp.t1":"20–30 € / hr","cmp.p1":"Free",
+  "cmp.r2":"Number of tasks","cmp.o2":"Infinite (all OL topics)","cmp.t2":"~10–15 / session","cmp.p2":"Limited — past exams only",
+  "cmp.r3":"Explanations","cmp.o3":"Instant, 24/7","cmp.t3":"Only during lesson","cmp.p3":"None — just a bare answer",
+  "cmp.r4":"Accessibility","cmp.o4":"Any device, anywhere","cmp.t4":"Tied to time & place","cmp.p4":"Local file only",
+  "rev.h2":"What those who tried it say",
+  "r1":"\"I prepared in 3 weeks and got 72 points on the exam. Step-by-step explanations were much better than any YouTube video — I actually understood what I was doing.\"",
+  "r2":"\"I used to fear combinatorics — now it's my favourite section. The algorithm knows exactly what to repeat.\"",
+  "r3":"\"Saved us €180 a month. My daughter improved from 4 to 7 in E-klase in two weeks. And we'll get the tax deduction too!\"",
+  "r4":"\"I use my phone on the bus to school. 20 minutes a day — and the progress is visible after just one week!\"",
+  "faq.h2":"Frequently Asked Questions",
+  "faq.q1":"Does the trainer meet the new Skola2030 requirements?","faq.a1":"Yes, the task database is fully updated to the latest VISC standards and specifications for Optimālais līmenis. We regularly monitor changes and update content.",
+  "faq.q2":"Can I cancel my subscription?","faq.a2":"Yes, at any time in your personal account with one click. No hidden charges, penalties or additional conditions. Cancel — no further payments.",
+  "faq.q3":"Do you issue a receipt for VID?","faq.a3":"Yes, all payments are official. After each payment you will receive an invoice by email that can be used to reclaim 20% income tax on education expenses.",
+  "fcta.h2":"Start preparing today","fcta.p":"Just 8.99 € / month. Only 17 spots left at the special price.","fcta.msg":"Questions? Write to us:",
+  "ft.pp":"Privacy Policy","ft.tos":"Terms of Service","ft.copy":"© 2025 OL Mat SIA. All rights reserved."
+}
+};
 
-function setLang(lang) {
-  currentLang = lang;
-
-  // Update all [data-lang] elements
-  document.querySelectorAll('[data-lang]').forEach(function(el) {
-    el.classList.toggle('active', el.getAttribute('data-lang') === lang);
+/* ── LANGUAGE SWITCH ─────────────────────────────────────── */
+var lang = "lv";
+function applyLang(l) {
+  lang = l;
+  document.querySelectorAll("[data-i18n]").forEach(function(el) {
+    var k = el.getAttribute("data-i18n");
+    if (T[l][k] !== undefined) el.innerHTML = T[l][k];
   });
-
-  // Update lang buttons
-  document.querySelectorAll('.lang-btn').forEach(function(btn) {
-    var txt = btn.textContent.trim().toLowerCase();
-    btn.classList.toggle('active',
-      (lang === 'lv' && txt === 'lv') ||
-      (lang === 'ru' && txt === 'ru') ||
-      (lang === 'en' && txt === 'eng')
-    );
+  var inp = document.getElementById("taskIn");
+  if (inp && T[l]["ph.inp"]) inp.placeholder = T[l]["ph.inp"];
+  document.querySelectorAll(".lbtn").forEach(function(b) {
+    b.classList.toggle("active", b.getAttribute("data-lang") === l);
   });
-
-  // Mobile login text
-  var mlt = document.getElementById('mobile-login-text');
-  if (mlt) {
-    mlt.textContent = lang === 'ru' ? 'Войти' : lang === 'en' ? 'Log In' : 'Ienākt';
-  }
-
-  localStorage.setItem('mathol_lang', lang);
+  document.documentElement.lang = l === "en" ? "en" : l;
 }
+document.querySelectorAll(".lbtn").forEach(function(b) {
+  b.addEventListener("click", function() { applyLang(this.getAttribute("data-lang")); });
+});
 
-// Restore saved lang
-var savedLang = localStorage.getItem('mathol_lang');
-if (savedLang) setLang(savedLang);
-
-// ─── AUDIENCE TOGGLE ───
-function setAudience(type) {
-  document.querySelectorAll('.audience-content').forEach(function(el) {
-    el.classList.remove('active');
-  });
-  document.getElementById(type + '-content').classList.add('active');
-
-  document.querySelectorAll('.aud-btn').forEach(function(btn, i) {
-    btn.classList.toggle('active', (type === 'student' && i === 0) || (type === 'parent' && i === 1));
-  });
-}
-
-// ─── FAQ ACCORDION ───
-function toggleFaq(item) {
-  var wasOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(function(i) { i.classList.remove('open'); });
-  if (!wasOpen) item.classList.add('open');
-}
-
-// ─── FOMO COUNTER (slowly incrementing for FOMO effect) ───
-var fomoBase = 83;
-var fomoCount = document.getElementById('fomo-count');
-var fomoFill = document.getElementById('fomoFill');
-
-function updateFomo() {
-  var extra = Math.floor(Math.random() * 2);
-  fomoBase = Math.min(fomoBase + extra, 98);
-  if (fomoCount) fomoCount.textContent = fomoBase + ' / 100';
-  if (fomoFill) fomoFill.style.width = fomoBase + '%';
-}
-setInterval(updateFomo, 45000);
-
-// ─── MOBILE MENU ───
-function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('open');
-}
-
-// Close mobile menu on link click
-document.querySelectorAll('.mobile-menu a').forEach(function(a) {
-  a.addEventListener('click', function() {
-    document.getElementById('mobileMenu').classList.remove('open');
+/* ── AUDIENCE TOGGLE ────────────────────────────────────── */
+document.querySelectorAll(".abtn").forEach(function(btn) {
+  btn.addEventListener("click", function() {
+    var aud = this.getAttribute("data-aud");
+    document.querySelectorAll(".abtn").forEach(function(b) { b.classList.remove("active"); });
+    this.classList.add("active");
+    document.getElementById("panel-student").classList.toggle("on", aud === "student");
+    document.getElementById("panel-parent").classList.toggle("on", aud === "parent");
   });
 });
 
-// ─── SMOOTH SCROLL ───
-document.querySelectorAll('a[href^="#"]').forEach(function(a) {
-  a.addEventListener('click', function(e) {
-    var target = document.querySelector(this.getAttribute('href'));
-    if (target) {
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+/* ── TASK CHECKER ───────────────────────────────────────── */
+var ANSWER = 35;
+document.getElementById("chkBtn").addEventListener("click", function() {
+  var val = parseInt(document.getElementById("taskIn").value);
+  var fb = document.getElementById("fbLine");
+  var ex = document.getElementById("explBlock");
+  fb.style.display = "block";
+  ex.classList.add("show");
+  if (val === ANSWER) {
+    fb.innerHTML = T[lang]["ph.ok"] || "✓ Pareizi!";
+    fb.className = "fb-line fb-ok";
+  } else {
+    fb.innerHTML = T[lang]["ph.err"] || "✗ Nav pareizi. Lūk, skaidrojums:";
+    fb.className = "fb-line fb-err";
+  }
+});
+document.getElementById("taskIn").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") document.getElementById("chkBtn").click();
+});
+
+/* ── REVIEWS SLIDER ─────────────────────────────────────── */
+(function() {
+  var track = document.getElementById("sTrack");
+  var cards = document.querySelectorAll(".rev-card");
+  var total = cards.length;
+  var cur = 0;
+  var perView = window.innerWidth >= 768 ? 2 : 1;
+  var pages = Math.ceil(total / perView);
+
+  // Build dots
+  var dotsEl = document.getElementById("sDots");
+  dotsEl.style.display = "flex"; dotsEl.style.gap = "6px"; dotsEl.style.alignItems = "center";
+  for (var i = 0; i < pages; i++) {
+    (function(idx) {
+      var d = document.createElement("div");
+      d.className = "sdot" + (idx === 0 ? " on" : "");
+      d.onclick = function() { go(idx); };
+      dotsEl.appendChild(d);
+    })(i);
+  }
+
+  function go(n) {
+    cur = ((n % pages) + pages) % pages;
+    // Each card = 100/perView % width. We translate by cur * 100% in terms of visible area
+    var slideW = cards[0].offsetWidth + 14;
+    track.style.transform = "translateX(-" + (cur * perView * slideW) + "px)";
+    document.querySelectorAll(".sdot").forEach(function(d, i) {
+      d.classList.toggle("on", i === cur);
+    });
+  }
+
+  document.getElementById("sPrev").onclick = function() { go(cur - 1); };
+  document.getElementById("sNext").onclick = function() { go(cur + 1); };
+
+  var autoSlide = setInterval(function() { go(cur + 1); }, 5000);
+  document.getElementById("sTrack").addEventListener("touchstart", function() { clearInterval(autoSlide); }, { passive: true });
+
+  window.addEventListener("resize", function() {
+    perView = window.innerWidth >= 768 ? 2 : 1;
+    pages = Math.ceil(total / perView);
+    go(0);
+  });
+})();
+
+/* ── FAQ ACCORDION ──────────────────────────────────────── */
+document.querySelectorAll(".faq-item").forEach(function(item) {
+  item.querySelector(".faq-q").addEventListener("click", function() {
+    var open = item.classList.contains("open");
+    document.querySelectorAll(".faq-item").forEach(function(i) {
+      i.classList.remove("open");
+      i.querySelector(".faq-a").style.maxHeight = "0";
+    });
+    if (!open) {
+      item.classList.add("open");
+      var a = item.querySelector(".faq-a");
+      a.style.maxHeight = a.scrollHeight + "px";
     }
   });
 });
-</script>
 
+/* ── FOMO BAR ANIMATION ─────────────────────────────────── */
+window.addEventListener("load", function() {
+  setTimeout(function() {
+    document.getElementById("fomoBar").style.width = "83%";
+  }, 400);
+});
+
+/* ── SCROLL FADE-IN ─────────────────────────────────────── */
+(function() {
+  var els = document.querySelectorAll(".fade-up");
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add("vis"); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(function(el) { obs.observe(el); });
+})();
+</script>
 </body>
-       </html>
+  </html>
