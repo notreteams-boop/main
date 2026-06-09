@@ -1256,7 +1256,7 @@ async function handleLogout(e) {
     else if (typeof window.signOut   === "function") await window.signOut();
     else if (window.firebase?.auth)                  await window.firebase.auth().signOut();
   } catch (err) { console.warn("Logout:", err); }
-  window.location.href = "/main/index.html";
+  window.location.href = "/main/";
 }
 
 /* Auto-atjauninājums, ja practice.html maina localStorage
