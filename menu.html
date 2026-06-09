@@ -1,70 +1,1222 @@
 <!DOCTYPE html>
 <html lang="lv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Uzdevumi – OL Mat Sagatavošana</title>
+<!-- !! DROŠĪBA: auth.js — OBLIGĀTI PIRMĀ RINDA !! -->
 <script src="/main/auth.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Tēmu izvēle · OL Mat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: #f4d5bb; color: #000; font-family: Arial, Helvetica, sans-serif; font-size: 20px; min-height: 100vh; }
-  .page { max-width: 700px; margin: 0 auto; padding: 56px 40px 80px; }
-  h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; }
-  .sub { font-size: 0.82rem; color: #666; margin-bottom: 36px; }
-  .grid { display: flex; flex-direction: column; gap: 10px; }
-  .task-btn { display: block; width: 100%; padding: 14px 18px; border: 1.5px solid #000; background: #fff; color: #000; font-size: 0.95rem; font-family: Arial, sans-serif; text-decoration: none; text-align: left; cursor: pointer; }
-  .task-btn:hover { background: #000; color: #fff; }
-  .logout { margin-top: 40px; display: inline-block; font-size: 0.78rem; color: #999; cursor: pointer; border: none; background: none; font-family: Arial, sans-serif; }
-  .logout:hover { color: #000; }
-  @media (max-width: 500px) { .page { padding: 32px 20px 60px; } }
+/* ═══════════════════════════════════════════════════════════════
+   TOKENS & RESET
+   ═══════════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:    #0d0e12;
+  --bg2:   #161820;
+  --bg3:   #1e2028;
+  --bg4:   #232635;
+  --bd:    rgba(255,255,255,0.07);
+  --a:     #bfff00;
+  --a-dim: rgba(191,255,0,0.09);
+  --a-glo: rgba(191,255,0,0.28);
+  --a-brd: rgba(191,255,0,0.26);
+  --tx:    #e8eaf0;
+  --mu:    rgba(232,234,240,0.44);
+  --or:    #ff8800;
+  --re:    #ff3b3b;
+  --r:     12px;
+  --r2:    16px;
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--tx);
+  font-family:'Rajdhani',sans-serif;font-size:16px;
+  min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 70% 50% at 20% -10%, rgba(191,255,0,0.03), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(0,200,150,0.03), transparent);
+}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--a-brd);}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════ */
+header{
+  position:sticky;top:0;z-index:200;
+  height:58px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;gap:12px;
+  background:rgba(13,14,18,0.90);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--a-brd);
+}
+.h-logo{
+  font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;
+  letter-spacing:3px;color:var(--a);
+  text-shadow:0 0 14px var(--a-glo);
+  flex-shrink:0;
+}
+.h-logo em{color:rgba(255,255,255,0.25);font-style:normal;}
+.h-mid{display:flex;align-items:center;gap:10px;flex:1;justify-content:center;}
+
+/* ── Streak badge ── */
+.streak{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 13px;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:100px;
+  user-select:none;cursor:default;white-space:nowrap;
+}
+.s-fire{font-size:1.05rem;line-height:1;transition:filter .35s,opacity .35s;}
+.s-fire.on {filter:drop-shadow(0 0 7px #ff8800);}
+.s-fire.off{filter:grayscale(1) brightness(0.6);opacity:.35;}
+.s-num{
+  font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;
+  color:var(--tx);min-width:1ch;
+}
+
+/* ── Lang switcher ── */
+.lsw{
+  display:flex;background:var(--bg2);
+  border:1px solid var(--bd);border-radius:100px;padding:3px;gap:2px;
+}
+.lbtn{
+  padding:4px 10px;min-height:28px;
+  background:transparent;border:none;border-radius:100px;
+  font-family:'Rajdhani',sans-serif;font-size:0.72rem;font-weight:700;
+  letter-spacing:.3px;color:var(--mu);cursor:pointer;transition:all .2s;
+}
+.lbtn.on{background:var(--a);color:#000;}
+
+/* ── Back button ── */
+.btn-back{
+  display:flex;align-items:center;gap:5px;
+  padding:7px 15px;min-height:36px;
+  background:transparent;border:1px solid var(--a-brd);border-radius:100px;
+  font-family:'Rajdhani',sans-serif;font-size:0.8rem;font-weight:700;
+  color:var(--a);text-decoration:none;white-space:nowrap;
+  transition:all .2s;flex-shrink:0;
+}
+.btn-back:hover{background:var(--a);color:#000;}
+@media(max-width:540px){
+  .btn-back .btn-lbl{display:none;}
+  .h-logo{font-size:.85rem;}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LAYOUT
+   ═══════════════════════════════════════════════════════════════ */
+.page{max-width:1160px;margin:0 auto;padding:0 18px 72px;}
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO + SCORE SLIDER
+   ═══════════════════════════════════════════════════════════════ */
+.hero{padding:32px 0 20px;text-align:center;}
+.hero-eye{
+  font-size:.68rem;letter-spacing:2.5px;color:var(--a);
+  font-weight:700;text-transform:uppercase;margin-bottom:7px;
+  font-family:'Share Tech Mono',monospace;
+}
+.hero-h{
+  font-family:'Orbitron',monospace;
+  font-size:clamp(1.35rem,4.5vw,2rem);font-weight:900;
+  letter-spacing:1px;line-height:1.22;margin-bottom:26px;
+}
+.hero-h em{color:var(--a);font-style:normal;text-shadow:0 0 18px var(--a-glo);}
+
+/* Score widget */
+.score-box{
+  max-width:440px;margin:0 auto;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:20px 22px;
+}
+.score-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+.score-lbl{font-size:.8rem;color:var(--mu);font-weight:600;letter-spacing:.2px;}
+.score-val{
+  font-family:'Orbitron',monospace;font-size:2.2rem;font-weight:900;
+  color:var(--a);text-shadow:0 0 20px var(--a-glo);line-height:1;
+}
+
+input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:5px;border-radius:100px;cursor:pointer;outline:none;
+  background:linear-gradient(to right,var(--a) var(--p,50%),var(--bg3) var(--p,50%));
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--a);border:3px solid var(--bg);
+  box-shadow:0 0 10px var(--a-glo);cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:20px;height:20px;border-radius:50%;
+  background:var(--a);border:3px solid var(--bg);
+  box-shadow:0 0 10px var(--a-glo);cursor:pointer;
+}
+.score-hint{font-size:.74rem;color:var(--mu);margin-top:9px;text-align:center;}
+
+/* ═══════════════════════════════════════════════════════════════
+   DAILY GOAL
+   ═══════════════════════════════════════════════════════════════ */
+.daily{
+  margin:16px 0;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:16px 20px;
+}
+.daily-top{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;flex-wrap:wrap;gap:6px;
+}
+.daily-lbl{
+  font-family:'Share Tech Mono',monospace;font-size:.7rem;
+  letter-spacing:2px;color:var(--a);font-weight:700;
+}
+.daily-cnt{font-size:.84rem;font-weight:700;}
+.daily-cnt b{font-family:'Orbitron',monospace;color:var(--a);}
+
+.prog-track{height:8px;background:var(--bg3);border-radius:100px;overflow:hidden;}
+.prog-fill{
+  height:100%;border-radius:100px;min-width:3px;
+  background:linear-gradient(90deg,#74d400,#bfff00,#e0ff66);
+  box-shadow:0 0 10px var(--a-glo);
+  transition:width .55s cubic-bezier(.34,1.56,.64,1);
+}
+.daily-bot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:9px;
+}
+.daily-hint{font-size:.72rem;color:var(--mu);}
+.cheat-btn{
+  padding:3px 9px;font-size:.68rem;font-weight:700;
+  background:transparent;border:1px solid var(--bd);border-radius:6px;
+  color:var(--mu);cursor:pointer;font-family:'Rajdhani',sans-serif;
+  transition:all .2s;letter-spacing:.2px;
+}
+.cheat-btn:hover{border-color:var(--a);color:var(--a);}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEARCH + FILTERS
+   ═══════════════════════════════════════════════════════════════ */
+.search-row{display:flex;gap:10px;margin:22px 0 12px;}
+.s-wrap{position:relative;flex:1;}
+.s-ico{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  color:var(--mu);font-size:.95rem;pointer-events:none;
+  font-family:'Share Tech Mono',monospace;
+}
+.s-in{
+  width:100%;padding:10px 36px 10px 38px;min-height:44px;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);
+  color:var(--tx);font-size:.93rem;font-family:'Rajdhani',sans-serif;
+  outline:none;transition:border-color .2s;
+}
+.s-in:focus{border-color:var(--a-brd);}
+.s-in::placeholder{color:var(--mu);}
+.s-clr{
+  position:absolute;right:11px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:var(--mu);cursor:pointer;
+  font-size:1rem;line-height:1;padding:2px;display:none;
+  transition:color .2s;
+}
+.s-clr.vis{display:block;}
+.s-clr:hover{color:var(--tx);}
+
+/* Category filter pills */
+.cats{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;}
+.cat-btn{
+  padding:5px 13px;min-height:34px;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:100px;
+  color:var(--mu);font-family:'Rajdhani',sans-serif;font-size:.76rem;font-weight:700;
+  cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.2px;
+}
+.cat-btn:hover:not(.on){border-color:rgba(255,255,255,.14);color:var(--tx);}
+.cat-btn.on{background:var(--a-dim);border-color:var(--a-brd);color:var(--a);}
+
+.res-count{font-size:.74rem;color:var(--mu);margin-bottom:14px;font-family:'Share Tech Mono',monospace;}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOPIC GRID
+   ═══════════════════════════════════════════════════════════════ */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:12px;
+}
+
+/* ── Card ── */
+.card{
+  position:relative;overflow:hidden;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:18px 18px 16px;
+  display:flex;flex-direction:column;gap:11px;
+  transition:border-color .22s,box-shadow .22s,transform .22s;
+}
+/* Ambient gradient on idle */
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:var(--r2);
+  background:linear-gradient(130deg,var(--a-dim),transparent 60%);
+  opacity:0;transition:opacity .25s;pointer-events:none;
+}
+/* Slow scan-line */
+.card.c-on::after{
+  content:'';position:absolute;left:0;right:0;top:-100%;height:50%;
+  background:linear-gradient(to bottom,transparent,rgba(191,255,0,0.025),transparent);
+  animation:scan 4s linear infinite;pointer-events:none;
+}
+@keyframes scan{to{top:200%;}}
+
+.card.c-on{cursor:pointer;}
+.card.c-on:hover{
+  border-color:var(--a);transform:translateY(-2px);
+  box-shadow:0 0 0 1px var(--a),0 10px 36px rgba(0,0,0,.45),0 0 24px var(--a-dim);
+}
+.card.c-on:hover::before{opacity:1;}
+.card.c-off{opacity:.38;cursor:not-allowed;pointer-events:none;}
+
+/* Card internals */
+.card-top{display:flex;justify-content:space-between;align-items:center;}
+.card-num{
+  font-family:'Share Tech Mono',monospace;font-size:.68rem;
+  color:var(--mu);letter-spacing:1px;
+}
+.bdg{
+  padding:2px 8px;border-radius:100px;
+  font-family:'Rajdhani',sans-serif;font-size:.63rem;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.bdg-on  {background:var(--a-dim);color:var(--a);border:1px solid var(--a-brd);}
+.bdg-off {background:rgba(255,255,255,.04);color:var(--mu);border:1px solid var(--bd);}
+
+.card-title{
+  font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;
+  line-height:1.45;flex:1;
+}
+.c-on .card-title{color:var(--tx);}
+.c-off .card-title{color:var(--mu);}
+
+.card-bot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
+.cat-tag{
+  padding:3px 9px;border-radius:6px;
+  background:var(--bg3);border:1px solid var(--bd);
+  color:var(--mu);font-size:.68rem;font-weight:600;
+  max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.card-cta{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 12px;border-radius:8px;
+  background:var(--a-dim);border:1px solid var(--a-brd);
+  color:var(--a);font-size:.74rem;font-weight:700;
+  font-family:'Rajdhani',sans-serif;
+  transition:background .2s,color .2s;white-space:nowrap;
+}
+.c-on:hover .card-cta{background:var(--a);color:#000;border-color:var(--a);}
+.card-lock{
+  display:inline-flex;align-items:center;gap:4px;
+  color:var(--mu);font-size:.7rem;font-weight:600;
+}
+
+/* Empty state */
+.empty{
+  grid-column:1/-1;text-align:center;padding:56px 20px;
+}
+.empty-ico{font-size:2.2rem;opacity:.35;margin-bottom:10px;}
+.empty-txt{color:var(--mu);font-size:.92rem;}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+@media(max-width:640px){
+  .page{padding:0 12px 60px;}
+  header{padding:0 12px;}
+  .hero-h{font-size:1.25rem;}
+  .score-val{font-size:1.7rem;}
+  .grid{grid-template-columns:1fr;}
+  .h-mid{gap:7px;}
+}
 </style>
 </head>
 <body>
-<div class="page">
-  <h1>Uzdevumu saraksts</h1>
-  <div class="sub">Izvēlies uzdevumu, lai sāktu</div>
 
-  <div class="grid">
-    <a href="/main/task1/index.html" class="task-btn">1. uzdevums</a>
-    <a href="/main/task2/index.html" class="task-btn">2. uzdevums</a>
-    <a href="/main/task3/index.html" class="task-btn">3. uzdevums</a>
-    <a href="/main/task4/index.html" class="task-btn">4. uzdevums</a>
-    <a href="/main/task5/index.html" class="task-btn">5. uzdevums</a>
-    <a href="/main/task6/index.html" class="task-btn">6. uzdevums</a>
-    <a href="/main/task7/index.html" class="task-btn">7. uzdevums</a>
-    <a href="/main/task8/index.html" class="task-btn">8. uzdevums</a>
-    <a href="/main/task9/index.html" class="task-btn">9. uzdevums</a>
-    <a href="/main/task10/index.html" class="task-btn">10. uzdevums</a>
-    <a href="/main/task11/index.html" class="task-btn">11. uzdevums</a>
-    <a href="/main/task12/index.html" class="task-btn">12. uzdevums</a>
-    <a href="/main/task13/index.html" class="task-btn">13. uzdevums</a>
-    <a href="/main/task14/index.html" class="task-btn">14. uzdevums</a>
-    <a href="/main/task15/index.html" class="task-btn">15. uzdevums</a>
-    <a href="/main/task16/index.html" class="task-btn">16. uzdevums</a>
-    <a href="/main/task17/index.html" class="task-btn">17. uzdevums</a>
-    <a href="/main/task18/index.html" class="task-btn">18. uzdevums</a>
-    <a href="/main/task19/index.html" class="task-btn">19. uzdevums</a>
-    <a href="/main/task20/index.html" class="task-btn">20. uzdevums</a>
-    <a href="/main/task21/index.html" class="task-btn">21. uzdevums</a>
-    <a href="/main/task22/index.html" class="task-btn">22. uzdevums</a>
-    <a href="/main/task23/index.html" class="task-btn">23. uzdevums</a>
-    <a href="/main/task24/index.html" class="task-btn">24. uzdevums</a>
-    <a href="/main/task25/index.html" class="task-btn">25. uzdevums</a>
-    <a href="/main/task26/index.html" class="task-btn">26. uzdevums</a>
-    <a href="/main/task27/index.html" class="task-btn">27. uzdevums</a>
-    <a href="/main/task28/index.html" class="task-btn">28. uzdevums</a>
-    <a href="/main/task29/index.html" class="task-btn">29. uzdevums</a>
-    <a href="/main/task30/index.html" class="task-btn">30. uzdevums</a>
+<!-- ═══════════ HEADER ═══════════ -->
+<header>
+  <div class="h-logo">OL<em>·</em>MAT</div>
+
+  <div class="h-mid">
+    <!-- Streak -->
+    <div class="streak">
+      <span class="s-fire off" id="fireIcon">🔥</span>
+      <span class="s-num"    id="streakNum">0</span>
+    </div>
+    <!-- Lang -->
+    <div class="lsw">
+      <button class="lbtn on" data-lang="lv">LV</button>
+      <button class="lbtn"    data-lang="ru">RU</button>
+      <button class="lbtn"    data-lang="en">EN</button>
+    </div>
   </div>
 
-  <button class="logout" id="logout-btn">Iziet no konta</button>
-</div>
+  <a href="/main/menu.html" class="btn-back">
+    ← <span class="btn-lbl" id="backLbl">Uz galveno izvēlni</span>
+  </a>
+</header>
 
+<!-- ═══════════ PAGE ═══════════ -->
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eye" id="eyebrow">VISC CE · OPTIMĀLAIS LĪMENIS</div>
+    <h1 class="hero-h"><em id="heroTitleAcc">Izvēlies</em> <span id="heroTitleRest">tēmu</span></h1>
+
+    <!-- Score slider -->
+    <div class="score-box">
+      <div class="score-row">
+        <span class="score-lbl" id="scoreLbl">Mans CE mērķis</span>
+        <span class="score-val" id="scoreVal">90%</span>
+      </div>
+      <input type="range" id="scoreSlider" min="40" max="100" value="90" step="5"/>
+      <div class="score-hint" id="scoreHint">Tiek ieteikts apgūt visas aktīvās tēmas</div>
+    </div>
+  </div>
+
+  <!-- DAILY GOAL -->
+  <div class="daily">
+    <div class="daily-top">
+      <span class="daily-lbl" id="goalLbl">DIENAS MĒRĶIS</span>
+      <span class="daily-cnt">
+        <b id="doneNum">0</b>&nbsp;/&nbsp;<b id="goalNum">15</b>
+        <span id="taskWrd"> uzdevumi</span>
+      </span>
+    </div>
+    <div class="prog-track">
+      <div class="prog-fill" id="progFill" style="width:0%"></div>
+    </div>
+    <div class="daily-bot">
+      <span class="daily-hint" id="goalHint"></span>
+      <button class="cheat-btn" id="cheatBtn" title="Dev: simulē +1 uzdevumu">＋ TEST</button>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="search-row">
+    <div class="s-wrap">
+      <span class="s-ico">⌕</span>
+      <input class="s-in" id="searchInput" type="text" autocomplete="off"/>
+      <button class="s-clr" id="searchClear">✕</button>
+    </div>
+  </div>
+
+  <!-- CATEGORY FILTERS -->
+  <div class="cats" id="catFilters"></div>
+
+  <!-- RESULTS INFO -->
+  <div class="res-count" id="resCnt"></div>
+
+  <!-- GRID -->
+  <div class="grid" id="topicGrid"></div>
+
+</div><!-- /page -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════════════════════ -->
 <script>
-document.getElementById("logout-btn").addEventListener("click", function() {
-  localStorage.removeItem("session_token");
-  window.location.href = "/main/login.html";
-});
+"use strict";
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 1 — KONFIG
+   ════════════════════════════════════════════════════════════
+   GITHUB_BASE_URL — bāzes URL repozitorijam ar uzdevumiem.
+   ID no tēmas (github_folder) tiek automātiski pievienots ceļam:
+     GITHUB_BASE_URL + topic.github_folder + "/task.json"
+   Maršrutēšana uz prakses lapu: PRACTICE_PAGE?topic=<folder>
+   ──────────────────────────────────────────────────────────── */
+const GITHUB_BASE_URL = "https://notreteams-boop.github.io/tasks/";
+const PRACTICE_PAGE   = "/main/practice.html";
+const DAILY_GOAL      = 15;          // dienas mērķis (uzdevumi)
+const STREAK_MIN_PCT  = 0.10;        // 10% no normas = minimums strikam
+const LS_KEY          = "olmat_v1"; // localStorage atslēga
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 2 — TULKOJUMI  (LV / RU / EN)
+   ════════════════════════════════════════════════════════════ */
+const I18N = {
+lv:{
+  eyebrow:"VISC CE · OPTIMĀLAIS LĪMENIS",
+  heroAcc:"Izvēlies", heroRest:"tēmu",
+  scoreLbl:"Mans CE mērķis",
+  scoreHint:"Tiek ieteikts apgūt visas aktīvās tēmas",
+  goalLbl:"DIENAS MĒRĶIS", taskWrd:" uzdevumi",
+  goalHint:"Pabeidz ${G} uzdevumus, lai saglabātu savu sēriju!",
+  search:"Meklēt tēmu vai atslēgvārdu...",
+  catAll:"Visas tēmas",
+  bdgOn:"Aktīvs", bdgOff:"Drīzumā",
+  cta:"Sākt →", lock:"Drīzumā",
+  back:"Uz galveno izvēlni",
+  empty:"Nekas netika atrasts. Mēģini citu atslēgvārdu.",
+  resTpl:"{n} tēmas"
+},
+ru:{
+  eyebrow:"VISC CE · OPTIMĀLAIS LĪMENIS",
+  heroAcc:"Выбери", heroRest:"тему",
+  scoreLbl:"Мой целевой результат CE",
+  scoreHint:"Рекомендуется освоить все активные темы",
+  goalLbl:"ДНЕВНАЯ ЦЕЛЬ", taskWrd:" задания",
+  goalHint:"Реши ${G} заданий, чтобы не потерять серию!",
+  search:"Поиск темы или ключевого слова...",
+  catAll:"Все темы",
+  bdgOn:"Активна", bdgOff:"Скоро",
+  cta:"Начать →", lock:"Скоро",
+  back:"В главное меню",
+  empty:"Ничего не найдено. Попробуй другой запрос.",
+  resTpl:"{n} темы"
+},
+en:{
+  eyebrow:"VISC CE · OPTIMĀLAIS LĪMENIS",
+  heroAcc:"Choose", heroRest:"a topic",
+  scoreLbl:"My CE Target Score",
+  scoreHint:"Recommended: complete all active topics",
+  goalLbl:"DAILY GOAL", taskWrd:" tasks",
+  goalHint:"Complete ${G} tasks to keep your streak!",
+  search:"Search topics or keywords...",
+  catAll:"All topics",
+  bdgOn:"Active", bdgOff:"Soon",
+  cta:"Start →", lock:"Soon",
+  back:"Back to Menu",
+  empty:"Nothing found. Try a different search.",
+  resTpl:"{n} topics"
+}
+};
+
+let lang = "lv";
+const tx = k => (I18N[lang][k] ?? k);
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 3 — TĒMU MASĪVS (45 tēmas)
+   ════════════════════════════════════════════════════════════
+   Katrs objekts:
+     id            — unikāls identifikators
+     category      — kategorija {lv, ru, en}
+     title         — nosaukums  {lv, ru, en}
+     github_folder — mapes nosaukums GITHUB_BASE_URL iekš
+     tags          — meklēšanas atslēgvārdi (dažādās valodās)
+     isActive      — vai tēma ir pieejama
+   ────────────────────────────────────────────────────────── */
+const TOPICS = [
+
+/* ── SKAITĻU TEORIJA (1–4) ───────────────────────────────── */
+{id:"topic_01",
+ category:{lv:"Skaitļu teorija",ru:"Теория чисел",en:"Number Theory"},
+ title:{lv:"Naturālie skaitļi un dalāmība",ru:"Натуральные числа и делимость",en:"Natural Numbers & Divisibility"},
+ github_folder:"topic_01",
+ tags:["NOD","MKD","НОД","НОК","GCD","LCM","dalītāji","делители","divisors",
+       "pirmskaitļi","простые числа","prime","сито Эратосфена","Eratostenes"],
+ isActive:true},
+
+{id:"topic_02",
+ category:{lv:"Skaitļu teorija",ru:"Теория чисел",en:"Number Theory"},
+ title:{lv:"Racionālie un iracionālie skaitļi",ru:"Рациональные и иррациональные числа",en:"Rational & Irrational Numbers"},
+ github_folder:"topic_02",
+ tags:["racionāls","irracionāls","irrational","√2","pi","π","daļskaitlis","дробь","fraction",
+       "skaitļu kopas","множества","number sets","reālie","действительные","real"],
+ isActive:true},
+
+{id:"topic_03",
+ category:{lv:"Skaitļu teorija",ru:"Теория чисел",en:"Number Theory"},
+ title:{lv:"Pakāpes un to īpašības",ru:"Степени и их свойства",en:"Powers & Their Properties"},
+ github_folder:"topic_03",
+ tags:["pakāpe","степень","power","exponent","kāpinātājs","a^n","aⁿ","квадрат","куб",
+       "squared","cubed","reizināšana","умножение","negative exponent"],
+ isActive:true},
+
+{id:"topic_04",
+ category:{lv:"Skaitļu teorija",ru:"Теория чисел",en:"Number Theory"},
+ title:{lv:"Saknes un to īpašības",ru:"Корни и их свойства",en:"Roots & Their Properties"},
+ github_folder:"topic_04",
+ tags:["sakne","корень","root","kvadrātsakne","квадратный корень","square root","√",
+       "kubsakne","cube root","n-tā pakāpe","nth root","радикал","radikāls"],
+ isActive:true},
+
+/* ── ALGEBRISKĀS IZTEIKSMES (5–8) ───────────────────────── */
+{id:"topic_05",
+ category:{lv:"Algebriskās izteiksmes",ru:"Алгебраические выражения",en:"Algebraic Expressions"},
+ title:{lv:"Polinomi un darbības ar tiem",ru:"Многочлены и действия с ними",en:"Polynomials & Operations"},
+ github_folder:"topic_05",
+ tags:["polinoms","многочлен","polynomial","monom","monomial","koeficients","коэффициент",
+       "pakāpe","degree","saskaitīšana","reizināšana","добавление","умножение"],
+ isActive:true},
+
+{id:"topic_06",
+ category:{lv:"Algebriskās izteiksmes",ru:"Алгебраические выражения",en:"Algebraic Expressions"},
+ title:{lv:"Algebrisko izteiksmi faktorizēšana",ru:"Разложение на множители",en:"Factoring Expressions"},
+ github_folder:"topic_06",
+ tags:["faktorizācija","factoring","разложение","множитель","kopīgais reizinātājs","GCF",
+       "diferences kvadrāts","difference of squares","разность квадратов","a²-b²",
+       "pilnā kvadrāts","perfect square","(a+b)²"],
+ isActive:true},
+
+{id:"topic_07",
+ category:{lv:"Algebriskās izteiksmes",ru:"Алгебраические выражения",en:"Algebraic Expressions"},
+ title:{lv:"Algebriskās daļas — vienkāršošana un darbības",ru:"Алгебраические дроби и операции",en:"Algebraic Fractions"},
+ github_folder:"topic_07",
+ tags:["daļa","дробь","fraction","algebraic fraction","saīsināt","сокращение","simplify",
+       "kopīgais saucējs","общий знаменатель","common denominator","dalīšana","деление"],
+ isActive:true},
+
+{id:"topic_08",
+ category:{lv:"Algebriskās izteiksmes",ru:"Алгебраические выражения",en:"Algebraic Expressions"},
+ title:{lv:"Logaritmi un to īpašības",ru:"Логарифмы и их свойства",en:"Logarithms & Properties"},
+ github_folder:"topic_08",
+ tags:["log","ln","logaritms","логарифм","logarithm","natural log","dabiskais logaritms",
+       "основание","base","log₂","log₁₀","bāzes maiņa","смена основания","change of base",
+       "log(ab)","log(a/b)"],
+ isActive:true},
+
+/* ── VIENĀDOJUMI (9–15) ──────────────────────────────────── */
+{id:"topic_09",
+ category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
+ title:{lv:"Lineāri vienādojumi",ru:"Линейные уравнения",en:"Linear Equations"},
+ github_folder:"topic_09",
+ tags:["lineārs","linear","линейное","ax+b=0","proporcija","proportion","пропорция",
+       "x atrašana","найти x","solve for x"],
+ isActive:true},
+
+{id:"topic_10",
+ category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
+ title:{lv:"Kvadrātvienādojumi",ru:"Квадратные уравнения",en:"Quadratic Equations"},
+ github_folder:"topic_10",
+ tags:["kvadrātvienādojums","квадратное уравнение","quadratic","diskriminants","дискриминант",
+       "discriminant","D=b²-4ac","Vjeta","Виета","Vieta","x²","x2","ax²+bx+c=0",
+       "saknes","корни","roots","формула дискриминанта","kvadrāta formula"],
+ isActive:true},
+
+{id:"topic_11",
+ category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
+ title:{lv:"Vienādojumu sistēmas — 2 mainīgie",ru:"Системы уравнений — 2 переменные",en:"Systems of Equations (2 Variables)"},
+ github_folder:"topic_11",
+ tags:["sistēma","system","система","substitūcija","подстановка","substitution",
+       "saskaitīšana","elimination","линейная система","grafiskā metode","graphical method",
+       "x un y","xy"],
+ isActive:true},
+
+{id:"topic_12",
+ category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
+ title:{lv:"Eksponenciālie vienādojumi",ru:"Показательные уравнения",en:"Exponential Equations"},
+ github_folder:"topic_12",
+ tags:["eksponenciāls","exponential","показательное","2^x","a^x","pakāpe","степень",
+       "bāze","основание","pārveidošana uz vienādu bāzi","одно основание"],
+ isActive:true},
+
+{id:"topic_13",
+ category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
+ title:{lv:"Logaritmiskie vienādojumi",ru:"Логарифмические уравнения",en:"Logarithmic Equations"},
+ github_folder:"topic_13",
+ tags:["log","ln","logaritms","логарифмическое уравнение","logarithmic equation",
+       "log x=a","ODZ","область допустимых","definīcijas apgabals","base","основание"],
+ isActive:true},
+
+{id:"topic_14",
+ category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
+ title:{lv:"Iracionālie vienādojumi",ru:"Иррациональные уравнения",en:"Irrational Equations"},
+ github_folder:"topic_14",
+ tags:["iracionāls","иррациональное","irrational","√x=a","sakne","корень","root",
+       "pārbaude","проверка","check","ODZ","квадрирование","kāpināšana kvadrātā"],
+ isActive:true},
+
+{id:"topic_15",
+ category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
+ title:{lv:"Vienādojumi ar moduli |x|",ru:"Уравнения с модулем |x|",en:"Absolute Value Equations"},
+ github_folder:"topic_15",
+ tags:["modulis","|x|","absolute value","модуль","±","absvalue","divi gadījumi","два случая"],
+ isActive:true},
+
+/* ── NEVIENĀDĪBAS (16–19) ────────────────────────────────── */
+{id:"topic_16",
+ category:{lv:"Nevienādības",ru:"Неравенства",en:"Inequalities"},
+ title:{lv:"Lineārās nevienādības",ru:"Линейные неравенства",en:"Linear Inequalities"},
+ github_folder:"topic_16",
+ tags:["nevienādība","inequality","неравенство","lineārs","<",">","≤","≥",
+       "skaitļu ass","числовая ось","number line","intervāls","interval","risinājumu kopa"],
+ isActive:true},
+
+{id:"topic_17",
+ category:{lv:"Nevienādības",ru:"Неравенства",en:"Inequalities"},
+ title:{lv:"Kvadrātiskās nevienādības",ru:"Квадратные неравенства",en:"Quadratic Inequalities"},
+ github_folder:"topic_17",
+ tags:["kvadrātiska nevienādība","квадратное неравенство","quadratic inequality",
+       "parabola","x²","x2","diskriminants","intervāls","interval","metode parabolas",
+       "знак квадратного трёхчлена"],
+ isActive:true},
+
+{id:"topic_18",
+ category:{lv:"Nevienādības",ru:"Неравенства",en:"Inequalities"},
+ title:{lv:"Nevienādību sistēmas",ru:"Системы неравенств",en:"Systems of Inequalities"},
+ github_folder:"topic_18",
+ tags:["sistēma","system","система","kopīgais risinājums","общее решение",
+       "intersections","šķelšanās","risinājumu kopa","объединение","apvienojums"],
+ isActive:true},
+
+{id:"topic_19",
+ category:{lv:"Nevienādības",ru:"Неравенства",en:"Inequalities"},
+ title:{lv:"Nevienādības ar moduli |x|",ru:"Неравенства с модулем |x|",en:"Absolute Value Inequalities"},
+ github_folder:"topic_19",
+ tags:["modulis","|x|","absolute value","модуль","-a<x<a","x<-a vai x>a",
+       "compound inequality","divkāršā nevienādība"],
+ isActive:false},
+
+/* ── FUNKCIJAS (20–25) ───────────────────────────────────── */
+{id:"topic_20",
+ category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
+ title:{lv:"Funkcijas jēdziens, grafiks, īpašības",ru:"Понятие функции, график, свойства",en:"Function Concept, Graph & Properties"},
+ github_folder:"topic_20",
+ tags:["funkcija","function","функция","grafiks","график","graph",
+       "definīcijas apgabals","область определения","domain",
+       "vērtību apgabals","область значений","range","monotona","četnie","nečetnie",
+       "even","odd","periodiska","period"],
+ isActive:true},
+
+{id:"topic_21",
+ category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
+ title:{lv:"Lineārā funkcija y = kx + b",ru:"Линейная функция y = kx + b",en:"Linear Function y = kx + b"},
+ github_folder:"topic_21",
+ tags:["lineārs","linear","линейная","y=kx+b","slope","slīpums","y-intercept",
+       "нуль функции","zero","k koeficients","угловой коэффициент","taisne plaknē"],
+ isActive:true},
+
+{id:"topic_22",
+ category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
+ title:{lv:"Kvadrātfunkcija un parabola",ru:"Квадратичная функция и парабола",en:"Quadratic Function & Parabola"},
+ github_folder:"topic_22",
+ tags:["parabola","kvadrātfunkcija","квадратичная","vertex","virsotne","вершина",
+       "симметрии ось","simētrijas ass","y=ax²+bx+c","x=-b/2a","f(x)=a(x-m)²+n"],
+ isActive:true},
+
+{id:"topic_23",
+ category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
+ title:{lv:"Eksponenciālā funkcija y = aˣ",ru:"Показательная функция y = aˣ",en:"Exponential Function y = aˣ"},
+ github_folder:"topic_23",
+ tags:["eksponents","exponential","показательная","a^x","y=2^x","y=e^x","e",
+       "growth","pieaugums","рост","decay","samazināšanās","asimptota","asymptote","y>0"],
+ isActive:true},
+
+{id:"topic_24",
+ category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
+ title:{lv:"Logaritmiskā funkcija y = logₐx",ru:"Логарифмическая функция y = logₐx",en:"Logarithmic Function y = logₐx"},
+ github_folder:"topic_24",
+ tags:["log","logaritms","логарифм","logarithmic","ln x","log x",
+       "apgrieztā funkcija","обратная функция","inverse","x>0","asimptota"],
+ isActive:false},
+
+{id:"topic_25",
+ category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
+ title:{lv:"Funkciju transformācijas un grafiku pārmaiņas",ru:"Преобразования графиков функций",en:"Graph Transformations"},
+ github_folder:"topic_25",
+ tags:["pārvietojums","shift","сдвиг","reflection","simētrija","отражение",
+       "stretching","f(x+a)","f(x)+b","-f(x)","f(-x)","k·f(x)","compress"],
+ isActive:false},
+
+/* ── SECĪBAS UN PROGRESIJAS (26–27) ──────────────────────── */
+{id:"topic_26",
+ category:{lv:"Secības un progresijas",ru:"Последовательности и прогрессии",en:"Sequences & Progressions"},
+ title:{lv:"Aritmētiskā progresija",ru:"Арифметическая прогрессия",en:"Arithmetic Progression"},
+ github_folder:"topic_26",
+ tags:["aritmētiskā","arithmetic","арифметическая","d starpība","разность","common difference",
+       "Sn","summa","aₙ=a₁+(n-1)d","vidējais aritmētiskais","среднее арифметическое"],
+ isActive:true},
+
+{id:"topic_27",
+ category:{lv:"Secības un progresijas",ru:"Последовательности и прогрессии",en:"Sequences & Progressions"},
+ title:{lv:"Ģeometriskā progresija",ru:"Геометрическая прогрессия",en:"Geometric Progression"},
+ github_folder:"topic_27",
+ tags:["ģeometriskā","geometric","геометрическая","q kvocients","знаменатель","common ratio",
+       "bₙ=b₁·qⁿ⁻¹","summa","бесконечная сумма","сумма бесконечной","S=b₁/(1-q)","|q|<1"],
+ isActive:true},
+
+/* ── KOMBINATORIKA UN VARBŪTĪBA (28–30) ──────────────────── */
+{id:"topic_28",
+ category:{lv:"Kombinatorika un varbūtība",ru:"Комбинаторика и вероятность",en:"Combinatorics & Probability"},
+ title:{lv:"Kombinatorika — pamatformulas",ru:"Комбинаторика — основные формулы",en:"Combinatorics — Core Formulas"},
+ github_folder:"topic_28",
+ tags:["kombinācija","combination","комбинация","C(n,k)","Cₙᵏ",
+       "permutācija","permutation","перестановка","P(n)","n!",
+       "izvietojums","размещение","arrangement","A(n,k)","faktoriāls","factorial"],
+ isActive:true},
+
+{id:"topic_29",
+ category:{lv:"Kombinatorika un varbūtība",ru:"Комбинаторика и вероятность",en:"Combinatorics & Probability"},
+ title:{lv:"Varbūtību teorija — pamatjēdzieni",ru:"Теория вероятностей — основные понятия",en:"Probability — Basics"},
+ github_folder:"topic_29",
+ tags:["varbūtība","probability","вероятность","P(A)","notikums","событие","event",
+       "neatkarīgs","independent","savienojums","объединение","šķelšanās","пересечение",
+       "klasiskā definīcija","favorable outcomes","labvēlīgi iznākumi"],
+ isActive:true},
+
+{id:"topic_30",
+ category:{lv:"Kombinatorika un varbūtība",ru:"Комбинаторика и вероятность",en:"Combinatorics & Probability"},
+ title:{lv:"Statistika un datu analīze",ru:"Статистика и анализ данных",en:"Statistics & Data Analysis"},
+ github_folder:"topic_30",
+ tags:["statistika","statistics","статистика","vidējais","среднее","mean",
+       "mediāna","median","moda","mode","dispersija","дисперсия","variance",
+       "standartnovirze","стандартное отклонение","std","boxplot","histogramma"],
+ isActive:true},
+
+/* ── TRIGONOMETRIJA (31–34) ──────────────────────────────── */
+{id:"topic_31",
+ category:{lv:"Trigonometrija",ru:"Тригонометрия",en:"Trigonometry"},
+ title:{lv:"Trigonometriskās funkcijas — pamati",ru:"Тригонометрические функции — основы",en:"Trigonometric Functions — Basics"},
+ github_folder:"topic_31",
+ tags:["sin","cos","tan","cot","sinuss","kosinuss","tangenss","котангенс",
+       "синус","косинус","тангенс","radian","rediāni","grādi","degrees",
+       "единичная окружность","unit circle","leņķis","угол","angle","30-60-90"],
+ isActive:true},
+
+{id:"topic_32",
+ category:{lv:"Trigonometrija",ru:"Тригонометрия",en:"Trigonometry"},
+ title:{lv:"Trigonometriskās identitātes",ru:"Тригонометрические тождества",en:"Trigonometric Identities"},
+ github_folder:"topic_32",
+ tags:["identitāte","identity","тождество","sin²+cos²=1","основное тождество",
+       "Pitagora trig identitāte","double angle","двойной угол","divkāršais leņķis",
+       "sin 2α","cos 2α","half angle","puse leņķa","sum formula"],
+ isActive:true},
+
+{id:"topic_33",
+ category:{lv:"Trigonometrija",ru:"Тригонометрия",en:"Trigonometry"},
+ title:{lv:"Sinusu un kosinusu teorēma",ru:"Теорема синусов и косинусов",en:"Law of Sines & Cosines"},
+ github_folder:"topic_33",
+ tags:["sinusu teorēma","sine rule","теорема синусов","a/sinA",
+       "kosinusu teorēma","cosine rule","теорema косинусов","c²=a²+b²-2ab·cosC",
+       "trijstūra laukums","площадь треугольника","S=½ab sinC"],
+ isActive:true},
+
+{id:"topic_34",
+ category:{lv:"Trigonometrija",ru:"Тригонометрия",en:"Trigonometry"},
+ title:{lv:"Trigonometriskie vienādojumi",ru:"Тригонометрические уравнения",en:"Trigonometric Equations"},
+ github_folder:"topic_34",
+ tags:["trig equation","тригонометрическое уравнение","sin x=a","cos x=a","tan x=a",
+       "arcsin","arccos","arctg","arctan","vispārīgais risinājums","general solution",
+       "x=arcsin(a)+2πn","perioda"],
+ isActive:false},
+
+/* ── PLĀNĢEOMETRIJA (35–39) ──────────────────────────────── */
+{id:"topic_35",
+ category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
+ title:{lv:"Taisnleņķa trijstūris un Pitagora teorēma",ru:"Прямоугольный треугольник и теорема Пифагора",en:"Right Triangle & Pythagorean Theorem"},
+ github_folder:"topic_35",
+ tags:["Pitagors","Pitagora teorēma","Пифагор","Pythagorean theorem","a²+b²=c²",
+       "hipotenūza","hypotenuse","katetis","leg","katete","30-60-90","45-45-90",
+       "speciālie leņķi","special angles"],
+ isActive:true},
+
+{id:"topic_36",
+ category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
+ title:{lv:"Trijstūri — laukumi, mediānas, bisektrises",ru:"Треугольники — площади, медианы, биссектрисы",en:"Triangles — Areas, Medians, Bisectors"},
+ github_folder:"topic_36",
+ tags:["trijstūris","triangle","треугольник","laukums","площадь","area",
+       "Herons formula","Gērons","mediana","медиана","bisektrise","биссектриса",
+       "augstums","высота","centrs","centroid","leņķu summa","sum of angles"],
+ isActive:true},
+
+{id:"topic_37",
+ category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
+ title:{lv:"Četrstūri — paralēlogramms, rombs, trapece",ru:"Четырёхугольники — параллелограмм, ромб, трапеция",en:"Quadrilaterals — Parallelogram, Rhombus, Trapezoid"},
+ github_folder:"topic_37",
+ tags:["četrstūris","quadrilateral","четырёхугольник","paralēlogramms","параллелограмм",
+       "trapece","трапеция","trapezoid","rombs","ромб","rhombus","taisnstūris",
+       "прямоугольник","kvadrāts","квадрат","diagonāle","diagonal"],
+ isActive:true},
+
+{id:"topic_38",
+ category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
+ title:{lv:"Riņķa līnija un aplis",ru:"Окружность и круг",en:"Circle"},
+ github_folder:"topic_38",
+ tags:["riņķis","circle","окружность","radius","rādiuss","diametrs","diameter",
+       "horda","chord","π","PI","loka garums","arc length","нота","tangent","tangente",
+       "inscribed angle","ierakstītais leņķis","вписанный угол","апофема"],
+ isActive:true},
+
+{id:"topic_39",
+ category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
+ title:{lv:"Regulārie daudzstūri un to laukumi",ru:"Правильные многоугольники и их площади",en:"Regular Polygons"},
+ github_folder:"topic_39",
+ tags:["daudzstūris","polygon","многоугольник","regulārs","hexagon","sešstūris",
+       "pentagon","пятиугольник","piecstūris","oktogons","diagonāle","diagonal",
+       "ierakstīts","circumscribed","aprakstīts","апофема","apothem"],
+ isActive:false},
+
+/* ── STEREOĢEOMETRIJA (40–41) ────────────────────────────── */
+{id:"topic_40",
+ category:{lv:"Stereoģeometrija",ru:"Стереометрия",en:"Solid Geometry"},
+ title:{lv:"Daudzskaldņi — prizmas un piramīdas",ru:"Многогранники — призмы и пирамиды",en:"Polyhedra — Prisms & Pyramids"},
+ github_folder:"topic_40",
+ tags:["prizma","prism","призма","piramīda","pyramid","пирамида","daudzskaldnis",
+       "многогранник","tilpums","объём","volume","V=Sh","sānu virsma",
+       "боковая поверхность","lateral surface","pilnā virsma","full surface"],
+ isActive:false},
+
+{id:"topic_41",
+ category:{lv:"Stereoģeometrija",ru:"Стереометрия",en:"Solid Geometry"},
+ title:{lv:"Cilindrs, konuss un sfēra — tilpumi",ru:"Цилиндр, конус и сфера — объёмы",en:"Cylinder, Cone & Sphere — Volumes"},
+ github_folder:"topic_41",
+ tags:["cilindrs","cylinder","цилиндр","konuss","cone","конус","sfēra","sphere",
+       "шар","сфера","tilpums","volume","объём","V=πr²h","V=⅓πr²h","V=⁴⁄₃πr³",
+       "surface area","virsmas laukums","площадь поверхности"],
+ isActive:false},
+
+/* ── VEKTORI UN KOORDINĀTAS (42–43) ─────────────────────── */
+{id:"topic_42",
+ category:{lv:"Vektori un koordinātas",ru:"Векторы и координаты",en:"Vectors & Coordinates"},
+ title:{lv:"Vektori — jēdziens un darbības",ru:"Векторы — понятие и операции",en:"Vectors — Concept & Operations"},
+ github_folder:"topic_42",
+ tags:["vektors","vector","вектор","skalārs","scalar","dot product",
+       "skalārais reizinājums","скалярное произведение","moduļs vektora",
+       "длина вектора","length","направление","direction","AB","pārvietojums"],
+ isActive:false},
+
+{id:"topic_43",
+ category:{lv:"Vektori un koordinātas",ru:"Векторы и координаты",en:"Vectors & Coordinates"},
+ title:{lv:"Koordinātu metode plaknē",ru:"Координатный метод на плоскости",en:"Coordinate Geometry — Plane"},
+ github_folder:"topic_43",
+ tags:["koordinātas","coordinates","координаты","taisne","line equation",
+       "attālums","distance","расстояние","midpoint","viduspunkts","середина",
+       "slope","slīpums","угловой коэффициент","y=kx+b plaknē"],
+ isActive:false},
+
+/* ── MATEMĀTISKĀ ANALĪZE (44–45) ─────────────────────────── */
+{id:"topic_44",
+ category:{lv:"Matemātiskā analīze",ru:"Математический анализ",en:"Calculus"},
+ title:{lv:"Atvasinājums — jēdziens un aprēķins",ru:"Производная — понятие и вычисление",en:"Derivative — Concept & Computation"},
+ github_folder:"topic_44",
+ tags:["atvasinājums","derivative","производная","d/dx","f'(x)","f prime",
+       "differentiate","diferenciāt","ātrums","скорость","rate of change",
+       "tangent line","pieskare","касательная","правила дифференцирования","rules"],
+ isActive:false},
+
+{id:"topic_45",
+ category:{lv:"Matemātiskā analīze",ru:"Математический анализ",en:"Calculus"},
+ title:{lv:"Atvasinājuma pielietojums — ekstrēmi",ru:"Производная — экстремумы функции",en:"Derivative Applications — Extrema"},
+ github_folder:"topic_45",
+ tags:["minimums","minimum","минимум","maksimums","maximum","максимум",
+       "ekstrēms","extremum","критическая точка","critical point","f'(x)=0",
+       "monotone","monotons","pieaugošs","убывающий","inflection point","liekuma punkts"],
+ isActive:false},
+
+]; // TOPICS end
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 4 — LAIKS UN STRIKS
+   ════════════════════════════════════════════════════════════
+   DROŠĪBA pret laika manipulācijām:
+   Latvijas datums tiek noteikts TIKAI ar Intl.DateTimeFormat
+   { timeZone: "Europe/Riga" }. Sistēmas pulksteņa maiņa
+   neietekmē rezultātu — tas ir atkarīgs no servera UTC laika
+   un IANA laika joslas datu bāzes pārlūkprogrammā.
+   ──────────────────────────────────────────────────────────── */
+
+/** Atgriež šodienas datumu Latvijas laikā "YYYY-MM-DD" formātā */
+function getRigaDate() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Riga",
+    year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(new Date());
+}
+
+function loadAppData() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; }
+}
+function saveAppData(d) {
+  localStorage.setItem(LS_KEY, JSON.stringify(d));
+}
+
+/**
+ * Inicializē / migrē datus.
+ * Ja jaunā diena (Rīgas laika) — pārbauda, vai striks tika nopelnīts,
+ * un atiestata dienas skaitītāju.
+ */
+function initAppData() {
+  const today = getRigaDate();
+  let d = loadAppData();
+  if (!d) {
+    d = { date: today, count: 0, streak: 0, score: 90 };
+    saveAppData(d);
+    return d;
+  }
+  if (d.date !== today) {
+    const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
+    d.streak = (d.count >= minOk) ? (d.streak || 0) + 1 : 0;
+    d.date   = today;
+    d.count  = 0;
+    saveAppData(d);
+  }
+  return d;
+}
+
+let AD = initAppData(); // application data
+
+/** Pievieno 1 uzdevumu, saglabā, atjauno UI */
+function addTask() {
+  AD.count++;
+  saveAppData(AD);
+  renderStreak();
+  renderProgress();
+}
+
+/** Atjaunina liesmas ikonu un striku skaitītāju */
+function renderStreak() {
+  const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
+  const on    = AD.count >= minOk;
+  document.getElementById("fireIcon").className = "s-fire " + (on ? "on" : "off");
+  document.getElementById("streakNum").textContent = AD.streak;
+}
+
+/** Atjaunina dienas mērķa joslu un tekstu */
+function renderProgress() {
+  const pct = Math.min(100, (AD.count / DAILY_GOAL) * 100);
+  document.getElementById("progFill").style.width = pct + "%";
+  document.getElementById("doneNum").textContent  = AD.count;
+  document.getElementById("goalNum").textContent  = DAILY_GOAL;
+  document.getElementById("taskWrd").textContent  = tx("taskWrd");
+  document.getElementById("goalHint").textContent =
+    tx("goalHint").replace("${G}", DAILY_GOAL);
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 5 — GITHUB MARŠRUTĒŠANA
+   ════════════════════════════════════════════════════════════
+   Katrā tēmā ir github_folder. Kad lietotājs noklikšķina uz
+   aktīvas kartītes, viņš tiek novirzīts uz:
+     PRACTICE_PAGE?topic=<github_folder>
+   practice.html pats pieprasa failus no:
+     GITHUB_BASE_URL + github_folder + "/..."
+   ──────────────────────────────────────────────────────────── */
+function getTopicUrl(topic) {
+  return PRACTICE_PAGE + "?topic=" + encodeURIComponent(topic.github_folder);
+}
+function goToTopic(topic) {
+  if (!topic.isActive) return;
+  window.location.href = getTopicUrl(topic);
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 6 — MEKLĒŠANAS LOĢIKA  (fuzzy-style)
+   ════════════════════════════════════════════════════════════
+   Meklēšana notiek pret VISIEM tēmas laukiem:
+     • nosaukums visās valodās
+     • kategorija visās valodās
+     • tags masīvs (daudzvalodu sinonīmi)
+   Vaicājums tiek sadalīts atstarpes-tokenī.
+   Tēma tiek rādīta, ja VISI tokeni atrasti kaut kur
+   norādītajos laukos (case-insensitive substring match).
+   Piemērs: "дискриминант" → atrod topic_10 caur tags[].
+   ──────────────────────────────────────────────────────────── */
+let searchQ  = "";
+let filterCat = null; // null = visas
+
+function topicMatch(topic, q) {
+  if (!q) return true;
+  const tokens = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const hay = [
+    topic.title.lv, topic.title.ru, topic.title.en,
+    topic.category.lv, topic.category.ru, topic.category.en,
+    ...topic.tags
+  ].join(" ").toLowerCase();
+  return tokens.every(tok => hay.includes(tok));
+}
+
+function filtered() {
+  return TOPICS.filter(tp => {
+    const ms = topicMatch(tp, searchQ);
+    const mc = !filterCat || tp.category.lv === filterCat;
+    return ms && mc;
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 7 — RENDERĒŠANA
+   ════════════════════════════════════════════════════════════ */
+
+/** Kategoriju filtru pogas */
+function renderCats() {
+  const seen = new Set();
+  const cats = [];
+  TOPICS.forEach(tp => {
+    if (!seen.has(tp.category.lv)) { seen.add(tp.category.lv); cats.push(tp.category); }
+  });
+  const wrap = document.getElementById("catFilters");
+  let h = `<button class="cat-btn on" data-c="">${tx("catAll")}</button>`;
+  cats.forEach(c => {
+    h += `<button class="cat-btn" data-c="${c.lv}">${c[lang]||c.lv}</button>`;
+  });
+  wrap.innerHTML = h;
+  wrap.querySelectorAll(".cat-btn").forEach(b => {
+    b.addEventListener("click", () => {
+      wrap.querySelectorAll(".cat-btn").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on");
+      filterCat = b.dataset.c || null;
+      renderGrid();
+    });
+  });
+}
+
+/** Tēmu kartīšu režģis */
+function renderGrid() {
+  const list = filtered();
+  const grid = document.getElementById("topicGrid");
+  const resCnt = document.getElementById("resCnt");
+  resCnt.textContent = list.length < TOPICS.length
+    ? tx("resTpl").replace("{n}", list.length)
+    : "";
+
+  if (!list.length) {
+    grid.innerHTML =
+      `<div class="empty"><div class="empty-ico">🔍</div>` +
+      `<div class="empty-txt">${tx("empty")}</div></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(tp => {
+    const num   = tp.id.split("_")[1];
+    const title = tp.title[lang] || tp.title.lv;
+    const cat   = tp.category[lang] || tp.category.lv;
+    const on    = tp.isActive;
+    const badge = on
+      ? `<span class="bdg bdg-on">${tx("bdgOn")}</span>`
+      : `<span class="bdg bdg-off">${tx("bdgOff")}</span>`;
+    const action = on
+      ? `<span class="card-cta">${tx("cta")}</span>`
+      : `<span class="card-lock">🔒 ${tx("lock")}</span>`;
+
+    return `<div class="card ${on?"c-on":"c-off"}"
+              data-id="${tp.id}" ${on?'role="button" tabindex="0"':""}>
+      <div class="card-top">
+        ${badge}
+        <span class="card-num"># ${num}</span>
+      </div>
+      <div class="card-title">${title}</div>
+      <div class="card-bot">
+        <span class="cat-tag">${cat}</span>
+        ${action}
+      </div>
+    </div>`;
+  }).join("");
+
+  /* Klikšķu apstrādātāji */
+  grid.querySelectorAll(".c-on").forEach(el => {
+    const id = el.dataset.id;
+    const tp = TOPICS.find(x => x.id === id);
+    el.addEventListener("click", () => goToTopic(tp));
+    el.addEventListener("keydown", e => { if (e.key==="Enter") goToTopic(tp); });
+  });
+}
+
+/** Visi statiskie teksti */
+function renderTexts() {
+  document.getElementById("eyebrow").textContent     = tx("eyebrow");
+  document.getElementById("heroTitleAcc").textContent = tx("heroAcc");
+  document.getElementById("heroTitleRest").textContent= tx("heroRest");
+  document.getElementById("scoreLbl").textContent     = tx("scoreLbl");
+  document.getElementById("scoreHint").textContent    = tx("scoreHint");
+  document.getElementById("goalLbl").textContent      = tx("goalLbl");
+  document.getElementById("backLbl").textContent      = tx("back");
+  document.getElementById("searchInput").placeholder  = tx("search");
+}
+
+/** Pilna UI atjaunināšana */
+function renderAll() {
+  renderTexts();
+  renderProgress();
+  renderStreak();
+  renderCats();
+  renderGrid();
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 8 — SCORE SLIDERS
+   ════════════════════════════════════════════════════════════ */
+function initSlider() {
+  const sl = document.getElementById("scoreSlider");
+  const dv = document.getElementById("scoreVal");
+  sl.value = AD.score || 90;
+  const upd = () => {
+    const v = sl.value;
+    dv.textContent = v + "%";
+    const p = ((v - 40) / 60 * 100).toFixed(1) + "%";
+    sl.style.setProperty("--p", p);
+    AD.score = parseInt(v);
+    saveAppData(AD);
+  };
+  upd();
+  sl.addEventListener("input", upd);
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 9 — VALODAS PĀRSLĒDZĒJS
+   ════════════════════════════════════════════════════════════ */
+function initLang() {
+  document.querySelectorAll(".lbtn").forEach(b => {
+    b.addEventListener("click", () => {
+      lang = b.dataset.lang;
+      document.querySelectorAll(".lbtn").forEach(x=>x.classList.remove("on"));
+      b.classList.add("on");
+      document.documentElement.lang = lang;
+      renderAll();
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 10 — MEKLĒŠANAS LAUKS
+   ════════════════════════════════════════════════════════════ */
+function initSearch() {
+  const inp = document.getElementById("searchInput");
+  const clr = document.getElementById("searchClear");
+  inp.addEventListener("input", () => {
+    searchQ = inp.value;
+    clr.classList.toggle("vis", !!searchQ);
+    renderGrid();
+  });
+  clr.addEventListener("click", () => {
+    inp.value = searchQ = "";
+    clr.classList.remove("vis");
+    inp.focus(); renderGrid();
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 11 — CHEAT / DEV POGA
+   ════════════════════════════════════════════════════════════
+   Simulē 1 atrisinātu uzdevumu. Tikai priekš testēšanas.
+   Ražošanā šo pogu var noņemt vai paslēpt.
+   ──────────────────────────────────────────────────────────── */
+function initCheat() {
+  document.getElementById("cheatBtn").addEventListener("click", addTask);
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  INICIALIZĀCIJA
+   ════════════════════════════════════════════════════════════ */
+(function init() {
+  initLang();
+  initSlider();
+  initSearch();
+  initCheat();
+  renderAll();
+})();
+
+/*
+  PIEZĪME PAR window.callGemini():
+  ──────────────────────────────────────────────────────────────
+  Šajā lapā (dashboard) AI netiek izsaukts — tā ir navigācijas lapa.
+  window.callGemini() no auth.js ir pieejams un tiek izmantots
+  practice.html, kur tiek ģenerēti uzdevumi un atrisinājumi.
+  Piemērs (practice.html):
+    const raw = await window.callGemini(PROMPT, { temperature: 0.8 });
+  ──────────────────────────────────────────────────────────────
+*/
 </script>
 </body>
 </html>
