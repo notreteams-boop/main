@@ -629,13 +629,29 @@ footer {
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ============================================================
-   LOAD ANIMATION
+   LOAD ANIMATION — pure CSS, no IntersectionObserver dependency
    ============================================================ */
 .fade-up {
-  opacity: 0; transform: translateY(24px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
+  animation: fadeUpAnim 0.6s ease both;
 }
-.fade-up.vis { opacity: 1; transform: none; }
+@keyframes fadeUpAnim {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Stagger delays: hero first, then sections cascade */
+#hero .fomo.fade-up        { animation-delay: 0.15s; }
+#hero .btn-primary.fade-up { animation-delay: 0.25s; }
+#audience .fade-up         { animation-delay: 0.05s; }
+#audience .grid3 .fade-up:nth-child(1) { animation-delay: 0.08s; }
+#audience .grid3 .fade-up:nth-child(2) { animation-delay: 0.16s; }
+#audience .grid3 .fade-up:nth-child(3) { animation-delay: 0.24s; }
+#platform .plat-txt.fade-up  { animation-delay: 0.05s; }
+#platform .phone.fade-up     { animation-delay: 0.15s; }
+#compare .fade-up            { animation-delay: 0.05s; }
+#compare .tbl-scroll.fade-up { animation-delay: 0.15s; }
+#reviews .fade-up            { animation-delay: 0.05s; }
+#faq .fade-up                { animation-delay: 0.05s; }
+#fcta .fade-up               { animation-delay: 0.05s; }
 </style>
 </head>
 <body>
@@ -1384,16 +1400,6 @@ async function doRegister() {
 
 // ESC to close
 document.addEventListener("keydown", function(e) { if(e.key==="Escape") closeModal(); });
-
-(function() {
-  var els = document.querySelectorAll(".fade-up");
-  var obs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { e.target.classList.add("vis"); obs.unobserve(e.target); }
-    });
-  }, { threshold: 0.12 });
-  els.forEach(function(el) { obs.observe(el); });
-})();
 </script>
 <!-- ════ AUTH MODAL ════ -->
 <div class="modal-ov" id="authModal" onclick="modalOverlayClick(event)">
