@@ -199,6 +199,19 @@ input[type=range]::-moz-range-thumb{
 }
 .cheat-btn:hover{border-color:var(--a);color:var(--a);}
 
+/* Score OK button */
+.score-ok{
+  display:block;width:100%;margin-top:12px;padding:9px 0;
+  background:var(--a-dim);border:1px solid var(--a-brd);border-radius:8px;
+  color:var(--a);font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:700;
+  letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:all .2s;
+}
+.score-ok:hover{background:var(--a);color:#000;box-shadow:0 0 14px var(--a-glo);}
+.score-ok-hint{
+  font-size:.72rem;color:var(--mu);margin-top:7px;text-align:center;
+  font-family:'Share Tech Mono',monospace;letter-spacing:.3px;
+}
+
 /* ═══════════════════════════════════════════════════════════════
    SEARCH + FILTERS
    ═══════════════════════════════════════════════════════════════ */
@@ -360,7 +373,7 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 
-  <a href="/main/menu.html" class="btn-back">
+  <a href="#" class="btn-back" id="backBtn" onclick="handleLogout(event)">
     ← <span class="btn-lbl" id="backLbl">Uz galveno izvēlni</span>
   </a>
 </header>
@@ -381,6 +394,8 @@ input[type=range]::-moz-range-thumb{
       </div>
       <input type="range" id="scoreSlider" min="40" max="100" value="90" step="5"/>
       <div class="score-hint" id="scoreHint">Tiek ieteikts apgūt visas aktīvās tēmas</div>
+      <button class="score-ok" id="scoreOkBtn">OK</button>
+      <div class="score-ok-hint" id="scoreOkHint"></div>
     </div>
   </div>
 
@@ -398,7 +413,7 @@ input[type=range]::-moz-range-thumb{
     </div>
     <div class="daily-bot">
       <span class="daily-hint" id="goalHint"></span>
-      <button class="cheat-btn" id="cheatBtn" title="Dev: simulē +1 uzdevumu">＋ TEST</button>
+      <button class="cheat-btn" id="cheatBtn" title="Dev: simulē +1 uzdevumu" style="display:none">＋ TEST</button>
     </div>
   </div>
 
@@ -438,9 +453,15 @@ input[type=range]::-moz-range-thumb{
    ──────────────────────────────────────────────────────────── */
 const GITHUB_BASE_URL = "https://notreteams-boop.github.io/tasks/";
 const PRACTICE_PAGE   = "/main/practice.html";
-const DAILY_GOAL      = 15;          // dienas mērķis (uzdevumi)
+let DAILY_GOAL        = 15;          // dienas mērķis — dinamiski no CE rezultāta
 const STREAK_MIN_PCT  = 0.10;        // 10% no normas = minimums strikam
 const LS_KEY          = "olmat_v1"; // localStorage atslēga
+
+/** Aprēķina dienas uzdevumu mērķi no CE rezultāta %.
+ *  40% → 5 uzd, 100% → 35 uzd (lineāri) */
+function scoreToGoal(score) {
+  return Math.round(5 + (score - 40) / 60 * 30);
+}
 
 /* ════════════════════════════════════════════════════════════
    █  SEKCIJA 2 — TULKOJUMI  (LV / RU / EN)
@@ -459,7 +480,8 @@ lv:{
   cta:"Sākt →", lock:"Drīzumā",
   back:"Uz galveno izvēlni",
   empty:"Nekas netika atrasts. Mēģini citu atslēgvārdu.",
-  resTpl:"{n} tēmas"
+  resTpl:"{n} tēmas",
+  perDay:"uzd./dienā"
 },
 ru:{
   eyebrow:"VISC CE · OPTIMĀLAIS LĪMENIS",
@@ -474,7 +496,8 @@ ru:{
   cta:"Начать →", lock:"Скоро",
   back:"В главное меню",
   empty:"Ничего не найдено. Попробуй другой запрос.",
-  resTpl:"{n} темы"
+  resTpl:"{n} темы",
+  perDay:"зад./день"
 },
 en:{
   eyebrow:"VISC CE · OPTIMĀLAIS LĪMENIS",
@@ -489,7 +512,8 @@ en:{
   cta:"Start →", lock:"Soon",
   back:"Back to Menu",
   empty:"Nothing found. Try a different search.",
-  resTpl:"{n} topics"
+  resTpl:"{n} topics",
+  perDay:"tasks/day"
 }
 };
 
@@ -943,8 +967,10 @@ function initAppData() {
   if (!d) {
     d = { date: today, count: 0, streak: 0, score: 90 };
     saveAppData(d);
+    DAILY_GOAL = scoreToGoal(90);
     return d;
   }
+  DAILY_GOAL = scoreToGoal(d.score || 90);
   if (d.date !== today) {
     const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
     d.streak = (d.count >= minOk) ? (d.streak || 0) + 1 : 0;
@@ -1123,6 +1149,8 @@ function renderTexts() {
   document.getElementById("goalLbl").textContent      = tx("goalLbl");
   document.getElementById("backLbl").textContent      = tx("back");
   document.getElementById("searchInput").placeholder  = tx("search");
+  document.getElementById("scoreOkHint").textContent  =
+    "→ " + scoreToGoal(AD.score || 90) + " " + tx("perDay");
 }
 
 /** Pilna UI atjaunināšana */
@@ -1138,19 +1166,36 @@ function renderAll() {
    █  SEKCIJA 8 — SCORE SLIDERS
    ════════════════════════════════════════════════════════════ */
 function initSlider() {
-  const sl = document.getElementById("scoreSlider");
-  const dv = document.getElementById("scoreVal");
+  const sl     = document.getElementById("scoreSlider");
+  const dv     = document.getElementById("scoreVal");
+  const okBtn  = document.getElementById("scoreOkBtn");
+  const okHint = document.getElementById("scoreOkHint");
+
   sl.value = AD.score || 90;
-  const upd = () => {
-    const v = sl.value;
+
+  const updPreview = () => {
+    const v = parseInt(sl.value);
     dv.textContent = v + "%";
     const p = ((v - 40) / 60 * 100).toFixed(1) + "%";
     sl.style.setProperty("--p", p);
-    AD.score = parseInt(v);
-    saveAppData(AD);
+    okHint.textContent = "→ " + scoreToGoal(v) + " " + tx("perDay");
   };
-  upd();
-  sl.addEventListener("input", upd);
+
+  const applyGoal = () => {
+    const v    = parseInt(sl.value);
+    AD.score   = v;
+    DAILY_GOAL = scoreToGoal(v);
+    saveAppData(AD);
+    renderProgress();
+    renderStreak();
+    /* Визуальное подтверждение */
+    okBtn.textContent = "✓";
+    setTimeout(() => { okBtn.textContent = "OK"; }, 900);
+  };
+
+  updPreview();
+  sl.addEventListener("input", updPreview);
+  okBtn.addEventListener("click", applyGoal);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1197,6 +1242,31 @@ function initCheat() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 12 — IZIET NO KONTA (LOGOUT)
+   ════════════════════════════════════════════════════════════
+   Tiek izsaukts, kad lietotājs nospiež "Uz galveno izvēlni".
+   Mēģina izsaukt auth.js logout funkciju, pēc tam pāriet uz /.
+   ──────────────────────────────────────────────────────────── */
+async function handleLogout(e) {
+  if (e) e.preventDefault();
+  try {
+    if      (typeof window.logout    === "function") await window.logout();
+    else if (typeof window.signOut   === "function") await window.signOut();
+    else if (window.firebase?.auth)                  await window.firebase.auth().signOut();
+  } catch (err) { console.warn("Logout:", err); }
+  window.location.href = "/";
+}
+
+/* Auto-atjauninājums, ja practice.html maina localStorage
+   (uzdevumu skaits tiek ņemts automātiski bez pogas)        */
+window.addEventListener("storage", (e) => {
+  if (e.key === LS_KEY) {
+    const fresh = loadAppData();
+    if (fresh) { AD = fresh; renderProgress(); renderStreak(); }
+  }
+});
+
+/* ════════════════════════════════════════════════════════════
    █  INICIALIZĀCIJA
    ════════════════════════════════════════════════════════════ */
 (function init() {
@@ -1219,4 +1289,4 @@ function initCheat() {
 */
 </script>
 </body>
-</html>
+   </html>
