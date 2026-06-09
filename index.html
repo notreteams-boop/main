@@ -100,8 +100,18 @@ header {
   text-decoration: none; cursor: pointer;
   transition: all 0.2s; white-space: nowrap;
   min-height: 38px; display: flex; align-items: center;
+  position: relative; overflow: hidden;
 }
 .btn-login:hover { background: var(--lime); color: #000; }
+.btn-login::after {
+  content: '';
+  position: absolute; top: -60%; left: -80%;
+  width: 45%; height: 220%;
+  background: linear-gradient(105deg, transparent 20%, rgba(168,230,53,0.45) 50%, transparent 80%);
+  transform: skewX(-18deg);
+  animation: wave-btn 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
 
 /* ============================================================
    LAYOUT HELPERS
@@ -137,8 +147,23 @@ header {
   text-decoration: none; cursor: pointer;
   transition: all 0.22s;
   box-shadow: 0 0 28px var(--lime-glow);
+  position: relative; overflow: hidden;
 }
 .btn-primary:hover { background: #bef060; transform: translateY(-2px); box-shadow: 0 0 44px rgba(168,230,53,0.45); }
+.btn-primary::after {
+  content: '';
+  position: absolute; top: -60%; left: -80%;
+  width: 40%; height: 220%;
+  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.38) 50%, transparent 80%);
+  transform: skewX(-18deg);
+  animation: wave-btn 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes wave-btn {
+  0%   { left: -80%; }
+  55%  { left: 130%; }
+  100% { left: 130%; }
+}
 
 .sec-label { text-align: center; }
 .sec-label h2 { margin-bottom: 10px; }
@@ -488,6 +513,122 @@ footer {
 }
 
 /* ============================================================
+   MODAL AUTH
+   ============================================================ */
+.modal-ov {
+  display: none; position: fixed; inset: 0; z-index: 600;
+  background: rgba(0,0,0,0.72);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-ov.open { display: flex; animation: mfade .22s ease; }
+@keyframes mfade { from { opacity:0; } to { opacity:1; } }
+
+.modal-card {
+  background: #130826;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 24px;
+  padding: 32px 28px 28px;
+  width: 100%; max-width: 370px;
+  position: relative;
+  box-shadow: 0 28px 70px rgba(0,0,0,0.65), 0 0 0 1px rgba(168,230,53,0.07);
+  animation: mslide .25s ease;
+}
+@keyframes mslide { from { transform: translateY(18px); opacity:0; } to { transform:none; opacity:1; } }
+
+.modal-close {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none; color: var(--muted);
+  font-size: 1.3rem; cursor: pointer; line-height: 1;
+  transition: color .2s;
+}
+.modal-close:hover { color: var(--text); }
+
+.modal-logo {
+  font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800;
+  background: linear-gradient(120deg, var(--lime) 0%, var(--purple) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 20px;
+}
+
+.modal-tabs {
+  display: flex; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: var(--r-btn);
+  padding: 3px; gap: 3px; margin-bottom: 24px;
+}
+.mtab {
+  flex: 1; padding: 9px; min-height: 40px;
+  background: transparent; border: none; border-radius: var(--r-btn);
+  font-family: 'Figtree', sans-serif; font-size: 0.88rem; font-weight: 700;
+  color: var(--muted); cursor: pointer; transition: all .22s;
+  position: relative; overflow: hidden;
+}
+.mtab.active { background: var(--lime); color: #000; }
+.mtab.active::after {
+  content:''; position:absolute; top:-60%; left:-80%;
+  width:40%; height:220%;
+  background: linear-gradient(105deg,transparent 20%,rgba(255,255,255,0.38) 50%,transparent 80%);
+  transform:skewX(-18deg);
+  animation: wave-btn 2.6s ease-in-out infinite;
+  pointer-events:none;
+}
+
+.mform { display: none; }
+.mform.on { display: block; }
+
+.mfield { margin-bottom: 16px; }
+.mfield label {
+  display: block; font-size: 0.78rem; color: var(--muted);
+  margin-bottom: 7px; font-weight: 600;
+}
+.mfield input {
+  width: 100%; padding: 11px 14px; min-height: 46px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border); border-radius: var(--r-sm);
+  color: var(--text); font-size: 0.92rem;
+  font-family: 'Figtree', sans-serif; outline: none;
+  transition: border-color .2s;
+}
+.mfield input:focus { border-color: var(--lime); }
+
+.mbtn {
+  width: 100%; padding: 13px; min-height: 50px;
+  background: var(--lime); color: #000;
+  border: none; border-radius: var(--r-btn);
+  font-family: 'Figtree', sans-serif; font-size: 0.97rem; font-weight: 700;
+  cursor: pointer; transition: background .2s;
+  margin-top: 6px; position: relative; overflow: hidden;
+}
+.mbtn:hover { background: #bef060; }
+.mbtn:disabled { opacity: .45; cursor: not-allowed; }
+.mbtn::after {
+  content:''; position:absolute; top:-60%; left:-80%;
+  width:40%; height:220%;
+  background: linear-gradient(105deg,transparent 20%,rgba(255,255,255,0.38) 50%,transparent 80%);
+  transform:skewX(-18deg);
+  animation: wave-btn 2.6s ease-in-out infinite;
+  pointer-events:none;
+}
+
+.merr {
+  font-size: 0.79rem; color: #f87171; margin-top: 12px;
+  display: none; line-height: 1.5;
+}
+.mok {
+  font-size: 0.79rem; color: var(--lime); margin-top: 12px;
+  display: none; font-weight: 600;
+}
+
+.mspinner {
+  display: inline-block; width: 13px; height: 13px;
+  border: 2px solid rgba(0,0,0,0.3); border-top-color: #000;
+  border-radius: 50%; animation: spin .65s linear infinite;
+  vertical-align: middle; margin-left: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
    LOAD ANIMATION
    ============================================================ */
 .fade-up {
@@ -516,7 +657,7 @@ footer {
       <button class="lbtn" data-lang="ru">RU</button>
       <button class="lbtn" data-lang="en">ENG</button>
     </div>
-    <a href="/main/login.html" class="btn-login" data-i18n="nav.login">Ienākt</a>
+    <button class="btn-login" id="hdrLoginBtn" data-i18n="nav.login" onclick="openModal('login')">Ienākt</button>
   </div>
 </header>
 
@@ -542,7 +683,7 @@ footer {
       </div>
     </div>
 
-    <a href="/main/login.html" class="btn-primary fade-up" data-i18n="hero.cta">Izmēģināt bez maksas →</a>
+    <button class="btn-primary fade-up" onclick="openModal('register')" data-i18n="hero.cta">Reģistrēties →</button>
   </div>
 </section>
 
@@ -836,7 +977,7 @@ footer {
       <div style="text-align:center; margin-top:10px; font-size:0.79rem; color:var(--orange); font-weight:700" data-i18n="fomo.warn">⚠ Atlikušas tikai 17 vietas!</div>
     </div>
 
-    <a href="/main/login.html" class="btn-primary fade-up" data-i18n="hero.cta">Izmēģināt bez maksas →</a>
+    <button class="btn-primary fade-up" onclick="openModal('register')" data-i18n="hero.cta">Reģistrēties →</button>
 
     <div style="margin-top:28px; font-size:0.85rem; color:var(--muted)" data-i18n="fcta.msg">Jautājumi? Raksti mums:</div>
     <div class="msg-row">
@@ -866,7 +1007,7 @@ lv: {
   "hero.h1":"Bezgalīgs matemātikas OL trenažieris veiksmīgai CE nokārtošanai",
   "hero.sub":"Tūkstošiem aktuālu uzdevumu pēc Skola2030 standartiem ar tūlītēju kļūdu analīzi un soli pa solim skaidrojumu katrai atbildei. Sāc gatavoties savā tempā bez privātskolotājiem.",
   "fomo.lbl":"Aizņemtas vietas","fomo.cnt":"83 / 100","fomo.unit":"/mēnesī","fomo.disc":"−64%","fomo.warn":"⚠ Atlikušas tikai 17 vietas!",
-  "hero.cta":"Izmēģināt bez maksas →",
+  "hero.cta":"Reģistrēties →",
   "aud.h2":"Šis trenažieris ir domāts tev","aud.s":"Skolēnam","aud.p":"Vecākiem",
   "s1.t":"Grūti piespiest sevi mācīties sausu teoriju","s1.d":"Klasiskās mācību grāmatas nogurdina. Mūsu trenažieris ir kā spēle — katrs uzdevums ir jauns izaicinājums un progress ir taustāms.",
   "s2.t":"Pārsātināts ar nesaprotamām formulām","s2.d":"Katram atrisinājumam — vienkāršs, cilvēciskā valodā skaidrojums. Ne akadēmiskās frāzes, bet īsts saprotams teksts.",
@@ -895,14 +1036,19 @@ lv: {
   "faq.q2":"Vai var atcelt abonementu?","faq.a2":"Jā, jebkurā brīdī personīgajā kabinetā ar vienu klikšķi. Nekādu slēpto maksājumu, sodiem par atteikšanos vai papildu nosacījumu. Atceli — un nekāda turpmāka norakstīšana.",
   "faq.q3":"Vai jūs izsniedz čeku VID?","faq.a3":"Jā, visi maksājumi ir oficiāli. Pēc katra maksājuma tu saņemsi rēķinu (invoice) uz e-pastu. To var izmantot, lai atskaitītu 20% IIN par izglītības izdevumiem saskaņā ar Latvijas nodokļu likumdošanu.",
   "fcta.h2":"Sāc gatavošanos jau šodien","fcta.p":"Tikai 8.99 € / mēnesī. Atlikušas 17 vietas ar īpašo cenu.","fcta.msg":"Jautājumi? Raksti mums:",
-  "ft.pp":"Privātuma politika","ft.tos":"Lietošanas noteikumi","ft.copy":"© 2025 OL Mat SIA. Visi tiesības aizsargātas."
+  "ft.pp":"Privātuma politika","ft.tos":"Lietošanas noteikumi","ft.copy":"© 2025 OL Mat SIA. Visi tiesības aizsargātas.",
+  "m.login":"Ieiet","m.register":"Reģistrēties",
+  "m.user":"Lietotājvārds","m.pass":"Parole","m.pass2":"Atkārtot paroli",
+  "m.login.btn":"Ieiet","m.reg.btn":"Reģistrēties",
+  "m.no.match":"Paroles nesakrīt.","m.fill":"Lūdzu, aizpildi visus laukus.",
+  "m.ok":"Veiksmīgi! Novirzām uz uzdevumiem...","m.err.net":"Savienojuma kļūda. Pārbaudi internetu."
 },
 ru: {
   "nav.login":"Войти","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
   "hero.h1":"Бесконечный тренажёр по математике OL для успешной сдачи экзамена VISC",
   "hero.sub":"Тысячи актуальных заданий по стандартам Skola2030 с мгновенным разбором ошибок и подробным пошаговым объяснением каждого ответа. Начни готовиться в своём темпе без репетиторов.",
   "fomo.lbl":"Занятых мест","fomo.cnt":"83 / 100","fomo.unit":"/месяц","fomo.disc":"−64%","fomo.warn":"⚠ Осталось только 17 мест!",
-  "hero.cta":"Попробовать бесплатно →",
+  "hero.cta":"Зарегистрироваться →",
   "aud.h2":"Этот тренажёр создан для тебя","aud.s":"Ученику","aud.p":"Родителю",
   "s1.t":"Сложно заставить себя учить сухую теорию","s1.d":"Классические учебники утомляют. Наш тренажёр — как игра: каждое задание — новый вызов и прогресс ощутим.",
   "s2.t":"Устал от непонятных формул","s2.d":"К каждому решению — простое объяснение человеческим языком. Не академические фразы, а реальный понятный текст.",
@@ -931,14 +1077,19 @@ ru: {
   "faq.q2":"Можно ли отменить подписку?","faq.a2":"Да, в любой момент в личном кабинете в один клик. Никаких скрытых списаний, штрафов или дополнительных условий. Отменил — и больше никаких платежей.",
   "faq.q3":"Выдаёте ли вы чек для VID?","faq.a3":"Да, все платежи официальные. После каждого платежа вы получите инвойс на e-mail, который можно использовать для возврата 20% подоходного налога за образование.",
   "fcta.h2":"Начни подготовку сегодня","fcta.p":"Всего 8.99 € / месяц. Осталось 17 мест по специальной цене.","fcta.msg":"Вопросы? Напиши нам:",
-  "ft.pp":"Политика конфиденциальности","ft.tos":"Условия использования","ft.copy":"© 2025 OL Mat SIA. Все права защищены."
+  "ft.pp":"Политика конфиденциальности","ft.tos":"Условия использования","ft.copy":"© 2025 OL Mat SIA. Все права защищены.",
+  "m.login":"Войти","m.register":"Регистрация",
+  "m.user":"Имя пользователя","m.pass":"Пароль","m.pass2":"Повторить пароль",
+  "m.login.btn":"Войти","m.reg.btn":"Зарегистрироваться",
+  "m.no.match":"Пароли не совпадают.","m.fill":"Пожалуйста, заполни все поля.",
+  "m.ok":"Успешно! Переходим к заданиям...","m.err.net":"Ошибка соединения. Проверь интернет."
 },
 en: {
   "nav.login":"Log In","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
   "hero.h1":"Infinite Math OL Trainer for Successful VISC Exam Preparation",
   "hero.sub":"Thousands of current tasks aligned with Skola2030 standards, with instant error analysis and step-by-step explanations for every answer. Start preparing at your own pace without tutors.",
   "fomo.lbl":"Spots taken","fomo.cnt":"83 / 100","fomo.unit":"/month","fomo.disc":"−64%","fomo.warn":"⚠ Only 17 spots left!",
-  "hero.cta":"Try for free →",
+  "hero.cta":"Sign up →",
   "aud.h2":"This trainer is made for you","aud.s":"For Student","aud.p":"For Parent",
   "s1.t":"Hard to force yourself to study dry theory","s1.d":"Classic textbooks are exhausting. Our trainer is like a game — each task is a new challenge and progress is tangible.",
   "s2.t":"Tired of incomprehensible formulas","s2.d":"Every solution has a simple, human-language explanation. Not academic jargon, but real understandable text.",
@@ -967,7 +1118,12 @@ en: {
   "faq.q2":"Can I cancel my subscription?","faq.a2":"Yes, at any time in your personal account with one click. No hidden charges, penalties or additional conditions. Cancel — no further payments.",
   "faq.q3":"Do you issue a receipt for VID?","faq.a3":"Yes, all payments are official. After each payment you will receive an invoice by email that can be used to reclaim 20% income tax on education expenses.",
   "fcta.h2":"Start preparing today","fcta.p":"Just 8.99 € / month. Only 17 spots left at the special price.","fcta.msg":"Questions? Write to us:",
-  "ft.pp":"Privacy Policy","ft.tos":"Terms of Service","ft.copy":"© 2025 OL Mat SIA. All rights reserved."
+  "ft.pp":"Privacy Policy","ft.tos":"Terms of Service","ft.copy":"© 2025 OL Mat SIA. All rights reserved.",
+  "m.login":"Log In","m.register":"Register",
+  "m.user":"Username","m.pass":"Password","m.pass2":"Repeat password",
+  "m.login.btn":"Log In","m.reg.btn":"Sign Up",
+  "m.no.match":"Passwords don't match.","m.fill":"Please fill in all fields.",
+  "m.ok":"Success! Taking you to tasks...","m.err.net":"Connection error. Check your internet."
 }
 };
 
@@ -1088,7 +1244,147 @@ window.addEventListener("load", function() {
   }, 400);
 });
 
-/* ── SCROLL FADE-IN ─────────────────────────────────────── */
+/* ── MODAL ──────────────────────────────────────────────────
+   Security: same WORKER_URL & token logic as auth.js — не трогаем
+   ─────────────────────────────────────────────────────────── */
+var WORKER_URL = "https://floral-tree-d2cb.eusjs56999.workers.dev/";
+
+function openModal(tab) {
+  document.getElementById("authModal").classList.add("open");
+  document.body.style.overflow = "hidden";
+  switchTab(tab || "login");
+  // Update modal text to current lang
+  document.querySelectorAll(".modal-card [data-i18n]").forEach(function(el) {
+    var k = el.getAttribute("data-i18n");
+    if (T[lang][k] !== undefined) el.innerHTML = T[lang][k];
+  });
+  // Focus first input
+  setTimeout(function() {
+    var first = document.querySelector(".mform.on input");
+    if (first) first.focus();
+  }, 120);
+}
+
+function closeModal() {
+  document.getElementById("authModal").classList.remove("open");
+  document.body.style.overflow = "";
+  clearModalErrors();
+}
+
+function modalOverlayClick(e) {
+  if (e.target === document.getElementById("authModal")) closeModal();
+}
+
+function switchTab(tab) {
+  var isLogin = tab === "login";
+  document.getElementById("tabLogin").classList.toggle("active", isLogin);
+  document.getElementById("tabReg").classList.toggle("active", !isLogin);
+  document.getElementById("mfLogin").classList.toggle("on", isLogin);
+  document.getElementById("mfReg").classList.toggle("on", !isLogin);
+  clearModalErrors();
+}
+
+function clearModalErrors() {
+  ["mLoginErr","mLoginOk","mRegErr","mRegOk"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.display="none"; el.textContent=""; }
+  });
+  ["mLoginBtn","mRegBtn"].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (btn) { btn.disabled = false; btn.innerHTML = btn.querySelector("span")
+      ? "<span>" + (btn.id==="mLoginBtn" ? (T[lang]["m.login.btn"]||"Ieiet") : (T[lang]["m.reg.btn"]||"Reģistrēties")) + "</span>"
+      : btn.textContent; }
+  });
+}
+
+function setBtnLoading(btnId) {
+  var btn = document.getElementById(btnId);
+  btn.disabled = true;
+  btn.innerHTML = btn.querySelector("span")
+    ? "<span>" + btn.querySelector("span").textContent + "</span><span class='mspinner'></span>"
+    : btn.textContent + "<span class='mspinner'></span>";
+}
+
+function showErr(errId, msg) {
+  var el = document.getElementById(errId);
+  el.textContent = msg; el.style.display = "block";
+}
+function showOk(okId, msg) {
+  var el = document.getElementById(okId);
+  el.textContent = msg; el.style.display = "block";
+}
+
+async function doLogin() {
+  var user = document.getElementById("mUser").value.trim();
+  var pass = document.getElementById("mPass").value.trim();
+  if (!user || !pass) { showErr("mLoginErr", T[lang]["m.fill"] || "Lūdzu, aizpildi visus laukus."); return; }
+  setBtnLoading("mLoginBtn");
+  document.getElementById("mLoginErr").style.display = "none";
+  try {
+    var res = await fetch(WORKER_URL + "login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: user, password: pass })
+    });
+    var data = await res.json();
+    if (!res.ok) {
+      showErr("mLoginErr", data.error || "Kļūda. Mēģini vēlreiz.");
+      document.getElementById("mLoginBtn").disabled = false;
+      document.getElementById("mLoginBtn").innerHTML = "<span>" + (T[lang]["m.login.btn"]||"Ieiet") + "</span>";
+      return;
+    }
+    localStorage.setItem("session_token", data.token);
+    showOk("mLoginOk", T[lang]["m.ok"] || "Veiksmīgi! Novirzām...");
+    setTimeout(function() { window.location.href = "/main/menu.html"; }, 900);
+  } catch(e) {
+    showErr("mLoginErr", T[lang]["m.err.net"] || "Savienojuma kļūda.");
+    document.getElementById("mLoginBtn").disabled = false;
+    document.getElementById("mLoginBtn").innerHTML = "<span>" + (T[lang]["m.login.btn"]||"Ieiet") + "</span>";
+  }
+}
+
+async function doRegister() {
+  var user  = document.getElementById("mRegUser").value.trim();
+  var pass  = document.getElementById("mRegPass").value.trim();
+  var pass2 = document.getElementById("mRegPass2").value.trim();
+  if (!user || !pass || !pass2) { showErr("mRegErr", T[lang]["m.fill"] || "Lūdzu, aizpildi visus laukus."); return; }
+  if (pass !== pass2) { showErr("mRegErr", T[lang]["m.no.match"] || "Paroles nesakrīt."); return; }
+  setBtnLoading("mRegBtn");
+  document.getElementById("mRegErr").style.display = "none";
+  try {
+    var res = await fetch(WORKER_URL + "register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: user, password: pass })
+    });
+    var data = await res.json();
+    if (!res.ok) {
+      showErr("mRegErr", data.error || "Kļūda. Mēģini vēlreiz.");
+      document.getElementById("mRegBtn").disabled = false;
+      document.getElementById("mRegBtn").innerHTML = "<span>" + (T[lang]["m.reg.btn"]||"Reģistrēties") + "</span>";
+      return;
+    }
+    localStorage.setItem("session_token", data.token);
+    showOk("mRegOk", T[lang]["m.ok"] || "Veiksmīgi! Novirzām...");
+    setTimeout(function() { window.location.href = "/main/menu.html"; }, 900);
+  } catch(e) {
+    showErr("mRegErr", T[lang]["m.err.net"] || "Savienojuma kļūda.");
+    document.getElementById("mRegBtn").disabled = false;
+    document.getElementById("mRegBtn").innerHTML = "<span>" + (T[lang]["m.reg.btn"]||"Reģistrēties") + "</span>";
+  }
+}
+
+// Enter key in modal inputs
+["mUser","mPass"].forEach(function(id) {
+  document.getElementById(id).addEventListener("keydown", function(e) { if(e.key==="Enter") doLogin(); });
+});
+["mRegUser","mRegPass","mRegPass2"].forEach(function(id) {
+  document.getElementById(id).addEventListener("keydown", function(e) { if(e.key==="Enter") doRegister(); });
+});
+
+// ESC to close
+document.addEventListener("keydown", function(e) { if(e.key==="Escape") closeModal(); });
+
 (function() {
   var els = document.querySelectorAll(".fade-up");
   var obs = new IntersectionObserver(function(entries) {
@@ -1099,5 +1395,61 @@ window.addEventListener("load", function() {
   els.forEach(function(el) { obs.observe(el); });
 })();
 </script>
+<!-- ════ AUTH MODAL ════ -->
+<div class="modal-ov" id="authModal" onclick="modalOverlayClick(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+    <div class="modal-logo">OL Mat</div>
+
+    <!-- Tabs -->
+    <div class="modal-tabs">
+      <button class="mtab active" id="tabLogin" onclick="switchTab('login')">
+        <span data-i18n="m.login">Ieiet</span>
+      </button>
+      <button class="mtab" id="tabReg" onclick="switchTab('register')">
+        <span data-i18n="m.register">Reģistrēties</span>
+      </button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="mform on" id="mfLogin">
+      <div class="mfield">
+        <label data-i18n="m.user">Lietotājvārds</label>
+        <input type="text" id="mUser" autocomplete="username" autocapitalize="none" />
+      </div>
+      <div class="mfield">
+        <label data-i18n="m.pass">Parole</label>
+        <input type="password" id="mPass" autocomplete="current-password" />
+      </div>
+      <button class="mbtn" id="mLoginBtn" onclick="doLogin()">
+        <span data-i18n="m.login.btn">Ieiet</span>
+      </button>
+      <div class="merr" id="mLoginErr"></div>
+      <div class="mok" id="mLoginOk"></div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="mform" id="mfReg">
+      <div class="mfield">
+        <label data-i18n="m.user">Lietotājvārds</label>
+        <input type="text" id="mRegUser" autocomplete="username" autocapitalize="none" />
+      </div>
+      <div class="mfield">
+        <label data-i18n="m.pass">Parole</label>
+        <input type="password" id="mRegPass" autocomplete="new-password" />
+      </div>
+      <div class="mfield">
+        <label data-i18n="m.pass2">Atkārtot paroli</label>
+        <input type="password" id="mRegPass2" autocomplete="new-password" />
+      </div>
+      <button class="mbtn" id="mRegBtn" onclick="doRegister()">
+        <span data-i18n="m.reg.btn">Reģistrēties</span>
+      </button>
+      <div class="merr" id="mRegErr"></div>
+      <div class="mok" id="mRegOk"></div>
+    </div>
+  </div>
+</div>
+
 </body>
-  </html>
+</html>
