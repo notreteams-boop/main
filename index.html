@@ -1057,7 +1057,17 @@ lv: {
   "m.user":"Lietotājvārds","m.pass":"Parole","m.pass2":"Atkārtot paroli",
   "m.login.btn":"Ieiet","m.reg.btn":"Reģistrēties",
   "m.no.match":"Paroles nesakrīt.","m.fill":"Lūdzu, aizpildi visus laukus.",
-  "m.ok":"Veiksmīgi! Novirzām uz uzdevumiem...","m.err.net":"Savienojuma kļūda. Pārbaudi internetu."
+  "m.ok":"Veiksmīgi! Novirzām uz uzdevumiem...","m.err.net":"Savienojuma kļūda. Pārbaudi internetu.",
+  "err.missing_fields":"Nav lietotājvārda vai paroles.",
+  "err.rate_limited":"Pārāk daudz mēģinājumu. Mēģini vēlāk.",
+  "err.invalid_credentials":"Nepareizs lietotājvārds vai parole.",
+  "err.subscription_inactive":"Abonements nav aktīvs.",
+  "err.subscription_expired":"Abonements beidzies.",
+  "err.device_limit":"Pārsniegts ierīču limits (maks. 3). Raksti Telegram, lai saņemtu palīdzību.",
+  "err.no_token":"Nav tokena. Lūdzu, ieej vēlreiz.",
+  "err.invalid_token":"Sesija beigusies. Lūdzu, ieej vēlreiz.",
+  "err.server_error":"Servera kļūda. Mēģini vēlāk.",
+  "err.unknown":"Kļūda. Mēģini vēlreiz."
 },
 ru: {
   "nav.login":"Войти","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
@@ -1098,7 +1108,17 @@ ru: {
   "m.user":"Имя пользователя","m.pass":"Пароль","m.pass2":"Повторить пароль",
   "m.login.btn":"Войти","m.reg.btn":"Зарегистрироваться",
   "m.no.match":"Пароли не совпадают.","m.fill":"Пожалуйста, заполни все поля.",
-  "m.ok":"Успешно! Переходим к заданиям...","m.err.net":"Ошибка соединения. Проверь интернет."
+  "m.ok":"Успешно! Переходим к заданиям...","m.err.net":"Ошибка соединения. Проверь интернет.",
+  "err.missing_fields":"Нет логина или пароля.",
+  "err.rate_limited":"Слишком много попыток. Попробуй позже.",
+  "err.invalid_credentials":"Неверный логин или пароль.",
+  "err.subscription_inactive":"Подписка неактивна.",
+  "err.subscription_expired":"Подписка истекла.",
+  "err.device_limit":"Превышен лимит устройств (макс. 3). Напиши в Telegram для помощи.",
+  "err.no_token":"Нет токена. Пожалуйста, войди снова.",
+  "err.invalid_token":"Сессия истекла. Пожалуйста, войди снова.",
+  "err.server_error":"Ошибка сервера. Попробуй позже.",
+  "err.unknown":"Ошибка. Попробуй снова."
 },
 en: {
   "nav.login":"Log In","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
@@ -1139,7 +1159,17 @@ en: {
   "m.user":"Username","m.pass":"Password","m.pass2":"Repeat password",
   "m.login.btn":"Log In","m.reg.btn":"Sign Up",
   "m.no.match":"Passwords don't match.","m.fill":"Please fill in all fields.",
-  "m.ok":"Success! Taking you to tasks...","m.err.net":"Connection error. Check your internet."
+  "m.ok":"Success! Taking you to tasks...","m.err.net":"Connection error. Check your internet.",
+  "err.missing_fields":"Missing username or password.",
+  "err.rate_limited":"Too many attempts. Try again later.",
+  "err.invalid_credentials":"Invalid username or password.",
+  "err.subscription_inactive":"Subscription is not active.",
+  "err.subscription_expired":"Subscription has expired.",
+  "err.device_limit":"Device limit reached (max 3). Message us on Telegram for help.",
+  "err.no_token":"No token. Please log in again.",
+  "err.invalid_token":"Session expired. Please log in again.",
+  "err.server_error":"Server error. Try again later.",
+  "err.unknown":"Something went wrong. Try again."
 }
 };
 
@@ -1330,6 +1360,14 @@ function showOk(okId, msg) {
   el.textContent = msg; el.style.display = "block";
 }
 
+function translateError(data) {
+  if (data && data.errorCode && T[lang]["err." + data.errorCode]) {
+    return T[lang]["err." + data.errorCode];
+  }
+  if (data && data.error) return data.error;
+  return T[lang]["err.unknown"] || "Kļūda. Mēģini vēlreiz.";
+}
+
 async function doLogin() {
   var user = document.getElementById("mUser").value.trim();
   var pass = document.getElementById("mPass").value.trim();
@@ -1344,7 +1382,7 @@ async function doLogin() {
     });
     var data = await res.json();
     if (!res.ok) {
-      showErr("mLoginErr", data.error || "Kļūda. Mēģini vēlreiz.");
+      showErr("mLoginErr", translateError(data));
       document.getElementById("mLoginBtn").disabled = false;
       document.getElementById("mLoginBtn").innerHTML = "<span>" + (T[lang]["m.login.btn"]||"Ieiet") + "</span>";
       return;
@@ -1375,7 +1413,7 @@ async function doRegister() {
     });
     var data = await res.json();
     if (!res.ok) {
-      showErr("mRegErr", data.error || "Kļūda. Mēģini vēlreiz.");
+      showErr("mRegErr", translateError(data));
       document.getElementById("mRegBtn").disabled = false;
       document.getElementById("mRegBtn").innerHTML = "<span>" + (T[lang]["m.reg.btn"]||"Reģistrēties") + "</span>";
       return;
