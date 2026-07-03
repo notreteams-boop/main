@@ -1067,7 +1067,15 @@ lv: {
   "err.no_token":"Nav tokena. Lūdzu, ieej vēlreiz.",
   "err.invalid_token":"Sesija beigusies. Lūdzu, ieej vēlreiz.",
   "err.server_error":"Servera kļūda. Mēģini vēlāk.",
-  "err.unknown":"Kļūda. Mēģini vēlreiz."
+  "err.unknown":"Kļūda. Mēģini vēlreiz.",
+  "m.reg.name":"Vārds",
+  "m.reg.username":"Vēlamais lietotājvārds",
+  "m.reg.note":"Pēc pārbaudes tiksi novirzīts uz Telegram, lai pabeigtu reģistrāciju un saņemtu pieejas datus.",
+  "m.reg.redirecting":"Novirzām uz Telegram...",
+  "err.username_invalid_format":"Lietotājvārdā drīkst būt tikai latīņu burti, cipari un _ (3-20 simboli).",
+  "err.username_taken":"Šis lietotājvārds jau aizņemts.",
+  "err.content_rejected":"Lūdzu, izmanto atbilstošu vārdu un lietotājvārdu.",
+  "err.name_too_long":"Vārds pārāk garš."
 },
 ru: {
   "nav.login":"Войти","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
@@ -1118,7 +1126,15 @@ ru: {
   "err.no_token":"Нет токена. Пожалуйста, войди снова.",
   "err.invalid_token":"Сессия истекла. Пожалуйста, войди снова.",
   "err.server_error":"Ошибка сервера. Попробуй позже.",
-  "err.unknown":"Ошибка. Попробуй снова."
+  "err.unknown":"Ошибка. Попробуй снова.",
+  "m.reg.name":"Имя",
+  "m.reg.username":"Желаемый логин",
+  "m.reg.note":"После проверки тебя перенаправит в Telegram, чтобы завершить регистрацию и получить данные для входа.",
+  "m.reg.redirecting":"Переходим в Telegram...",
+  "err.username_invalid_format":"Логин может содержать только латинские буквы, цифры и _ (3-20 символов).",
+  "err.username_taken":"Этот логин уже занят.",
+  "err.content_rejected":"Пожалуйста, используй подходящее имя и логин.",
+  "err.name_too_long":"Имя слишком длинное."
 },
 en: {
   "nav.login":"Log In","hero.pill":"🚀 Skola2030 · Optimālais Līmenis · VISC CE",
@@ -1169,7 +1185,15 @@ en: {
   "err.no_token":"No token. Please log in again.",
   "err.invalid_token":"Session expired. Please log in again.",
   "err.server_error":"Server error. Try again later.",
-  "err.unknown":"Something went wrong. Try again."
+  "err.unknown":"Something went wrong. Try again.",
+  "m.reg.name":"Name",
+  "m.reg.username":"Desired username",
+  "m.reg.note":"After verification you'll be redirected to Telegram to finish registration and get your login details.",
+  "m.reg.redirecting":"Redirecting to Telegram...",
+  "err.username_invalid_format":"Username can only contain latin letters, digits and _ (3-20 characters).",
+  "err.username_taken":"This username is already taken.",
+  "err.content_rejected":"Please use an appropriate name and username.",
+  "err.name_too_long":"Name is too long."
 }
 };
 
@@ -1398,33 +1422,39 @@ async function doLogin() {
 }
 
 async function doRegister() {
-  var user  = document.getElementById("mRegUser").value.trim();
-  var pass  = document.getElementById("mRegPass").value.trim();
-  var pass2 = document.getElementById("mRegPass2").value.trim();
-  if (!user || !pass || !pass2) { showErr("mRegErr", T[lang]["m.fill"] || "Lūdzu, aizpildi visus laukus."); return; }
-  if (pass !== pass2) { showErr("mRegErr", T[lang]["m.no.match"] || "Paroles nesakrīt."); return; }
+  var name = document.getElementById("mRegName").value.trim();
+  var user = document.getElementById("mRegUser").value.trim().toLowerCase();
+
+  if (!name || !user) { showErr("mRegErr", T[lang]["m.fill"] || "Lūdzu, aizpildi visus laukus."); return; }
+
+  if (!/^[a-z0-9_]{3,20}$/.test(user)) {
+    showErr("mRegErr", T[lang]["err.username_invalid_format"] || "Lietotājvārdā drīkst būt tikai latīņu burti, cipari un _ (3-20 simboli).");
+    return;
+  }
+
   setBtnLoading("mRegBtn");
   document.getElementById("mRegErr").style.display = "none";
   try {
-    var res = await fetch(WORKER_URL + "register", {
+    var res = await fetch(WORKER_URL + "register-check", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username: user, password: pass })
+      body: JSON.stringify({ name: name, username: user })
     });
     var data = await res.json();
     if (!res.ok) {
       showErr("mRegErr", translateError(data));
       document.getElementById("mRegBtn").disabled = false;
-      document.getElementById("mRegBtn").innerHTML = "<span>" + (T[lang]["m.reg.btn"]||"Reģistrēties") + "</span>";
+      document.getElementById("mRegBtn").innerHTML = "<span>" + (T[lang]["m.reg.btn"]||"Turpināt →") + "</span>";
       return;
     }
-    localStorage.setItem("session_token", data.token);
-    showOk("mRegOk", T[lang]["m.ok"] || "Veiksmīgi! Novirzām...");
-    setTimeout(function() { window.location.href = "/main/menu.html"; }, 900);
+    showOk("mRegOk", T[lang]["m.reg.redirecting"] || "Novirzām uz Telegram...");
+    setTimeout(function() {
+      window.location.href = "https://t.me/TAVA_BOTA_LIETOTAJVARDS?start=" + data.code;
+    }, 600);
   } catch(e) {
     showErr("mRegErr", T[lang]["m.err.net"] || "Savienojuma kļūda.");
     document.getElementById("mRegBtn").disabled = false;
-    document.getElementById("mRegBtn").innerHTML = "<span>" + (T[lang]["m.reg.btn"]||"Reģistrēties") + "</span>";
+    document.getElementById("mRegBtn").innerHTML = "<span>" + (T[lang]["m.reg.btn"]||"Turpināt →") + "</span>";
   }
 }
 
@@ -1432,7 +1462,7 @@ async function doRegister() {
 ["mUser","mPass"].forEach(function(id) {
   document.getElementById(id).addEventListener("keydown", function(e) { if(e.key==="Enter") doLogin(); });
 });
-["mRegUser","mRegPass","mRegPass2"].forEach(function(id) {
+["mRegName","mRegUser"].forEach(function(id) {
   document.getElementById(id).addEventListener("keydown", function(e) { if(e.key==="Enter") doRegister(); });
 });
 
@@ -1475,19 +1505,16 @@ document.addEventListener("keydown", function(e) { if(e.key==="Escape") closeMod
     <!-- REGISTER FORM -->
     <div class="mform" id="mfReg">
       <div class="mfield">
-        <label data-i18n="m.user">Lietotājvārds</label>
-        <input type="text" id="mRegUser" autocomplete="username" autocapitalize="none" />
+        <label data-i18n="m.reg.name">Vārds</label>
+        <input type="text" id="mRegName" autocomplete="name" maxlength="60" />
       </div>
       <div class="mfield">
-        <label data-i18n="m.pass">Parole</label>
-        <input type="password" id="mRegPass" autocomplete="new-password" />
+        <label data-i18n="m.reg.username">Vēlamais lietotājvārds</label>
+        <input type="text" id="mRegUser" autocomplete="username" autocapitalize="none" maxlength="20" placeholder="piem. janis123" />
       </div>
-      <div class="mfield">
-        <label data-i18n="m.pass2">Atkārtot paroli</label>
-        <input type="password" id="mRegPass2" autocomplete="new-password" />
-      </div>
+      <div class="mreg-note" data-i18n="m.reg.note">Pēc pārbaudes tiksi novirzīts uz Telegram, lai pabeigtu reģistrāciju un saņemtu pieejas datus.</div>
       <button class="mbtn" id="mRegBtn" onclick="doRegister()">
-        <span data-i18n="m.reg.btn">Reģistrēties</span>
+        <span data-i18n="m.reg.btn">Turpināt →</span>
       </button>
       <div class="merr" id="mRegErr"></div>
       <div class="mok" id="mRegOk"></div>
@@ -1496,4 +1523,4 @@ document.addEventListener("keydown", function(e) { if(e.key==="Escape") closeMod
 </div>
 
 </body>
-</html>
+   </html>
