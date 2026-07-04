@@ -343,6 +343,90 @@ input[type=range]::-moz-range-thumb{
 .empty-txt{color:var(--mu);font-size:.92rem;}
 
 /* ═══════════════════════════════════════════════════════════════
+   EXAM COUNTDOWN
+   ═══════════════════════════════════════════════════════════════ */
+.countdown{
+  margin:16px 0;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:16px 20px;
+}
+.countdown-lbl{
+  font-family:'Share Tech Mono',monospace;font-size:.7rem;
+  letter-spacing:2px;color:var(--a);font-weight:700;margin-bottom:10px;
+}
+.countdown-row{display:flex;gap:10px;flex-wrap:wrap;}
+.countdown-unit{
+  flex:1;min-width:60px;text-align:center;
+  background:var(--bg3);border-radius:10px;padding:8px 4px;
+}
+.countdown-num{
+  font-family:'Orbitron',monospace;font-weight:900;font-size:1.4rem;
+  color:var(--a);line-height:1;display:block;
+}
+.countdown-unit-lbl{font-size:.62rem;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;}
+
+/* ═══════════════════════════════════════════════════════════════
+   LEADERBOARD
+   ═══════════════════════════════════════════════════════════════ */
+.lboard{
+  margin:16px 0;
+  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:16px 20px;
+}
+.lboard-top{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;flex-wrap:wrap;gap:6px;
+}
+.lboard-lbl{
+  font-family:'Share Tech Mono',monospace;font-size:.7rem;
+  letter-spacing:2px;color:var(--a);font-weight:700;
+}
+.lboard-period{font-size:.68rem;color:var(--mu);}
+.lboard-list{display:flex;flex-direction:column;gap:6px;}
+.lboard-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:10px;
+  background:rgba(255,255,255,.02);border:1px solid transparent;
+  transition:background .2s,border-color .2s;
+}
+.lboard-row.me{
+  background:var(--a-dim);border-color:var(--a-brd);
+}
+.lboard-rank{
+  font-family:'Orbitron',monospace;font-weight:900;font-size:.9rem;
+  color:var(--mu);width:26px;text-align:center;flex-shrink:0;
+}
+.lboard-row:nth-child(1) .lboard-rank{color:#ffd700;}
+.lboard-row:nth-child(2) .lboard-rank{color:#c0c0c0;}
+.lboard-row:nth-child(3) .lboard-rank{color:#cd7f32;}
+.lboard-name{flex:1;font-size:.83rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lboard-row.me .lboard-name{color:var(--a);}
+.lboard-count{
+  font-family:'Orbitron',monospace;font-weight:700;font-size:.8rem;
+  color:var(--a);flex-shrink:0;
+}
+.lboard-sep{
+  text-align:center;color:var(--mu);font-size:.7rem;padding:2px 0;letter-spacing:2px;
+}
+.lboard-empty{text-align:center;color:var(--mu);font-size:.8rem;padding:16px 0;}
+.lboard-badge{
+  font-family:'Share Tech Mono',monospace;font-size:.58rem;font-weight:700;
+  letter-spacing:.5px;padding:2px 7px;border-radius:100px;flex-shrink:0;
+  background:linear-gradient(90deg,#ffd700,#ffed4e);color:#3a2a00;
+  text-transform:uppercase;
+}
+.lboard-myrank{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--a-dim);border:1px solid var(--a-brd);border-radius:10px;
+  padding:10px 14px;margin-bottom:12px;
+}
+.lboard-myrank-lbl{font-size:.72rem;color:var(--mu);}
+.lboard-myrank-val{
+  font-family:'Orbitron',monospace;font-weight:900;font-size:1.1rem;color:var(--a);
+}
+.lboard-myrank-val span{font-size:.7rem;font-weight:600;color:var(--mu);}
+
+/* ═══════════════════════════════════════════════════════════════
    RESPONSIVE
    ═══════════════════════════════════════════════════════════════ */
 @media(max-width:640px){
@@ -419,6 +503,44 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 
+  <!-- EXAM COUNTDOWN -->
+  <div class="countdown">
+    <div class="countdown-lbl" id="countdownLbl">LĪDZ EKSĀMENAM</div>
+    <div class="countdown-row">
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cdDays">--</span>
+        <span class="countdown-unit-lbl" id="cdDaysLbl">dienas</span>
+      </div>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cdHours">--</span>
+        <span class="countdown-unit-lbl" id="cdHoursLbl">stundas</span>
+      </div>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cdMinutes">--</span>
+        <span class="countdown-unit-lbl" id="cdMinutesLbl">minūtes</span>
+      </div>
+      <div class="countdown-unit">
+        <span class="countdown-num" id="cdSeconds">--</span>
+        <span class="countdown-unit-lbl" id="cdSecondsLbl">sekundes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="lboard">
+    <div class="lboard-top">
+      <span class="lboard-lbl" id="lboardLbl">MĒNEŠA LĪDERI</span>
+      <span class="lboard-period" id="lboardPeriod">Pēc atrisināto uzdevumu skaita</span>
+    </div>
+    <div class="lboard-myrank" id="lboardMyRank" style="display:none;">
+      <span class="lboard-myrank-lbl" id="lboardMyRankLbl">Tava vieta</span>
+      <span class="lboard-myrank-val" id="lboardMyRankVal">— <span id="lboardMyRankOf"></span></span>
+    </div>
+    <div class="lboard-list" id="lboardList">
+      <div class="lboard-empty" id="lboardEmpty">Ielādē...</div>
+    </div>
+  </div>
+
   <!-- SEARCH -->
   <div class="search-row">
     <div class="s-wrap">
@@ -475,6 +597,9 @@ lv:{
   scoreLbl:"Mans CE mērķis",
   scoreHint:"Tiek ieteikts apgūt visas aktīvās tēmas",
   goalLbl:"DIENAS MĒRĶIS", taskWrd:" uzdevumi",
+  countdownLbl:"LĪDZ EKSĀMENAM", cdDaysLbl:"dienas", cdHoursLbl:"stundas", cdMinutesLbl:"minūtes", cdSecondsLbl:"sekundes",
+  lboardLbl:"MĒNEŠA LĪDERI", lboardPeriod:"Pēc atrisināto uzdevumu skaita",
+  lboardMyRankLbl:"Tava vieta", lboardOf:"no", lboardBadge:"Līderis",
   goalHint:"Pabeidz ${G} uzdevumus, lai saglabātu savu sēriju!",
   search:"Meklēt tēmu vai atslēgvārdu...",
   catAll:"Visas tēmas",
@@ -491,6 +616,9 @@ ru:{
   scoreLbl:"Мой целевой результат CE",
   scoreHint:"Рекомендуется освоить все активные темы",
   goalLbl:"ДНЕВНАЯ ЦЕЛЬ", taskWrd:" задания",
+  countdownLbl:"ДО ЭКЗАМЕНА", cdDaysLbl:"дней", cdHoursLbl:"часов", cdMinutesLbl:"минут", cdSecondsLbl:"секунд",
+  lboardLbl:"ЛИДЕРЫ МЕСЯЦА", lboardPeriod:"По количеству решённых заданий",
+  lboardMyRankLbl:"Твоё место", lboardOf:"из", lboardBadge:"Лидер",
   goalHint:"Реши ${G} заданий, чтобы не потерять серию!",
   search:"Поиск темы или ключевого слова...",
   catAll:"Все темы",
@@ -507,6 +635,9 @@ en:{
   scoreLbl:"My CE Target Score",
   scoreHint:"Recommended: complete all active topics",
   goalLbl:"DAILY GOAL", taskWrd:" tasks",
+  countdownLbl:"UNTIL THE EXAM", cdDaysLbl:"days", cdHoursLbl:"hours", cdMinutesLbl:"minutes", cdSecondsLbl:"seconds",
+  lboardLbl:"MONTHLY LEADERS", lboardPeriod:"By number of solved tasks",
+  lboardMyRankLbl:"Your rank", lboardOf:"of", lboardBadge:"Leader",
   goalHint:"Complete ${G} tasks to keep your streak!",
   search:"Search topics or keywords...",
   catAll:"All topics",
@@ -1013,6 +1144,126 @@ function renderProgress() {
 }
 
 /* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 4B — EKSĀMENA ATSKAITE (COUNTDOWN)
+   ════════════════════════════════════════════════════════════
+   Mērķa datums: 2026. gada 30. septembris, 00:00 pēc Rīgas laika.
+   Tīri klienta puses aprēķins, bez servera pieprasījumiem —
+   atjaunojas katru sekundi.
+   ──────────────────────────────────────────────────────────── */
+
+var EXAM_DATE = new Date("2026-09-30T00:00:00+03:00"); // Rīgas laika josla (EEST)
+
+function updateCountdown() {
+  var now = new Date();
+  var diff = EXAM_DATE - now;
+
+  if (diff <= 0) {
+    document.getElementById("cdDays").textContent = "0";
+    document.getElementById("cdHours").textContent = "0";
+    document.getElementById("cdMinutes").textContent = "0";
+    document.getElementById("cdSeconds").textContent = "0";
+    return;
+  }
+
+  var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+  document.getElementById("cdDays").textContent = days;
+  document.getElementById("cdHours").textContent = hours;
+  document.getElementById("cdMinutes").textContent = minutes;
+  document.getElementById("cdSeconds").textContent = seconds;
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ════════════════════════════════════════════════════════════
+   █  SEKCIJA 4C — LĪDERU SARAKSTS (LEADERBOARD)
+   ════════════════════════════════════════════════════════════
+   Iegūst datus no /leaderboard endpoint. Tā kā auth.js jau
+   pārbaudīja tokenu (citādi šī lapa vispār neielādētos),
+   izmantojam to pašu WORKER_URL un token, kas jau ir localStorage.
+   ──────────────────────────────────────────────────────────── */
+
+var LBOARD_WORKER_URL = "https://floral-tree-d2cb.eusjs56999.workers.dev/";
+
+async function loadLeaderboard() {
+  var listEl = document.getElementById("lboardList");
+  var myRankBox = document.getElementById("lboardMyRank");
+  var token = localStorage.getItem("session_token");
+  if (!token) return; // auth.js jau būtu novirzījis uz login, bet drošības pēc
+
+  try {
+    var res = await fetch(LBOARD_WORKER_URL + "leaderboard", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({})
+    });
+    var data = await res.json();
+
+    if (!res.ok || !data.top) {
+      listEl.innerHTML = '<div class="lboard-empty">Neizdevās ielādēt.</div>';
+      return;
+    }
+
+    if (data.top.length === 0) {
+      listEl.innerHTML = '<div class="lboard-empty">Vēl nav datu.</div>';
+      return;
+    }
+
+    // Vienmēr rādām "tava vieta" bloku virs saraksta — neatkarīgi no tā,
+    // vai lietotājs ir topā vai nav
+    if (data.myRank > 0) {
+      myRankBox.style.display = "flex";
+      document.getElementById("lboardMyRankVal").innerHTML =
+        "#" + data.myRank + ' <span id="lboardMyRankOf">' + tx("lboardOf") + " " + data.totalUsers + "</span>";
+    }
+
+    var html = "";
+    var myShown = false;
+
+    data.top.forEach(function(u, idx) {
+      var rank = idx + 1;
+      var isMe = (u.username === data.myUsername);
+      if (isMe) myShown = true;
+      var medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+      var badge = rank <= 3 ? '<span class="lboard-badge">' + tx("lboardBadge") + '</span>' : '';
+      html += '<div class="lboard-row' + (isMe ? ' me' : '') + '">' +
+        '<span class="lboard-rank">' + medal + '</span>' +
+        '<span class="lboard-name">' + escapeHtml(u.displayName || u.username) + '</span>' +
+        badge +
+        '<span class="lboard-count">' + u.solvedCount + '</span>' +
+        '</div>';
+    });
+
+    // Ja lietotājs nav topā, parādām atsevišķi viņa pozīciju sarakstā
+    if (!myShown && data.myRank > 0) {
+      html += '<div class="lboard-sep">···</div>';
+      html += '<div class="lboard-row me">' +
+        '<span class="lboard-rank">' + data.myRank + '</span>' +
+        '<span class="lboard-name">' + escapeHtml(data.myUsername) + '</span>' +
+        '<span class="lboard-count">—</span>' +
+        '</div>';
+    }
+
+    listEl.innerHTML = html;
+  } catch(e) {
+    listEl.innerHTML = '<div class="lboard-empty">Neizdevās ielādēt.</div>';
+  }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+loadLeaderboard();
+
+/* ════════════════════════════════════════════════════════════
    █  SEKCIJA 5 — GITHUB MARŠRUTĒŠANA
    ════════════════════════════════════════════════════════════
    Katrā tēmā ir github_folder. Kad lietotājs noklikšķina uz
@@ -1153,6 +1404,14 @@ function renderTexts() {
   document.getElementById("searchInput").placeholder  = tx("search");
   document.getElementById("scoreOkHint").textContent  =
     "→ " + scoreToGoal(AD.score || 90) + " " + tx("perDay");
+  document.getElementById("countdownLbl").textContent = tx("countdownLbl");
+  document.getElementById("cdDaysLbl").textContent    = tx("cdDaysLbl");
+  document.getElementById("cdHoursLbl").textContent   = tx("cdHoursLbl");
+  document.getElementById("cdMinutesLbl").textContent = tx("cdMinutesLbl");
+  document.getElementById("cdSecondsLbl").textContent = tx("cdSecondsLbl");
+  document.getElementById("lboardLbl").textContent    = tx("lboardLbl");
+  document.getElementById("lboardPeriod").textContent = tx("lboardPeriod");
+  document.getElementById("lboardMyRankLbl").textContent = tx("lboardMyRankLbl");
 }
 
 /** Pilna UI atjaunināšana */
