@@ -328,8 +328,18 @@ header {
   border-radius: var(--r-sm); padding: 14px;
 }
 .expl.show { display: block; }
-.estep { display: flex; gap: 10px; margin-bottom: 10px; }
+.estep {
+  display: flex; gap: 10px; margin-bottom: 10px;
+  opacity: 0; animation: stepFadeIn 0.4s ease forwards;
+}
 .estep:last-child { margin-bottom: 0; }
+.expl.show .estep:nth-child(1) { animation-delay: 0s; }
+.expl.show .estep:nth-child(2) { animation-delay: 0.3s; }
+.expl.show .estep:nth-child(3) { animation-delay: 0.6s; }
+@keyframes stepFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 .esnum {
   width: 20px; height: 20px; border-radius: 50%;
   background: var(--lime); color: #000;
@@ -461,6 +471,56 @@ header {
 .faq-item.open .faq-ic { transform: rotate(45deg); }
 .faq-a { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
 .faq-ai { padding: 0 0 18px; font-size: 0.89rem; color: var(--muted); line-height: 1.75; }
+
+/* ── TASK-SPECIFIC FOLLOW-UP QUESTIONS (появляются вместе с объяснением) ── */
+.task-faq { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); }
+.task-faq-label { font-size: 0.66rem; letter-spacing: 2px; text-transform: uppercase; color: var(--lime); font-family: 'Share Tech Mono', monospace; margin-bottom: 8px; }
+.task-faq-item { margin-bottom: 8px; }
+.task-faq-item:last-child { margin-bottom: 0; }
+.task-faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 14px; gap: 12px; cursor: pointer;
+  background: rgba(191,255,0,0.05); border: 1px solid rgba(191,255,0,0.18);
+  border-radius: 10px; transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.task-faq-q:hover {
+  background: rgba(191,255,0,0.09); border-color: rgba(191,255,0,0.32);
+  box-shadow: 0 0 16px rgba(191,255,0,0.08);
+}
+.task-faq-item.open .task-faq-q {
+  background: rgba(191,255,0,0.1); border-color: rgba(191,255,0,0.35);
+  border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+}
+.task-faq-q span { font-size: 0.83rem; font-weight: 600; }
+.task-faq-ic { color: var(--lime); font-size: 1.1rem; flex-shrink: 0; transition: transform 0.25s; line-height: 1; }
+.task-faq-item.open .task-faq-ic { transform: rotate(45deg); }
+.task-faq-a {
+  overflow: hidden; max-height: 0; transition: max-height 0.3s ease;
+  background: rgba(191,255,0,0.03); border: 1px solid rgba(191,255,0,0.18); border-top: none;
+  border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;
+}
+.task-faq-ai { padding: 10px 14px 12px; font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+.task-faq-own { padding: 10px 0 0; }
+.task-faq-own-hint { font-size: 0.73rem; color: var(--muted); margin-bottom: 8px; }
+.task-faq-own-row { display: flex; gap: 8px; }
+.task-faq-own-in {
+  flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 9px 12px; color: var(--text); font-size: 0.8rem; font-family: inherit;
+}
+.task-faq-own-in::placeholder { color: var(--muted); }
+.task-faq-own-btn {
+  background: var(--lime); color: #0a0a0a; border: none; border-radius: 8px;
+  padding: 9px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+  font-family: inherit; transition: opacity 0.2s;
+}
+.task-faq-own-btn:hover { opacity: 0.85; }
+
+.mreg-question-note {
+  background: rgba(191,255,0,0.06); border: 1px solid rgba(191,255,0,0.25);
+  border-radius: 10px; padding: 10px 12px; font-size: 0.8rem; color: var(--text);
+  margin-bottom: 12px; line-height: 1.5;
+}
+.mreg-question-note strong { color: var(--lime); }
 
 /* ============================================================
    SECTION 7: FOOTER CTA
@@ -793,6 +853,40 @@ footer {
               <div class="esnum">3</div>
               <div class="estxt" data-i18n="ph.s3">Atbilde: <strong>35</strong> iespējamie komitejas sastāvi ✓</div>
             </div>
+
+            <!-- ════ Уточняющие вопросы про эту конкретную задачу ════ -->
+            <div class="task-faq">
+              <div class="task-faq-label" data-i18n="task.faq.label">Papildu jautājumi par šo uzdevumu</div>
+
+              <div class="task-faq-item" id="taskFaqItem1">
+                <div class="task-faq-q">
+                  <span data-i18n="task.faq.q1">Kāpēc izmantojam kombinācijas, nevis permutācijas?</span>
+                  <span class="task-faq-ic">+</span>
+                </div>
+                <div class="task-faq-a">
+                  <div class="task-faq-ai" data-i18n="task.faq.a1">Tāpēc, ka komitejas sastāva <strong>secība nav svarīga</strong> — {A, B, C} un {C, B, A} ir viena un tā pati komiteja. Ja secība būtu svarīga (piemēram, priekšsēdētājs, vietnieks, sekretārs), izmantotu permutācijas, un atbilde būtu lielāka: P(7,3) = 7·6·5 = 210.</div>
+                </div>
+              </div>
+
+              <div class="task-faq-item" id="taskFaqItem2">
+                <div class="task-faq-q">
+                  <span data-i18n="task.faq.q2">Kā mainītos atbilde, ja kandidātu būtu 8?</span>
+                  <span class="task-faq-ic">+</span>
+                </div>
+                <div class="task-faq-a">
+                  <div class="task-faq-ai" data-i18n="task.faq.a2">Formula paliktu tā pati, tikai n mainītos uz 8: C(8,3) = 8! / (3! · 5!) = (8·7·6) / (3·2·1) = 336 / 6 = <strong>56</strong> iespējamie sastāvi. Jo vairāk kandidātu, jo straujāk pieaug iespējamo kombināciju skaits.</div>
+                </div>
+              </div>
+
+              <div class="task-faq-own">
+                <div class="task-faq-own-hint" data-i18n="task.faq.own.hint">Vēl kas neskaidrs par šo uzdevumu? Uzdod savu jautājumu:</div>
+                <div class="task-faq-own-row">
+                  <input type="text" class="task-faq-own-in" id="taskFaqOwnInput" placeholder="Uzraksti savu jautājumu..." maxlength="200" />
+                  <button class="task-faq-own-btn" id="taskFaqOwnBtn" data-i18n="task.faq.own.btn">Saņemt atbildi →</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1034,8 +1128,25 @@ lv: {
   "plat.pill":"Kā tas strādā?","plat.h2":"Kā izskatās trenažieris iekšā?","plat.p":"Uzdevumi nekad nebeidzas. Mūsu algoritms ģenerē jaunus nosacījumus, kamēr tu ideāli apgūsi tēmu. Katram uzdevumam — tūlītējs soli pa solim skaidrojums.",
   "ph.title":"OL Mat · Kombinatorika","ph.topic":"📐 KOMBINATORIKA · UZDEVUMS 1/∞",
   "ph.q":"Komitejā jāievēl <strong>3 cilvēki</strong> no <strong>7 kandidātiem</strong>. Kārtība nav svarīga. Cik iespējamo komitejas sastāvu var izveidot?",
-  "ph.inp":"Tava atbilde...","ph.chk":"Pārbaudīt","ph.ok":"✓ Pareizi!","ph.err":"✗ Nav pareizi. Lūk, skaidrojums:",
+  "ph.inp":"Tava atbilde...","ph.chk":"Pārbaudīt","ph.ok":"✓ Pareizi!","ph.err":"✗ Nav pareizi — dari tā:",
   "ph.s1":"Kārtība nav svarīga → izmantojam <strong>kombināciju formulu</strong>: C(n,k) = n! / (k! · (n−k)!)","ph.s2":"Aizpildam: <strong>C(7,3) = 7! / (3! · 4!) = (7·6·5) / (3·2·1) = 210 / 6</strong>","ph.s3":"Atbilde: <strong>35</strong> iespējamie komitejas sastāvi ✓",
+  "task.faq.label":"Papildu jautājumi par šo uzdevumu",
+  "task.faq.q1":"Kāpēc izmantojam kombinācijas, nevis permutācijas?",
+  "task.faq.a1":"Tāpēc, ka komitejas sastāva <strong>secība nav svarīga</strong> — {A, B, C} un {C, B, A} ir viena un tā pati komiteja. Ja secība būtu svarīga (piemēram, priekšsēdētājs, vietnieks, sekretārs), izmantotu permutācijas, un atbilde būtu lielāka: P(7,3) = 7·6·5 = 210.",
+  "task.faq.q2":"Kā mainītos atbilde, ja kandidātu būtu 8?",
+  "task.faq.a2":"Formula paliktu tā pati, tikai n mainītos uz 8: C(8,3) = 8! / (3! · 5!) = (8·7·6) / (3·2·1) = 336 / 6 = <strong>56</strong> iespējamie sastāvi. Jo vairāk kandidātu, jo straujāk pieaug iespējamo kombināciju skaits.",
+  "task.faq.own.hint":"Vēl kas neskaidrs par šo uzdevumu? Uzdod savu jautājumu:",
+  "task.faq.own.placeholder":"Uzraksti savu jautājumu...",
+  "task.faq.own.btn":"Saņemt atbildi →",
+  "ph.faq.label":"Vēl jautājumi?",
+  "ph.faq.q1":"Cik laika prasa sagatavošanās?",
+  "ph.faq.a1":"Vidēji 20-30 minūtes dienā ir pietiekami, lai redzētu progresu. Trenažieris pielāgojas tavam tempam — vari mācīties tik ilgi vai īsi, cik vēlies. Svarīgākais ir regularitāte, nevis ilgas sesijas.",
+  "ph.faq.q2":"Vai der arī tiem, kam matemātika padodas grūti?",
+  "ph.faq.a2":"Jā, tieši tāpēc trenažieris izskaidro katru soli vienkāršā valodā, nevis akadēmiskās frāzēs. Sāc no pamatiem un ej uz priekšu savā tempā — algoritms pielāgojas tavam līmenim.",
+  "ph.faq.own.hint":"Neatradi atbildi? Uzdod savu jautājumu:",
+  "ph.faq.own.placeholder":"Uzraksti savu jautājumu...",
+  "ph.faq.own.btn":"Nosūtīt →",
+  "ph.faq.own.note":"Nosūtot tiksi novirzīts uz reģistrācijas formu, kur saņemsi atbildi.","m.reg.question.prefix":"Tavs jautājums:",
   "cmp.h2":"Kur gatavoties efektīvāk?","cmp.sub":"Salīdzini objektīvi — skaitļi runā paši par sevi",
   "cmp.c1":"⚡ Mūsu Trenažieris","cmp.c2":"Repetitors Latvijā","cmp.c3":"PDF pašmācība",
   "cmp.r1":"Cena","cmp.o1":"8.99 € / mēn.","cmp.t1":"20–30 € / stundā","cmp.p1":"Bezmaksas",
@@ -1093,8 +1204,25 @@ ru: {
   "plat.pill":"Как это работает?","plat.h2":"Как выглядит тренажёр изнутри?","plat.p":"Задания никогда не кончаются. Алгоритм генерирует новые условия, пока ты идеально не освоишь тему. К каждому заданию — мгновенное пошаговое объяснение.",
   "ph.title":"OL Mat · Комбинаторика","ph.topic":"📐 КОМБИНАТОРИКА · ЗАДАНИЕ 1/∞",
   "ph.q":"В комитет нужно избрать <strong>3 человека</strong> из <strong>7 кандидатов</strong>. Порядок не важен. Сколько возможных составов комитета?",
-  "ph.inp":"Твой ответ...","ph.chk":"Проверить","ph.ok":"✓ Правильно!","ph.err":"✗ Неверно. Вот объяснение:",
+  "ph.inp":"Твой ответ...","ph.chk":"Проверить","ph.ok":"✓ Правильно!","ph.err":"✗ Неверно — вот как надо:",
   "ph.s1":"Порядок не важен → используем <strong>формулу сочетаний</strong>: C(n,k) = n! / (k! · (n−k)!)","ph.s2":"Подставляем: <strong>C(7,3) = 7! / (3! · 4!) = (7·6·5) / (3·2·1) = 210 / 6</strong>","ph.s3":"Ответ: <strong>35</strong> возможных составов комитета ✓",
+  "task.faq.label":"Дополнительные вопросы про эту задачу",
+  "task.faq.q1":"Почему используем сочетания, а не перестановки?",
+  "task.faq.a1":"Потому что <strong>порядок в составе комитета не важен</strong> — {А, Б, В} и {В, Б, А} это один и тот же комитет. Если бы порядок был важен (например, председатель, заместитель, секретарь), использовали бы перестановки, и ответ был бы больше: P(7,3) = 7·6·5 = 210.",
+  "task.faq.q2":"Как изменился бы ответ, если бы кандидатов было 8?",
+  "task.faq.a2":"Формула осталась бы та же, просто n изменилось бы на 8: C(8,3) = 8! / (3! · 5!) = (8·7·6) / (3·2·1) = 336 / 6 = <strong>56</strong> возможных составов. Чем больше кандидатов, тем быстрее растёт число возможных комбинаций.",
+  "task.faq.own.hint":"Ещё что-то неясно про эту задачу? Задай свой вопрос:",
+  "task.faq.own.placeholder":"Напиши свой вопрос...",
+  "task.faq.own.btn":"Получить ответ →",
+  "ph.faq.label":"Ещё вопросы?",
+  "ph.faq.q1":"Сколько времени занимает подготовка?",
+  "ph.faq.a1":"В среднем 20-30 минут в день достаточно, чтобы увидеть прогресс. Тренажёр подстраивается под твой темп — можешь заниматься сколько угодно долго или коротко. Главное — регулярность, а не долгие сессии.",
+  "ph.faq.q2":"Подойдёт ли тем, кому математика даётся тяжело?",
+  "ph.faq.a2":"Да, именно поэтому тренажёр объясняет каждый шаг простым языком, а не академическими фразами. Начни с основ и двигайся вперёд в своём темпе — алгоритм подстраивается под твой уровень.",
+  "ph.faq.own.hint":"Не нашёл ответ? Задай свой вопрос:",
+  "ph.faq.own.placeholder":"Напиши свой вопрос...",
+  "ph.faq.own.btn":"Отправить →",
+  "ph.faq.own.note":"После отправки тебя перенаправит на форму регистрации, где ты получишь ответ.","m.reg.question.prefix":"Твой вопрос:",
   "cmp.h2":"Где эффективнее готовиться?","cmp.sub":"Сравни объективно — цифры говорят сами за себя",
   "cmp.c1":"⚡ Наш Тренажёр","cmp.c2":"Репетитор в Латвии","cmp.c3":"Старые PDF",
   "cmp.r1":"Цена","cmp.o1":"8.99 € / мес.","cmp.t1":"20–30 € / час","cmp.p1":"Бесплатно",
@@ -1152,8 +1280,25 @@ en: {
   "plat.pill":"How it works","plat.h2":"What does the trainer look like inside?","plat.p":"Tasks never run out. Our algorithm generates new conditions until you've perfectly mastered the topic. Every task has instant step-by-step explanations.",
   "ph.title":"OL Mat · Combinatorics","ph.topic":"📐 COMBINATORICS · TASK 1/∞",
   "ph.q":"<strong>3 people</strong> must be elected to a committee from <strong>7 candidates</strong>. Order doesn't matter. How many possible committee compositions are there?",
-  "ph.inp":"Your answer...","ph.chk":"Check","ph.ok":"✓ Correct!","ph.err":"✗ Not quite. Here's the explanation:",
+  "ph.inp":"Your answer...","ph.chk":"Check","ph.ok":"✓ Correct!","ph.err":"✗ Not quite — here's how:",
   "ph.s1":"Order doesn't matter → use the <strong>combination formula</strong>: C(n,k) = n! / (k! · (n−k)!)","ph.s2":"Substitute: <strong>C(7,3) = 7! / (3! · 4!) = (7·6·5) / (3·2·1) = 210 / 6</strong>","ph.s3":"Answer: <strong>35</strong> possible committee compositions ✓",
+  "task.faq.label":"Follow-up questions about this task",
+  "task.faq.q1":"Why do we use combinations, not permutations?",
+  "task.faq.a1":"Because the <strong>order within the committee doesn't matter</strong> — {A, B, C} and {C, B, A} are the same committee. If order mattered (e.g. chairperson, deputy, secretary), we'd use permutations, and the answer would be larger: P(7,3) = 7·6·5 = 210.",
+  "task.faq.q2":"How would the answer change if there were 8 candidates?",
+  "task.faq.a2":"The formula stays the same, only n changes to 8: C(8,3) = 8! / (3! · 5!) = (8·7·6) / (3·2·1) = 336 / 6 = <strong>56</strong> possible compositions. The more candidates, the faster the number of possible combinations grows.",
+  "task.faq.own.hint":"Still unclear about this task? Ask your own question:",
+  "task.faq.own.placeholder":"Write your question...",
+  "task.faq.own.btn":"Get an answer →",
+  "ph.faq.label":"More questions?",
+  "ph.faq.q1":"How much time does preparation take?",
+  "ph.faq.a1":"On average, 20-30 minutes a day is enough to see progress. The trainer adapts to your pace — study for as long or short as you like. Consistency matters more than long sessions.",
+  "ph.faq.q2":"Does it work for those who struggle with math?",
+  "ph.faq.a2":"Yes, that's exactly why the trainer explains every step in plain language, not academic phrasing. Start from the basics and move forward at your own pace — the algorithm adapts to your level.",
+  "ph.faq.own.hint":"Didn't find your answer? Ask your own question:",
+  "ph.faq.own.placeholder":"Write your question...",
+  "ph.faq.own.btn":"Send →",
+  "ph.faq.own.note":"After sending you'll be redirected to the registration form, where you'll get your answer.","m.reg.question.prefix":"Your question:",
   "cmp.h2":"Where is it more effective to prepare?","cmp.sub":"Compare objectively — the numbers speak for themselves",
   "cmp.c1":"⚡ Our Trainer","cmp.c2":"Tutor in Latvia","cmp.c3":"Old PDF files",
   "cmp.r1":"Price","cmp.o1":"8.99 € / mo.","cmp.t1":"20–30 € / hr","cmp.p1":"Free",
@@ -1207,6 +1352,8 @@ function applyLang(l) {
   });
   var inp = document.getElementById("taskIn");
   if (inp && T[l]["ph.inp"]) inp.placeholder = T[l]["ph.inp"];
+  var taskOwnInp = document.getElementById("taskFaqOwnInput");
+  if (taskOwnInp && T[l]["task.faq.own.placeholder"]) taskOwnInp.placeholder = T[l]["task.faq.own.placeholder"];
   document.querySelectorAll(".lbtn").forEach(function(b) {
     b.classList.toggle("active", b.getAttribute("data-lang") === l);
   });
@@ -1239,12 +1386,48 @@ document.getElementById("chkBtn").addEventListener("click", function() {
     fb.innerHTML = T[lang]["ph.ok"] || "✓ Pareizi!";
     fb.className = "fb-line fb-ok";
   } else {
-    fb.innerHTML = T[lang]["ph.err"] || "✗ Nav pareizi. Lūk, skaidrojums:";
+    fb.innerHTML = T[lang]["ph.err"] || "✗ Nav pareizi — dari tā:";
     fb.className = "fb-line fb-err";
   }
 });
 document.getElementById("taskIn").addEventListener("keydown", function(e) {
   if (e.key === "Enter") document.getElementById("chkBtn").click();
+});
+
+/* ── TASK FOLLOW-UP QUESTIONS ACCORDION (появляется вместе с объяснением) ── */
+document.querySelectorAll(".task-faq-item").forEach(function(item) {
+  item.querySelector(".task-faq-q").addEventListener("click", function() {
+    var open = item.classList.contains("open");
+    document.querySelectorAll(".task-faq-item").forEach(function(i) {
+      i.classList.remove("open");
+      i.querySelector(".task-faq-a").style.maxHeight = "0";
+    });
+    if (!open) {
+      item.classList.add("open");
+      var a = item.querySelector(".task-faq-a");
+      a.style.maxHeight = a.scrollHeight + "px";
+    }
+  });
+});
+
+/* ── TASK: свой вопрос про задачу → форма регистрации ────────────────── */
+document.getElementById("taskFaqOwnBtn").addEventListener("click", function() {
+  var input = document.getElementById("taskFaqOwnInput");
+  var question = input.value.trim();
+  if (!question) {
+    input.focus();
+    return;
+  }
+
+  // Показываем вопрос пользователя в форме регистрации, чтобы он видел,
+  // что вопрос не потерялся, и его учтут при ответе после регистрации
+  var noteEl = document.getElementById("mRegQuestionNote");
+  var prefix = T[lang]["m.reg.question.prefix"] || "Tavs jautājums:";
+  noteEl.innerHTML = "<strong>" + prefix + "</strong> " + question.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  noteEl.style.display = "block";
+
+  openModal("register");
+  input.value = "";
 });
 
 /* ── REVIEWS SLIDER ─────────────────────────────────────── */
@@ -1449,7 +1632,7 @@ async function doRegister() {
     }
     showOk("mRegOk", T[lang]["m.reg.redirecting"] || "Novirzām uz Telegram...");
     setTimeout(function() {
-      window.location.href = "https://t.me/oplatasaitelvbot?start=" + data.code;
+      window.location.href = "https://t.me/TAVA_BOTA_LIETOTAJVARDS?start=" + data.code;
     }, 600);
   } catch(e) {
     showErr("mRegErr", T[lang]["m.err.net"] || "Savienojuma kļūda.");
@@ -1512,6 +1695,7 @@ document.addEventListener("keydown", function(e) { if(e.key==="Escape") closeMod
         <label data-i18n="m.reg.username">Vēlamais lietotājvārds</label>
         <input type="text" id="mRegUser" autocomplete="username" autocapitalize="none" maxlength="20" placeholder="piem. janis123" />
       </div>
+      <div class="mreg-question-note" id="mRegQuestionNote" style="display:none;"></div>
       <div class="mreg-note" data-i18n="m.reg.note">Pēc pārbaudes tiksi novirzīts uz Telegram, lai pabeigtu reģistrāciju un saņemtu pieejas datus.</div>
       <button class="mbtn" id="mRegBtn" onclick="doRegister()">
         <span data-i18n="m.reg.btn">Turpināt →</span>
@@ -1523,4 +1707,4 @@ document.addEventListener("keydown", function(e) { if(e.key==="Escape") closeMod
 </div>
 
 </body>
-   </html>
+</html>
