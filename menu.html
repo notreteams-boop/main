@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="lv">
 <head>
-<!-- !!! DROŠĪBA: auth.js — OBLIGĀTI PIRMĀ RINDA !! -->
+<!-- !! DROŠĪBA: auth.js — OBLIGĀTI PIRMĀ RINDA !! -->
 <script src="/main/auth.js"></script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -105,6 +105,19 @@ header{
   transition:all .2s;flex-shrink:0;
 }
 .btn-back:hover{background:var(--a);color:#000;}
+
+/* ── Account button (личный кабинет) ── */
+.btn-account{
+  display:flex;align-items:center;justify-content:center;
+  width:36px;height:36px;flex-shrink:0;
+  background:transparent;border:1px solid var(--bd);border-radius:50%;
+  color:var(--mu);text-decoration:none;font-size:1rem;
+  transition:all .2s;
+}
+.btn-account:hover{border-color:var(--a-brd);color:var(--a);background:var(--a-dim);}
+
+.h-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+
 @media(max-width:540px){
   .btn-back .btn-lbl{display:none;}
   .h-logo{font-size:.85rem;}
@@ -459,9 +472,12 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 
-  <a href="#" class="btn-back" id="backBtn" onclick="handleLogout(event)">
-    ← <span class="btn-lbl" id="backLbl">Uz galveno izvēlni</span>
-  </a>
+  <div class="h-right">
+    <a href="/main/account.html" class="btn-account" title="Mans konts">👤</a>
+    <a href="#" class="btn-back" id="backBtn" onclick="handleLogout(event)">
+      ← <span class="btn-lbl" id="backLbl">Uz galveno izvēlni</span>
+    </a>
+  </div>
 </header>
 
 <!-- ═══════════ PAGE ═══════════ -->
@@ -1061,6 +1077,16 @@ const TOPICS = [
        "ekstrēms","extremum","критическая точка","critical point","f'(x)=0",
        "monotone","monotons","pieaugošs","убывающий","inflection point","liekuma punkts"],
  isActive:false},
+
+/* ── FINANŠU MATEMĀTIKA (46) ─────────────────────────────── */
+{id:"topic_46",
+ category:{lv:"Finanšu matemātika",ru:"Финансовая математика",en:"Financial Mathematics"},
+ title:{lv:"Procenti, kredīti un noguldījumi",ru:"Проценты, кредиты и вклады",en:"Interest, Loans & Deposits"},
+ github_folder:"topic_46",
+ tags:["procenti","проценты","interest","salikts procents","сложный процент","compound interest",
+       "kredīts","кредит","loan","noguldījums","вклад","deposit","annuitāte","аннуитет","annuity",
+       "banka","банк","bank","aizdevums","займ","borrowing","inflācija","инфляция","inflation"],
+ isActive:true},
 
 ]; // TOPICS end
 
