@@ -179,6 +179,11 @@ header{
 }
 .estxt{font-size:.83rem;color:var(--mu);line-height:1.6;}
 .estxt strong{color:var(--a);}
+.eformula{
+  display:block;font-family:'Share Tech Mono',monospace;font-size:.78rem;
+  color:var(--tx);background:var(--bg3);border:1px solid var(--bd);border-radius:8px;
+  padding:8px 12px;margin-top:6px;overflow-x:auto;white-space:nowrap;
+}
 
 /* ═══════════════════════════════════════════════════════════════
    FOLLOW-UP QUESTIONS
@@ -404,7 +409,37 @@ function loadAppData() {
 }
 function saveAppData(d) { localStorage.setItem(LS_KEY, JSON.stringify(d)); }
 
-let AD = loadAppData() || { date: getRigaDate(), count: 0, streak: 0, score: 90 };
+/** Aprēķina dienas uzdevumu mērķi no CE rezultāta %. 40% → 5 uzd, 100% → 35 uzd (lineāri) */
+function scoreToGoal(score) {
+  return Math.round(5 + (score - 40) / 60 * 30);
+}
+
+let DAILY_GOAL = 15; // dienas mērķis — pārrēķinās no AD.score zemāk
+const STREAK_MIN_PCT = 0.10; // 10% no normas = minimums strikam (tas pats, kas menu.html)
+
+/** Ta pati loģika, kas menu.html initAppData() — nodrošina, ka AD dati (streak, count, date)
+    ir identiski un konsekventi starp abām lapām, jo tās izmanto vienu un to pašu LS_KEY. */
+function initAppData() {
+  const today = getRigaDate();
+  let d = loadAppData();
+  if (!d) {
+    d = { date: today, count: 0, streak: 0, score: 90 };
+    saveAppData(d);
+    DAILY_GOAL = scoreToGoal(90);
+    return d;
+  }
+  DAILY_GOAL = scoreToGoal(d.score || 90);
+  if (d.date !== today) {
+    const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
+    d.streak = (d.count >= minOk) ? (d.streak || 0) + 1 : 0;
+    d.date   = today;
+    d.count  = 0;
+    saveAppData(d);
+  }
+  return d;
+}
+
+let AD = initAppData();
 
 function addTask() {
   AD.count++;
@@ -412,7 +447,8 @@ function addTask() {
   renderStreak();
 }
 function renderStreak() {
-  const on = AD.count >= 2; // упрощённая проверка, реальный минимум считается на menu.html
+  const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
+  const on = AD.count >= minOk;
   document.getElementById("fireIcon").className = "s-fire " + (on ? "on" : "off");
   document.getElementById("streakNum").textContent = AD.streak;
 }
@@ -441,8 +477,19 @@ function applyLang(l) {
   var saveLblSpan = saveBtn.querySelector("span");
   if (saveLblSpan) saveLblSpan.textContent = saveBtn.classList.contains("saved") ? tx("savedLbl") : tx("saveLbl");
 }
+
+var lastLoadedLang = null; // язык, на котором сейчас реально сгенерировано currentTask
+
 document.querySelectorAll(".lbtn").forEach(btn => {
-  btn.addEventListener("click", () => applyLang(btn.dataset.lang));
+  btn.addEventListener("click", () => {
+    var newLang = btn.dataset.lang;
+    applyLang(newLang);
+    // Задание было сгенерировано на другом языке — перегенерируем на новом,
+    // иначе текст задачи останется на старом языке, а интерфейс переключится
+    if (currentTask && lastLoadedLang !== null && lastLoadedLang !== newLang) {
+      generateTask();
+    }
+  });
 });
 
 /* ════════════════════════════════════════════════════════════
@@ -454,9 +501,32 @@ function escapeHtml(str) {
   return String(str).replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+// Рендерит один шаг объяснения. Поддерживает новую структуру {text, formula}
+// и старую (простая строка) для обратной совместимости, если Gemini иногда
+// всё же вернёт steps не по схеме, несмотря на промпт.
+function renderStep(elId, step) {
+  var el = document.getElementById(elId);
+  if (!step) { el.innerHTML = ""; return; }
+
+  if (typeof step === "string") {
+    el.innerHTML = escapeHtml(step);
+    return;
+  }
+
+  var html = escapeHtml(step.text || "");
+  if (step.formula) {
+    html += '<span class="eformula">' + escapeHtml(step.formula) + '</span>';
+  }
+  el.innerHTML = html;
+}
+
 async function generateTask() {
   var token = localStorage.getItem("session_token");
   if (!token) return; // auth.js jau novirzīs uz login
+
+  // Отправляем результат ПРЕДЫДУЩЕГО задания на сервер (баллы), прежде чем
+  // сбрасывать состояние для нового — иначе потеряем информацию о попытке
+  await submitSolveResult();
 
   // Сбрасываем UI в состояние загрузки
   document.getElementById("taskQ").innerHTML =
@@ -469,6 +539,7 @@ async function generateTask() {
   resetSaveButton();
   document.querySelectorAll(".task-faq-item").forEach(i => {
     i.classList.remove("open");
+    delete i.dataset.wasOpened;
     i.querySelector(".task-faq-a").style.maxHeight = "0";
   });
   document.getElementById("taskOwnAnswer").classList.remove("show");
@@ -497,6 +568,7 @@ async function generateTask() {
     var text = await res.text();
     var task = JSON.parse(text);
     currentTask = task;
+    lastLoadedLang = lang;
 
     document.getElementById("taskQ").textContent = task.question;
     document.getElementById("taskIn").disabled = false;
@@ -505,12 +577,17 @@ async function generateTask() {
 
     document.getElementById("taskFaqQ1").textContent = task.followupQ1 || "";
     document.getElementById("taskFaqA1").textContent = task.followupA1 || "";
+    var faqItem1 = document.getElementById("taskFaqItem1");
+    faqItem1.style.display = task.followupQ1 ? "" : "none";
+
     document.getElementById("taskFaqQ2").textContent = task.followupQ2 || "";
     document.getElementById("taskFaqA2").textContent = task.followupA2 || "";
+    var faqItem2 = document.getElementById("taskFaqItem2");
+    faqItem2.style.display = task.followupQ2 ? "" : "none";
 
-    document.getElementById("estep1").innerHTML = escapeHtml(task.steps[0] || "");
-    document.getElementById("estep2").innerHTML = escapeHtml(task.steps[1] || "");
-    document.getElementById("estep3").innerHTML = escapeHtml(task.steps[2] || "");
+    renderStep("estep1", task.steps[0]);
+    renderStep("estep2", task.steps[1]);
+    renderStep("estep3", task.steps[2]);
   } catch(e) {
     document.getElementById("taskQ").innerHTML = '<span class="task-loading">' + tx("errNet") + '</span>';
   }
@@ -522,7 +599,13 @@ async function generateTask() {
 document.getElementById("chkBtn").addEventListener("click", checkAnswer);
 document.getElementById("taskIn").addEventListener("keydown", e => { if (e.key === "Enter") checkAnswer(); });
 
-async function checkAnswer() {
+// Отслеживаем состояние текущей попытки — отправляем в /solve только когда
+// человек уходит от задания (жмёт "Nākamais uzdevums"), чтобы успеть учесть,
+// раскрыл ли он уточняющие вопросы (это может произойти ПОСЛЕ клика Pārbaudīt).
+var attemptMade = false;   // была ли хоть одна попытка ответить
+var attemptCorrect = false; // был ли правильный ответ хоть раз за это задание
+
+function checkAnswer() {
   if (!currentTask) return;
   var userAnswer = document.getElementById("taskIn").value.trim();
   if (!userAnswer) return;
@@ -532,6 +615,9 @@ async function checkAnswer() {
   var normalizedCorrect = String(currentTask.answer).toLowerCase().replace(/\s+/g, "");
   var isCorrect = normalizedUser === normalizedCorrect;
 
+  attemptMade = true;
+  if (isCorrect) attemptCorrect = true; // если хоть раз ответил верно — засчитываем как верный
+
   fb.textContent = isCorrect ? tx("ok") : tx("err");
   fb.className = "fb-line " + (isCorrect ? "fb-ok" : "fb-err");
   fb.style.display = "block";
@@ -539,24 +625,43 @@ async function checkAnswer() {
   // Объяснение показываем всегда (правильно или нет) — так человек видит логику решения
   document.getElementById("explBlock").classList.add("show");
 
-  // Отмечаем задание решённым — на сервере (для лидерборда) и локально (для стрика)
+  // Локальный стрик обновляем сразу — он не зависит от системы баллов на сервере
   addTask();
+
+  document.getElementById("nextBtn").disabled = false;
+  document.getElementById("taskIn").disabled = true;
+  document.getElementById("chkBtn").disabled = true;
+}
+
+// Раскрыл ли пользователь ОБА уточняющих вопроса за это задание
+function bothQuestionsOpened() {
+  var item1 = document.getElementById("taskFaqItem1");
+  var item2 = document.getElementById("taskFaqItem2");
+  // Если какого-то вопроса вообще нет на этом задании (скрыт) — не считаем это требованием
+  var q1ok = item1.style.display === "none" || item1.classList.contains("open") || item1.dataset.wasOpened === "1";
+  var q2ok = item2.style.display === "none" || item2.classList.contains("open") || item2.dataset.wasOpened === "1";
+  return q1ok && q2ok;
+}
+
+// Отправляет накопленный результат текущего задания на сервер (баллы для лидерборда)
+async function submitSolveResult() {
+  if (!attemptMade) return; // не было ни одной попытки — нечего засчитывать
+
   try {
     var token = localStorage.getItem("session_token");
     if (token) {
       await fetch(WORKER_URL + "solve", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
-        body: JSON.stringify({})
+        body: JSON.stringify({ isCorrect: attemptCorrect, questionsOpened: bothQuestionsOpened() })
       });
     }
   } catch(e) {
-    // Не блокируем UI, если сервер недоступен — локальный стрик всё равно обновился
+    // Не блокируем UI, если сервер недоступен
   }
 
-  document.getElementById("nextBtn").disabled = false;
-  document.getElementById("taskIn").disabled = true;
-  document.getElementById("chkBtn").disabled = true;
+  attemptMade = false;
+  attemptCorrect = false;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -571,6 +676,7 @@ document.querySelectorAll(".task-faq-item").forEach(item => {
     });
     if (!open) {
       item.classList.add("open");
+      item.dataset.wasOpened = "1"; // засчитывается даже если пользователь потом закроет аккордеон
       var a = item.querySelector(".task-faq-a");
       a.style.maxHeight = a.scrollHeight + "px";
     }
@@ -669,6 +775,19 @@ function resetSaveButton() {
 /* ════════════════════════════════════════════════════════════
    █  СТАРТ
    ════════════════════════════════════════════════════════════ */
+
+// Пытаемся зафиксировать результат последней попытки, если пользователь
+// уходит со страницы без клика "Nākamais uzdevums" (закрыл вкладку, перешёл
+// на другую тему через кнопку "назад" и т.п.). sendBeacon не блокирует переход
+// и работает надёжнее обычного fetch в момент unload.
+window.addEventListener("beforeunload", () => {
+  if (!attemptMade) return;
+  var token = localStorage.getItem("session_token");
+  if (!token) return;
+  var payload = JSON.stringify({ isCorrect: attemptCorrect, questionsOpened: bothQuestionsOpened() });
+  navigator.sendBeacon(WORKER_URL + "solve", new Blob([payload], { type: "application/json" }));
+});
+
 generateTask();
 
 </script>
