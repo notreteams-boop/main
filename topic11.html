@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<!-- !! DROŠĪBA: auth.js — OBLIGĀTI PIRMĀ RINDA !! -->
+<script src="/main/auth.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Vienādojumu sistēmas · OL Mat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   TOKENS & RESET
+   ═══════════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:    #07010f;
+  --bg2:   #161820;
+  --bg3:   #1e2028;
+  --bg4:   #232635;
+  --bd:    rgba(255,255,255,0.07);
+  --a:     #bfff00;
+  --a-dim: rgba(191,255,0,0.09);
+  --a-glo: rgba(191,255,0,0.28);
+  --a-brd: rgba(191,255,0,0.26);
+  --tx:    #e8eaf0;
+  --mu:    rgba(232,234,240,0.44);
+  --or:    #ff8800;
+  --re:    #ff3b3b;
+  --r:     12px;
+  --r2:    16px;
+}
+html{scroll-behavior:smooth;}
+body{
+  color:var(--tx);
+  font-family:'Rajdhani',sans-serif;font-size:16px;
+  min-height:100vh;overflow-x:hidden;
+  background:
+    radial-gradient(ellipse 70% 55% at 2% -5%,  rgba(200,20,255,0.09),  transparent),
+    radial-gradient(ellipse 60% 50% at 98% 102%, rgba(15,60,255,0.08),  transparent),
+    linear-gradient(175deg, #21093B 0%, #100320 45%, #07010f 100%);
+  background-attachment:fixed;
+}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--a-brd);}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER (идентичен menu.html)
+   ═══════════════════════════════════════════════════════════════ */
+header{
+  position:sticky;top:0;z-index:200;height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;gap:16px;
+  background:rgba(20,5,40,0.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--a-brd);
+}
+.h-logo{
+  font-family:'Orbitron',monospace;font-weight:900;font-size:1rem;
+  letter-spacing:3px;color:var(--a);
+  text-shadow:0 0 18px var(--a-glo);flex-shrink:0;
+}
+.h-logo em{color:var(--tx);font-style:normal;}
+.h-mid{display:flex;align-items:center;gap:14px;}
+.streak{display:flex;align-items:center;gap:5px;font-family:'Orbitron',monospace;font-weight:700;font-size:.85rem;}
+.s-fire{font-size:.95rem;filter:grayscale(1);opacity:.35;transition:filter .3s,opacity .3s;}
+.s-fire.on{filter:none;opacity:1;text-shadow:0 0 10px rgba(255,140,0,.6);}
+.s-num{color:var(--mu);}
+.s-fire.on ~ .s-num{color:var(--a);}
+.lsw{display:flex;gap:4px;background:var(--bg2);border-radius:100px;padding:3px;}
+.lbtn{
+  background:transparent;border:none;color:var(--mu);
+  font-family:inherit;font-size:.7rem;font-weight:700;
+  padding:4px 9px;border-radius:100px;cursor:pointer;transition:.2s;
+}
+.lbtn.on{background:var(--a);color:#000;}
+.btn-back{
+  display:flex;align-items:center;gap:4px;
+  background:transparent;border:1px solid var(--a-brd);color:var(--a);
+  font-family:inherit;font-size:.78rem;font-weight:600;text-decoration:none;
+  padding:6px 12px;border-radius:100px;transition:.2s;flex-shrink:0;
+}
+.btn-back:hover{background:var(--a);color:#000;}
+
+@media(max-width:540px){
+  header{padding:0 12px;}
+  .h-logo{font-size:.85rem;}
+  .btn-lbl{display:none;}
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE / HERO
+   ═══════════════════════════════════════════════════════════════ */
+.page{max-width:820px;margin:0 auto;padding:0 24px 60px;}
+.hero-eye{
+  font-family:'Share Tech Mono',monospace;font-size:.7rem;
+  letter-spacing:2.5px;text-transform:uppercase;color:var(--a);
+  margin:28px 0 8px;
+}
+.hero-h{
+  font-family:'Orbitron',monospace;font-weight:900;
+  font-size:clamp(1.35rem,4.5vw,2rem);letter-spacing:1px;margin-bottom:24px;
+}
+.hero-h em{color:var(--a);font-style:normal;text-shadow:0 0 18px var(--a-glo);}
+
+/* ═══════════════════════════════════════════════════════════════
+   TASK CARD
+   ═══════════════════════════════════════════════════════════════ */
+.task-card{
+  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
+  padding:22px;margin-bottom:16px;position:relative;
+}
+.task-topic-lbl{
+  font-family:'Share Tech Mono',monospace;font-size:.68rem;
+  letter-spacing:2px;text-transform:uppercase;color:var(--a);margin-bottom:10px;
+}
+.task-q{font-size:.95rem;line-height:1.6;margin-bottom:16px;min-height:1.6em;}
+.task-loading{color:var(--mu);font-size:.85rem;}
+.task-loading .dot{animation:dotPulse 1.4s infinite;}
+.task-loading .dot:nth-child(2){animation-delay:.2s;}
+.task-loading .dot:nth-child(3){animation-delay:.4s;}
+@keyframes dotPulse{0%,60%,100%{opacity:.25;}30%{opacity:1;}}
+
+.task-in-row{display:flex;gap:10px;margin-bottom:8px;}
+.task-in{
+  flex:1;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);
+  padding:11px 14px;color:var(--tx);font-size:.9rem;font-family:inherit;
+}
+.task-in::placeholder{color:var(--mu);}
+.task-in:focus{outline:none;border-color:var(--a-brd);}
+.task-chk{
+  background:var(--a-dim);border:1px solid var(--a-brd);color:var(--a);
+  border-radius:var(--r);padding:11px 20px;font-family:inherit;font-size:.85rem;
+  font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0;
+}
+.task-chk:hover{background:var(--a);color:#000;}
+.task-chk:disabled{opacity:.4;cursor:not-allowed;}
+
+.fb-line{font-size:.82rem;font-weight:700;margin:6px 0;display:none;}
+.fb-ok{color:var(--a);}
+.fb-err{color:var(--or);}
+
+.next-btn{
+  display:block;width:100%;margin-top:16px;
+  background:var(--a);color:#000;border:none;border-radius:var(--r);
+  padding:13px;font-family:'Orbitron',monospace;font-weight:900;font-size:.9rem;
+  cursor:pointer;transition:opacity .2s;
+}
+.next-btn:hover{opacity:.85;}
+.next-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ═══════════════════════════════════════════════════════════════
+   EXPLANATION (последовательное появление шагов)
+   ═══════════════════════════════════════════════════════════════ */
+.expl{display:none;background:var(--a-dim);border:1px solid var(--a-brd);border-radius:var(--r);padding:16px;margin-top:4px;}
+.expl.show{display:block;}
+.estep{display:flex;gap:10px;margin-bottom:10px;opacity:0;animation:stepFadeIn .4s ease forwards;}
+.estep:last-child{margin-bottom:0;}
+.expl.show .estep:nth-child(1){animation-delay:0s;}
+.expl.show .estep:nth-child(2){animation-delay:.3s;}
+.expl.show .estep:nth-child(3){animation-delay:.6s;}
+@keyframes stepFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.esnum{
+  width:20px;height:20px;border-radius:50%;background:var(--a);color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;font-weight:800;flex-shrink:0;margin-top:2px;
+}
+.estxt{font-size:.83rem;color:var(--mu);line-height:1.6;}
+.estxt strong{color:var(--a);}
+.eformula{
+  display:block;font-family:'Share Tech Mono',monospace;font-size:.78rem;
+  color:var(--tx);background:var(--bg3);border:1px solid var(--bd);border-radius:8px;
+  padding:8px 12px;margin-top:6px;overflow-x:auto;white-space:nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOLLOW-UP QUESTIONS
+   ═══════════════════════════════════════════════════════════════ */
+.task-faq{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);}
+.task-faq-label{font-size:.66rem;letter-spacing:2px;text-transform:uppercase;color:var(--a);font-family:'Share Tech Mono',monospace;margin-bottom:8px;}
+.task-faq-item{margin-bottom:8px;}
+.task-faq-item:last-child{margin-bottom:0;}
+.task-faq-q{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:11px 14px;gap:12px;cursor:pointer;
+  background:var(--a-dim);border:1px solid var(--a-brd);
+  border-radius:10px;transition:background .2s,border-color .2s,box-shadow .2s;
+}
+.task-faq-q:hover{background:rgba(191,255,0,.14);box-shadow:0 0 16px var(--a-dim);}
+.task-faq-item.open .task-faq-q{background:rgba(191,255,0,.16);border-bottom-left-radius:0;border-bottom-right-radius:0;}
+.task-faq-q span{font-size:.83rem;font-weight:600;}
+.task-faq-ic{color:var(--a);font-size:1.1rem;flex-shrink:0;transition:transform .25s;line-height:1;}
+.task-faq-item.open .task-faq-ic{transform:rotate(45deg);}
+.task-faq-a{
+  overflow:hidden;max-height:0;transition:max-height .3s ease;
+  background:rgba(191,255,0,.03);border:1px solid var(--a-brd);border-top:none;
+  border-bottom-left-radius:10px;border-bottom-right-radius:10px;
+}
+.task-faq-ai{
+  padding:10px 14px 12px;font-size:.78rem;color:var(--mu);line-height:1.6;
+  opacity:0;transform:translateY(-6px);
+  transition:opacity .55s ease .3s,transform .55s ease .3s;
+}
+.task-faq-item.open .task-faq-ai{opacity:1;transform:translateY(0);}
+
+.task-own{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08);}
+.task-own-hint{font-size:.78rem;color:var(--mu);margin-bottom:10px;}
+.task-own-row{display:flex;gap:8px;}
+.task-own-in{
+  flex:1;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);
+  padding:10px 13px;color:var(--tx);font-size:.85rem;font-family:inherit;
+}
+.task-own-in::placeholder{color:var(--mu);}
+.task-own-btn{
+  background:var(--a);color:#000;border:none;border-radius:var(--r);
+  padding:10px 16px;font-size:.85rem;font-weight:700;cursor:pointer;
+  white-space:nowrap;font-family:inherit;transition:opacity .2s;
+}
+.task-own-btn:hover{opacity:.85;}
+.task-own-btn:disabled{opacity:.4;cursor:not-allowed;}
+.task-own-answer{
+  margin-top:10px;padding:12px 14px;background:var(--bg3);border:1px solid var(--bd);
+  border-radius:var(--r);font-size:.82rem;color:var(--mu);line-height:1.6;display:none;
+}
+.task-own-answer.show{display:block;}
+.task-own-cached{font-size:.68rem;color:var(--a);margin-top:6px;display:none;}
+.task-own-cached.show{display:block;}
+
+@media(max-width:640px){
+  .page{padding:0 12px 60px;}
+  .hero-h{font-size:1.25rem;}
+  .task-in-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-logo">OL<em>·</em>MAT</div>
+
+  <div class="h-mid">
+    <div class="streak">
+      <span class="s-fire off" id="fireIcon">🔥</span>
+      <span class="s-num" id="streakNum">0</span>
+    </div>
+    <div class="lsw">
+      <button class="lbtn on" data-lang="lv">LV</button>
+      <button class="lbtn" data-lang="ru">RU</button>
+      <button class="lbtn" data-lang="en">EN</button>
+    </div>
+  </div>
+
+  <a href="/main/menu.html" class="btn-back" id="backBtn">
+    ← <span class="btn-lbl" id="backLbl">Uz tēmām</span>
+  </a>
+</header>
+
+<div class="page">
+
+  <div class="hero-eye" id="topicEyebrow">VIENĀDOJUMU SISTĒMAS</div>
+  <h1 class="hero-h"><em id="heroAcc">Atrisini</em> <span id="heroRest">uzdevumu</span></h1>
+
+  <div class="task-card">
+    <div class="task-topic-lbl" id="taskTopicLbl">UZDEVUMS</div>
+
+    <div class="task-q" id="taskQ">
+      <span class="task-loading" id="taskLoading">
+        Ģenerē uzdevumu<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span>
+      </span>
+    </div>
+
+    <div class="task-in-row">
+      <input type="text" class="task-in" id="taskIn" placeholder="Tava atbilde..." disabled/>
+      <button class="task-chk" id="chkBtn" disabled>Pārbaudīt</button>
+    </div>
+    <div class="fb-line" id="fbLine"></div>
+
+    <div class="expl" id="explBlock">
+      <div class="estep">
+        <div class="esnum">1</div>
+        <div class="estxt" id="estep1"></div>
+      </div>
+      <div class="estep">
+        <div class="esnum">2</div>
+        <div class="estxt" id="estep2"></div>
+      </div>
+      <div class="estep">
+        <div class="esnum">3</div>
+        <div class="estxt" id="estep3"></div>
+      </div>
+
+      <!-- Уточняющие вопросы про эту задачу -->
+      <div class="task-faq">
+        <div class="task-faq-label" id="taskFaqLabel">Vēl kas neskaidrs?</div>
+
+        <div class="task-faq-item" id="taskFaqItem1">
+          <div class="task-faq-q">
+            <span id="taskFaqQ1"></span>
+            <span class="task-faq-ic">+</span>
+          </div>
+          <div class="task-faq-a">
+            <div class="task-faq-ai" id="taskFaqA1"></div>
+          </div>
+        </div>
+
+        <div class="task-faq-item" id="taskFaqItem2">
+          <div class="task-faq-q">
+            <span id="taskFaqQ2"></span>
+            <span class="task-faq-ic">+</span>
+          </div>
+          <div class="task-faq-a">
+            <div class="task-faq-ai" id="taskFaqA2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Свой вопрос про задачу -->
+      <div class="task-own">
+        <div class="task-own-hint" id="taskOwnHint">Vēl kas neskaidrs par šo uzdevumu? Uzdod savu jautājumu:</div>
+        <div class="task-own-row">
+          <input type="text" class="task-own-in" id="taskOwnIn" placeholder="Uzraksti savu jautājumu..." maxlength="200"/>
+          <button class="task-own-btn" id="taskOwnBtn">Jautāt →</button>
+        </div>
+        <div class="task-own-answer" id="taskOwnAnswer"></div>
+        <div class="task-own-cached" id="taskOwnCached">⚡ Atbilde no krātuves</div>
+      </div>
+
+      <button class="next-btn" id="nextBtn">Nākamais uzdevums →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+
+/* ════════════════════════════════════════════════════════════
+   █  KONFIG
+   ════════════════════════════════════════════════════════════ */
+const WORKER_URL = "https://floral-tree-d2cb.eusjs56999.workers.dev/";
+const LS_KEY = "olmat_v1"; // тот же ключ, что на menu.html — общий стрик/дневная цель
+
+// Эта страница жёстко привязана к теме "системы уравнений" — не принимает
+// параметр из URL, в отличие от общей practice.html
+const currentTopicId = "topic_11";
+const GENERATE_ENDPOINT = "generate-special-task"; // отдельный эндпоинт от общего /generate-task
+
+/* ════════════════════════════════════════════════════════════
+   █  ПЕРЕВОДЫ
+   ════════════════════════════════════════════════════════════ */
+const I18N = {
+  lv: {
+    heroAcc:"Atrisini", heroRest:"uzdevumu",
+    topicEyebrow:"VIENĀDOJUMU SISTĒMAS", taskTopicLbl:"UZDEVUMS",
+    backLbl:"Uz tēmām", chk:"Pārbaudīt", inpPh:"Tava atbilde...",
+    ok:"✓ Pareizi!", err:"✗ Nav pareizi — dari tā:",
+    generating:"Ģenerē uzdevumu", nextBtn:"Nākamais uzdevums →", checking:"Pārbaudu...",
+    faqLabel:"Vēl kas neskaidrs?", ownHint:"Vēl kas neskaidrs par šo uzdevumu? Uzdod savu jautājumu:",
+    ownPh:"Uzraksti savu jautājumu...", ownBtn:"Jautāt →", cachedNote:"⚡ Atbilde no krātuves",
+    cooldown:"Uzgaidi pāris sekundes...", errNet:"Savienojuma kļūda.", errGen:"Neizdevās ielādēt uzdevumu."
+  },
+  ru: {
+    heroAcc:"Решай", heroRest:"задание",
+    topicEyebrow:"СИСТЕМЫ УРАВНЕНИЙ", taskTopicLbl:"ЗАДАНИЕ",
+    backLbl:"К темам", chk:"Проверить", inpPh:"Твой ответ...",
+    ok:"✓ Правильно!", err:"✗ Неверно — вот как надо:",
+    generating:"Генерирую задание", nextBtn:"Следующее задание →", checking:"Проверяю...",
+    faqLabel:"Ещё что-то непонятно?", ownHint:"Ещё что-то неясно про эту задачу? Задай свой вопрос:",
+    ownPh:"Напиши свой вопрос...", ownBtn:"Спросить →", cachedNote:"⚡ Ответ из кэша",
+    cooldown:"Подожди пару секунд...", errNet:"Ошибка соединения.", errGen:"Не удалось загрузить задание."
+  },
+  en: {
+    heroAcc:"Solve", heroRest:"the task",
+    topicEyebrow:"SYSTEMS OF EQUATIONS", taskTopicLbl:"TASK",
+    backLbl:"To topics", chk:"Check", inpPh:"Your answer...",
+    ok:"✓ Correct!", err:"✗ Not quite — here's how:",
+    generating:"Generating task", nextBtn:"Next task →", checking:"Checking...",
+    faqLabel:"Still not clear?", ownHint:"Still unclear about this task? Ask your own question:",
+    ownPh:"Write your question...", ownBtn:"Ask →", cachedNote:"⚡ Answer from cache",
+    cooldown:"Wait a couple seconds...", errNet:"Connection error.", errGen:"Failed to load task."
+  }
+};
+
+let lang = "lv";
+const tx = k => I18N[lang][k] ?? k;
+
+/* ════════════════════════════════════════════════════════════
+   █  СТРИК / ДНЕВНАЯ ЦЕЛЬ (тот же механизм, что на menu.html)
+   ════════════════════════════════════════════════════════════ */
+function getRigaDate() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Riga", year:"numeric", month:"2-digit", day:"2-digit" }).format(new Date());
+}
+function loadAppData() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; }
+}
+function saveAppData(d) { localStorage.setItem(LS_KEY, JSON.stringify(d)); }
+
+/** Aprēķina dienas uzdevumu mērķi no CE rezultāta %. 40% → 5 uzd, 100% → 35 uzd (lineāri) */
+function scoreToGoal(score) {
+  return Math.round(5 + (score - 40) / 60 * 30);
+}
+
+let DAILY_GOAL = 15; // dienas mērķis — pārrēķinās no AD.score zemāk
+const STREAK_MIN_PCT = 0.10; // 10% no normas = minimums strikam (tas pats, kas menu.html)
+
+/** Ta pati loģika, kas menu.html initAppData() — nodrošina, ka AD dati (streak, count, date)
+    ir identiski un konsekventi starp abām lapām, jo tās izmanto vienu un to pašu LS_KEY. */
+function initAppData() {
+  const today = getRigaDate();
+  let d = loadAppData();
+  if (!d) {
+    d = { date: today, count: 0, streak: 0, score: 90 };
+    saveAppData(d);
+    DAILY_GOAL = scoreToGoal(90);
+    return d;
+  }
+  DAILY_GOAL = scoreToGoal(d.score || 90);
+  if (d.date !== today) {
+    const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
+    d.streak = (d.count >= minOk) ? (d.streak || 0) + 1 : 0;
+    d.date   = today;
+    d.count  = 0;
+    saveAppData(d);
+  }
+  return d;
+}
+
+let AD = initAppData();
+
+function addTask() {
+  AD.count++;
+  saveAppData(AD);
+  renderStreak();
+}
+function renderStreak() {
+  const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
+  const on = AD.count >= minOk;
+  document.getElementById("fireIcon").className = "s-fire " + (on ? "on" : "off");
+  document.getElementById("streakNum").textContent = AD.streak;
+}
+renderStreak();
+
+/* ════════════════════════════════════════════════════════════
+   █  ЯЗЫКОВОЙ ПЕРЕКЛЮЧАТЕЛЬ
+   ════════════════════════════════════════════════════════════ */
+function applyLang(l) {
+  lang = l;
+  document.querySelectorAll(".lbtn").forEach(b => b.classList.toggle("on", b.dataset.lang === l));
+  document.getElementById("topicEyebrow").textContent = tx("topicEyebrow");
+  document.getElementById("heroAcc").textContent = tx("heroAcc");
+  document.getElementById("heroRest").textContent = tx("heroRest");
+  document.getElementById("taskTopicLbl").textContent = tx("taskTopicLbl");
+  document.getElementById("backLbl").textContent = tx("backLbl");
+  document.getElementById("chkBtn").textContent = tx("chk");
+  document.getElementById("taskIn").placeholder = tx("inpPh");
+  document.getElementById("nextBtn").textContent = tx("nextBtn");
+  document.getElementById("taskFaqLabel").textContent = tx("faqLabel");
+  document.getElementById("taskOwnHint").textContent = tx("ownHint");
+  document.getElementById("taskOwnIn").placeholder = tx("ownPh");
+  document.getElementById("taskOwnBtn").textContent = tx("ownBtn");
+  document.getElementById("taskOwnCached").textContent = tx("cachedNote");
+}
+
+var lastLoadedLang = null; // язык, на котором сейчас реально сгенерировано currentTask
+
+document.querySelectorAll(".lbtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    var newLang = btn.dataset.lang;
+    applyLang(newLang);
+    // Задание было сгенерировано на другом языке — перегенерируем на новом,
+    // иначе текст задачи останется на старом языке, а интерфейс переключится
+    if (currentTask && lastLoadedLang !== null && lastLoadedLang !== newLang) {
+      generateTask();
+    }
+  });
+});
+
+/* ════════════════════════════════════════════════════════════
+   █  ГЕНЕРАЦИЯ ЗАДАНИЯ
+   ════════════════════════════════════════════════════════════ */
+let currentTask = null; // { question, answer, steps, followupQ1, followupA1, followupQ2, followupA2 }
+
+function escapeHtml(str) {
+  return String(str).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// Рендерит один шаг объяснения. Поддерживает новую структуру {text, formula}
+// и старую (простая строка) для обратной совместимости, если Gemini иногда
+// всё же вернёт steps не по схеме, несмотря на промпт.
+function renderStep(elId, step) {
+  var el = document.getElementById(elId);
+  if (!step) { el.innerHTML = ""; return; }
+
+  if (typeof step === "string") {
+    el.innerHTML = escapeHtml(step);
+    return;
+  }
+
+  var html = escapeHtml(step.text || "");
+  if (step.formula) {
+    html += '<span class="eformula">' + escapeHtml(step.formula) + '</span>';
+  }
+  el.innerHTML = html;
+}
+
+async function generateTask() {
+  var token = localStorage.getItem("session_token");
+  if (!token) return; // auth.js jau novirzīs uz login
+
+  // Отправляем результат ПРЕДЫДУЩЕГО задания на сервер (баллы), прежде чем
+  // сбрасывать состояние для нового — иначе потеряем информацию о попытке
+  await submitSolveResult();
+
+  // Сбрасываем UI в состояние загрузки
+  document.getElementById("taskQ").innerHTML =
+    '<span class="task-loading" id="taskLoading">' + tx("generating") + '<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></span>';
+  document.getElementById("taskIn").disabled = true;
+  document.getElementById("taskIn").value = "";
+  document.getElementById("chkBtn").disabled = true;
+  document.getElementById("fbLine").style.display = "none";
+  document.getElementById("explBlock").classList.remove("show");
+  document.querySelectorAll(".task-faq-item").forEach(i => {
+    i.classList.remove("open");
+    delete i.dataset.wasOpened;
+    i.querySelector(".task-faq-a").style.maxHeight = "0";
+  });
+  document.getElementById("taskOwnAnswer").classList.remove("show");
+  document.getElementById("taskOwnCached").classList.remove("show");
+  document.getElementById("taskOwnIn").value = "";
+  document.getElementById("nextBtn").disabled = true;
+
+  try {
+    var res = await fetch(WORKER_URL + GENERATE_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: JSON.stringify({ topicId: currentTopicId, lang: lang })
+    });
+
+    if (res.status === 429) {
+      document.getElementById("taskQ").innerHTML = '<span class="task-loading">' + tx("cooldown") + '</span>';
+      setTimeout(generateTask, 3000); // повторим через 3с, пока не пройдёт 15с лимит
+      return;
+    }
+
+    if (!res.ok) {
+      document.getElementById("taskQ").innerHTML = '<span class="task-loading">' + tx("errGen") + '</span>';
+      return;
+    }
+
+    var text = await res.text();
+    var task = JSON.parse(text);
+    currentTask = task;
+    lastLoadedLang = lang;
+
+    document.getElementById("taskQ").textContent = task.question;
+    document.getElementById("taskIn").disabled = false;
+    document.getElementById("chkBtn").disabled = false;
+    document.getElementById("taskIn").focus();
+
+    document.getElementById("taskFaqQ1").textContent = task.followupQ1 || "";
+    document.getElementById("taskFaqA1").textContent = task.followupA1 || "";
+    var faqItem1 = document.getElementById("taskFaqItem1");
+    faqItem1.style.display = task.followupQ1 ? "" : "none";
+
+    document.getElementById("taskFaqQ2").textContent = task.followupQ2 || "";
+    document.getElementById("taskFaqA2").textContent = task.followupA2 || "";
+    var faqItem2 = document.getElementById("taskFaqItem2");
+    faqItem2.style.display = task.followupQ2 ? "" : "none";
+
+    renderStep("estep1", task.steps[0]);
+    renderStep("estep2", task.steps[1]);
+    renderStep("estep3", task.steps[2]);
+  } catch(e) {
+    document.getElementById("taskQ").innerHTML = '<span class="task-loading">' + tx("errNet") + '</span>';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  ПРОВЕРКА ОТВЕТА
+   ════════════════════════════════════════════════════════════ */
+document.getElementById("chkBtn").addEventListener("click", checkAnswer);
+document.getElementById("taskIn").addEventListener("keydown", e => { if (e.key === "Enter") checkAnswer(); });
+
+// Отслеживаем состояние текущей попытки — отправляем в /solve только когда
+// человек уходит от задания (жмёт "Nākamais uzdevums"), чтобы успеть учесть,
+// раскрыл ли он уточняющие вопросы (это может произойти ПОСЛЕ клика Pārbaudīt).
+var attemptMade = false;   // была ли хоть одна попытка ответить
+var attemptCorrect = false; // был ли правильный ответ хоть раз за это задание
+
+// Гибкая нормализация — убирает скобки, точки с запятой, x=/y=, лишние пробелы.
+// Нужна здесь, так как ответ для систем уравнений составной — пара (x, y),
+// которую можно записать по-разному: "(2, 1)", "x=2, y=1", "2;1" и т.д.
+function normalizeAnswer(str) {
+  return String(str)
+    .toLowerCase()
+    .replace(/[xy]\s*=\s*/g, "")
+    .replace(/[();,\s]/g, "");
+}
+
+async function checkAnswer() {
+  if (!currentTask) return;
+  var userAnswer = document.getElementById("taskIn").value.trim();
+  if (!userAnswer) return;
+
+  var fb = document.getElementById("fbLine");
+  var chkBtn = document.getElementById("chkBtn");
+
+  var normalizedUser = normalizeAnswer(userAnswer);
+  var normalizedCorrect = normalizeAnswer(currentTask.answer);
+  var isCorrect = normalizedUser === normalizedCorrect;
+
+  // Простое сравнение не совпало — пробуем AI-проверку эквивалентности,
+  // так как один и тот же ответ можно записать разными способами
+  if (!isCorrect) {
+    chkBtn.disabled = true;
+    fb.textContent = tx("checking");
+    fb.className = "fb-line";
+    fb.style.display = "block";
+
+    try {
+      var token = localStorage.getItem("session_token");
+      var res = await fetch(WORKER_URL + "check-answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ userAnswer: userAnswer, correctAnswer: String(currentTask.answer) })
+      });
+      var data = await res.json();
+      if (res.ok && data.isEquivalent) {
+        isCorrect = true;
+      }
+    } catch(e) {
+      // AI-проверка недоступна — остаёмся с результатом простого сравнения
+    }
+  }
+
+  attemptMade = true;
+  if (isCorrect) attemptCorrect = true; // если хоть раз ответил верно — засчитываем как верный
+
+  fb.textContent = isCorrect ? tx("ok") : tx("err");
+  fb.className = "fb-line " + (isCorrect ? "fb-ok" : "fb-err");
+  fb.style.display = "block";
+
+  // Объяснение показываем всегда (правильно или нет) — так человек видит логику решения
+  document.getElementById("explBlock").classList.add("show");
+
+  // Локальный стрик обновляем сразу — он не зависит от системы баллов на сервере
+  addTask();
+
+  document.getElementById("nextBtn").disabled = false;
+  document.getElementById("taskIn").disabled = true;
+  chkBtn.disabled = true;
+}
+
+// Раскрыл ли пользователь ОБА уточняющих вопроса за это задание
+function bothQuestionsOpened() {
+  var item1 = document.getElementById("taskFaqItem1");
+  var item2 = document.getElementById("taskFaqItem2");
+  // Если какого-то вопроса вообще нет на этом задании (скрыт) — не считаем это требованием
+  var q1ok = item1.style.display === "none" || item1.classList.contains("open") || item1.dataset.wasOpened === "1";
+  var q2ok = item2.style.display === "none" || item2.classList.contains("open") || item2.dataset.wasOpened === "1";
+  return q1ok && q2ok;
+}
+
+// Отправляет накопленный результат текущего задания на сервер (баллы для лидерборда)
+async function submitSolveResult() {
+  if (!attemptMade) return; // не было ни одной попытки — нечего засчитывать
+
+  try {
+    var token = localStorage.getItem("session_token");
+    if (token) {
+      await fetch(WORKER_URL + "solve", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify({ isCorrect: attemptCorrect, questionsOpened: bothQuestionsOpened() })
+      });
+    }
+  } catch(e) {
+    // Не блокируем UI, если сервер недоступен
+  }
+
+  attemptMade = false;
+  attemptCorrect = false;
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  АККОРДЕОН УТОЧНЯЮЩИХ ВОПРОСОВ
+   ════════════════════════════════════════════════════════════ */
+document.querySelectorAll(".task-faq-item").forEach(item => {
+  item.querySelector(".task-faq-q").addEventListener("click", () => {
+    var open = item.classList.contains("open");
+    document.querySelectorAll(".task-faq-item").forEach(i => {
+      i.classList.remove("open");
+      i.querySelector(".task-faq-a").style.maxHeight = "0";
+    });
+    if (!open) {
+      item.classList.add("open");
+      item.dataset.wasOpened = "1"; // засчитывается даже если пользователь потом закроет аккордеон
+      var a = item.querySelector(".task-faq-a");
+      a.style.maxHeight = a.scrollHeight + "px";
+    }
+  });
+});
+
+/* ════════════════════════════════════════════════════════════
+   █  СВОЙ ВОПРОС (с кэшем на сервере)
+   ════════════════════════════════════════════════════════════ */
+document.getElementById("taskOwnBtn").addEventListener("click", askOwnQuestion);
+document.getElementById("taskOwnIn").addEventListener("keydown", e => { if (e.key === "Enter") askOwnQuestion(); });
+
+async function askOwnQuestion() {
+  var input = document.getElementById("taskOwnIn");
+  var question = input.value.trim();
+  if (!question || !currentTask) return;
+
+  var btn = document.getElementById("taskOwnBtn");
+  var answerBox = document.getElementById("taskOwnAnswer");
+  var cachedNote = document.getElementById("taskOwnCached");
+
+  btn.disabled = true;
+  answerBox.classList.remove("show");
+  cachedNote.classList.remove("show");
+  answerBox.textContent = tx("generating") + "...";
+  answerBox.classList.add("show");
+
+  try {
+    var token = localStorage.getItem("session_token");
+    var taskContext = currentTask.question + " (Atbilde: " + currentTask.answer + ")";
+
+    var res = await fetch(WORKER_URL + "ask-question", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: JSON.stringify({ question: question, taskContext: taskContext, lang: lang })
+    });
+
+    var data = await res.json();
+    if (!res.ok || !data.answer) {
+      answerBox.textContent = tx("errNet");
+      btn.disabled = false;
+      return;
+    }
+
+    answerBox.textContent = data.answer;
+    if (data.fromCache) cachedNote.classList.add("show");
+    input.value = "";
+  } catch(e) {
+    answerBox.textContent = tx("errNet");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   █  СЛЕДУЮЩЕЕ ЗАДАНИЕ
+   ════════════════════════════════════════════════════════════ */
+document.getElementById("nextBtn").addEventListener("click", generateTask);
+
+/* ════════════════════════════════════════════════════════════
+   █  СТАРТ
+   ════════════════════════════════════════════════════════════ */
+
+// Пытаемся зафиксировать результат последней попытки, если пользователь
+// уходит со страницы без клика "Nākamais uzdevums" (закрыл вкладку, перешёл
+// на другую тему через кнопку "назад" и т.п.). sendBeacon не блокирует переход
+// и работает надёжнее обычного fetch в момент unload.
+window.addEventListener("beforeunload", () => {
+  if (!attemptMade) return;
+  var token = localStorage.getItem("session_token");
+  if (!token) return;
+  var payload = JSON.stringify({ isCorrect: attemptCorrect, questionsOpened: bothQuestionsOpened() });
+  navigator.sendBeacon(WORKER_URL + "solve", new Blob([payload], { type: "application/json" }));
+});
+
+generateTask();
+
+</script>
+
+</body>
+</html>
