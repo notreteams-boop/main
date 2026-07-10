@@ -1,1228 +1,656 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="lv">
 <head>
 <!-- !! DROŠĪBA: auth.js — OBLIGĀTI PIRMĀ RINDA !! -->
-<script src="/main/auth.js"></script>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Tēmu izvēle · OL Mat</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<script src="/auth.js"></script>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>English OL — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
 <style>
-/* ═══════════════════════════════════════════════════════════════
-   TOKENS & RESET
-   ═══════════════════════════════════════════════════════════════ */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:    #07010f;
-  --bg2:   #161820;
-  --bg3:   #1e2028;
-  --bg4:   #232635;
-  --bd:    rgba(255,255,255,0.07);
-  --a:     #bfff00;
-  --a-dim: rgba(191,255,0,0.09);
-  --a-glo: rgba(191,255,0,0.28);
-  --a-brd: rgba(191,255,0,0.26);
-  --tx:    #e8eaf0;
-  --mu:    rgba(232,234,240,0.44);
-  --or:    #ff8800;
-  --re:    #ff3b3b;
-  --r:     12px;
-  --r2:    16px;
-}
-html{scroll-behavior:smooth;}
-body{
-  color:var(--tx);
-  font-family:'Rajdhani',sans-serif;font-size:16px;
-  min-height:100vh;overflow-x:hidden;
-  background:
-    radial-gradient(ellipse 70% 55% at 2% -5%,  rgba(200,20,255,0.09),  transparent),
-    radial-gradient(ellipse 60% 50% at 98% 102%, rgba(15,60,255,0.08),  transparent),
-    linear-gradient(175deg, #21093B 0%, #100320 45%, #07010f 100%);
-  background-attachment:fixed;
-}
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:var(--bg);}
-::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
-::-webkit-scrollbar-thumb:hover{background:var(--a-brd);}
+  :root{
+    --bg:#08080b; --card:#101017; --card2:#14141c;
+    --bd:rgba(255,255,255,.06); --bdh:rgba(255,255,255,.12);
+    --t:#f4f5f7; --td:#a4a7b3; --tm:#6a6d7a;
+    --cyan:#6cf0e0; --indigo:#7c8cff; --violet:#a78bfa;
+    --amber:#fbbf24; --green:#34d399; --red:#f87171;
+    --grad:linear-gradient(135deg,#7c8cff 0%,#56d4ff 55%,#6cf0e0 100%);
+    --r:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--t);min-height:100%}
+  body{font-family:"Manrope",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace;letter-spacing:0}
+  a,button{font-family:inherit}
+  button{cursor:pointer;border:0;background:transparent;color:inherit}
 
-/* ═══════════════════════════════════════════════════════════════
-   HEADER
-   ═══════════════════════════════════════════════════════════════ */
-header{
-  position:sticky;top:0;z-index:200;
-  height:58px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;gap:12px;
-  background:rgba(20,5,40,0.88);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--a-brd);
-}
-.h-logo{
-  font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;
-  letter-spacing:3px;color:var(--a);
-  text-shadow:0 0 14px var(--a-glo);
-  flex-shrink:0;
-}
-.h-logo em{color:rgba(255,255,255,0.25);font-style:normal;}
-.h-mid{display:flex;align-items:center;gap:10px;flex:1;justify-content:center;}
+  /* Ambient + grain */
+  .ambient{position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(600px 400px at 12% -5%,rgba(124,140,255,.14),transparent 60%),
+      radial-gradient(700px 500px at 105% 10%,rgba(108,240,224,.08),transparent 60%),
+      radial-gradient(800px 600px at 50% 110%,rgba(86,212,255,.06),transparent 60%);}
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.035;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/></svg>")}
 
-/* ── Streak badge ── */
-.streak{
-  display:flex;align-items:center;gap:5px;
-  padding:5px 13px;
-  background:var(--bg2);border:1px solid var(--bd);border-radius:100px;
-  user-select:none;cursor:default;white-space:nowrap;
-}
-.s-fire{font-size:1.05rem;line-height:1;transition:filter .35s,opacity .35s;}
-.s-fire.on {filter:drop-shadow(0 0 7px #ff8800);}
-.s-fire.off{filter:grayscale(1) brightness(0.6);opacity:.35;}
-.s-num{
-  font-family:'Orbitron',monospace;font-size:0.75rem;font-weight:700;
-  color:var(--tx);min-width:1ch;
-}
+  .wrap{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:0 32px}
+  @media(max-width:640px){.wrap{padding:0 18px}}
 
-/* ── Lang switcher ── */
-.lsw{
-  display:flex;background:var(--bg2);
-  border:1px solid var(--bd);border-radius:100px;padding:3px;gap:2px;
-}
-.lbtn{
-  padding:4px 10px;min-height:28px;
-  background:transparent;border:none;border-radius:100px;
-  font-family:'Rajdhani',sans-serif;font-size:0.72rem;font-weight:700;
-  letter-spacing:.3px;color:var(--mu);cursor:pointer;transition:all .2s;
-}
-.lbtn.on{background:var(--a);color:#000;}
+  /* Header */
+  header{border-bottom:1px solid var(--bd)}
+  .hd{display:flex;align-items:center;justify-content:space-between;padding:20px 0;gap:14px}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo-b{width:36px;height:36px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#0b0b12}
+  .logo-t{font-weight:800;font-size:17px;letter-spacing:-.02em}
+  .logo-t span{color:rgba(255,255,255,.55)}
+  .logo-s{font-size:10px;letter-spacing:.22em;color:rgba(255,255,255,.4);text-transform:uppercase;margin-top:2px}
 
-/* ── Back button ── */
-.btn-back{
-  display:flex;align-items:center;gap:5px;
-  padding:7px 15px;min-height:36px;
-  background:transparent;border:1px solid var(--a-brd);border-radius:100px;
-  font-family:'Rajdhani',sans-serif;font-size:0.8rem;font-weight:700;
-  color:var(--a);text-decoration:none;white-space:nowrap;
-  transition:all .2s;flex-shrink:0;
-}
-.btn-back:hover{background:var(--a);color:#000;}
+  .cluster{display:flex;align-items:center;gap:10px}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid var(--bd);font-size:12.5px;font-weight:600}
+  @media(max-width:640px){.chip{display:none}}
 
-/* ── Account button (личный кабинет) ── */
-.btn-account{
-  display:flex;align-items:center;justify-content:center;
-  width:36px;height:36px;flex-shrink:0;
-  background:transparent;border:1px solid var(--bd);border-radius:50%;
-  color:var(--mu);text-decoration:none;font-size:1rem;
-  transition:all .2s;
-}
-.btn-account:hover{border-color:var(--a-brd);color:var(--a);background:var(--a-dim);}
+  .seg{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:999px;padding:3px;display:inline-flex;gap:2px}
+  .seg-item{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;color:var(--td);cursor:pointer;transition:color .18s,background .18s;display:inline-flex;align-items:center;gap:6px}
+  .seg-item.active{color:#0b0b12;background:var(--grad)}
 
-.h-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .avatar{width:36px;height:36px;border-radius:999px;background:var(--grad);color:#0b0b12;font-weight:800;font-size:13px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 6px 22px -8px rgba(86,212,255,.55)}
+  .ghost{width:36px;height:36px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid var(--bd);display:inline-flex;align-items:center;justify-content:center;transition:background .2s,border-color .2s}
+  .ghost:hover{background:rgba(255,255,255,.06);border-color:var(--bdh)}
 
-@media(max-width:540px){
-  .btn-back .btn-lbl{display:none;}
-  .h-logo{font-size:.85rem;}
-}
+  .flame{filter:drop-shadow(0 0 6px rgba(251,191,36,.6));animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{filter:drop-shadow(0 0 6px rgba(251,191,36,.6))}50%{filter:drop-shadow(0 0 14px rgba(251,191,36,.9))}}
 
-/* ═══════════════════════════════════════════════════════════════
-   LAYOUT
-   ═══════════════════════════════════════════════════════════════ */
-.page{max-width:1160px;margin:0 auto;padding:0 18px 72px;}
+  main{padding:40px 0 60px}
+  .rise{opacity:0;transform:translateY(14px);animation:rise .62s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes rise{to{opacity:1;transform:none}}
 
-/* ═══════════════════════════════════════════════════════════════
-   HERO + SCORE SLIDER
-   ═══════════════════════════════════════════════════════════════ */
-.hero{padding:32px 0 20px;text-align:center;}
-.hero-eye{
-  font-size:.68rem;letter-spacing:2.5px;color:var(--a);
-  font-weight:700;text-transform:uppercase;margin-bottom:7px;
-  font-family:'Share Tech Mono',monospace;
-}
-.hero-h{
-  font-family:'Orbitron',monospace;
-  font-size:clamp(1.35rem,4.5vw,2rem);font-weight:900;
-  letter-spacing:1px;line-height:1.22;margin-bottom:26px;
-}
-.hero-h em{color:var(--a);font-style:normal;text-shadow:0 0 18px var(--a-glo);}
+  .eyebrow{font-size:11px;letter-spacing:.24em;color:rgba(108,240,224,.85);text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;margin-bottom:12px}
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cyan)}
+  h1{font-size:44px;line-height:1.05;letter-spacing:-.03em;margin:0 0 10px;font-weight:800}
+  .sub{color:rgba(255,255,255,.6);font-size:17px;margin:0 0 32px}
 
-/* Score widget */
-.score-box{
-  max-width:440px;margin:0 auto;
-  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
-  padding:20px 22px;
-}
-.score-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
-.score-lbl{font-size:.8rem;color:var(--mu);font-weight:600;letter-spacing:.2px;}
-.score-val{
-  font-family:'Orbitron',monospace;font-size:2.2rem;font-weight:900;
-  color:var(--a);text-shadow:0 0 20px var(--a-glo);line-height:1;
-}
+  /* Task grid */
+  .tasks{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:44px}
+  @media(max-width:1000px){.tasks{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.tasks{grid-template-columns:1fr}}
 
-input[type=range]{
-  -webkit-appearance:none;appearance:none;
-  width:100%;height:5px;border-radius:100px;cursor:pointer;outline:none;
-  background:linear-gradient(to right,var(--a) var(--p,50%),var(--bg3) var(--p,50%));
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;appearance:none;
-  width:20px;height:20px;border-radius:50%;
-  background:var(--a);border:3px solid var(--bg);
-  box-shadow:0 0 10px var(--a-glo);cursor:pointer;
-}
-input[type=range]::-moz-range-thumb{
-  width:20px;height:20px;border-radius:50%;
-  background:var(--a);border:3px solid var(--bg);
-  box-shadow:0 0 10px var(--a-glo);cursor:pointer;
-}
-.score-hint{font-size:.74rem;color:var(--mu);margin-top:9px;text-align:center;}
+  .card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent),var(--card);border:1px solid var(--bd);border-radius:var(--r);transition:border-color .24s,transform .24s,box-shadow .24s}
+  .card:hover{border-color:var(--bdh)}
+  .glow{position:relative}
+  .glow::before{content:"";position:absolute;inset:-1px;border-radius:calc(var(--r) + 1px);padding:1px;background:var(--grad);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;pointer-events:none}
+  .glow:hover::before{opacity:1}
+  .glow:hover{transform:translateY(-2px);box-shadow:0 20px 60px -20px rgba(86,212,255,.25)}
 
-/* ═══════════════════════════════════════════════════════════════
-   DAILY GOAL
-   ═══════════════════════════════════════════════════════════════ */
-.daily{
-  margin:16px 0;
-  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
-  padding:16px 20px;
-}
-.daily-top{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:10px;flex-wrap:wrap;gap:6px;
-}
-.daily-lbl{
-  font-family:'Share Tech Mono',monospace;font-size:.7rem;
-  letter-spacing:2px;color:var(--a);font-weight:700;
-}
-.daily-cnt{font-size:.84rem;font-weight:700;}
-.daily-cnt b{font-family:'Orbitron',monospace;color:var(--a);}
+  .task{padding:26px;text-align:left;display:flex;flex-direction:column;gap:22px;min-height:220px;overflow:hidden}
+  .task::after{content:"";position:absolute;right:-30%;top:-50%;width:260px;height:260px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in oklab,var(--ta,#7c8cff) 45%,transparent),transparent);opacity:0;transition:opacity .38s;pointer-events:none}
+  .task:hover::after{opacity:.55}
+  .task .icon-b{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,color-mix(in oklab,var(--ta) 20%,transparent),color-mix(in oklab,var(--tb) 12%,transparent));border:1px solid color-mix(in oklab,var(--ta) 35%,transparent);color:var(--ta)}
+  .task h3{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .task .count{color:rgba(255,255,255,.5);font-size:14px}
+  .task .count b{color:rgba(255,255,255,.9);font-weight:700}
+  .task .foot{margin-top:auto;display:flex;justify-content:space-between;align-items:center;padding-top:6px}
+  .task .cta{color:rgba(255,255,255,.6);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:4px;transition:color .2s}
+  .task:hover .cta{color:#fff}
+  .task .arr{width:32px;height:32px;border-radius:999px;background:var(--grad);color:#0b0b12;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s}
+  .task:hover .arr{opacity:1}
 
-.prog-track{height:8px;background:var(--bg3);border-radius:100px;overflow:hidden;}
-.prog-fill{
-  height:100%;border-radius:100px;min-width:3px;
-  background:linear-gradient(90deg,#74d400,#bfff00,#e0ff66);
-  box-shadow:0 0 10px var(--a-glo);
-  transition:width .55s cubic-bezier(.34,1.56,.64,1);
-}
-.daily-bot{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-top:9px;
-}
-.daily-hint{font-size:.72rem;color:var(--mu);}
-.cheat-btn{
-  padding:3px 9px;font-size:.68rem;font-weight:700;
-  background:transparent;border:1px solid var(--bd);border-radius:6px;
-  color:var(--mu);cursor:pointer;font-family:'Rajdhani',sans-serif;
-  transition:all .2s;letter-spacing:.2px;
-}
-.cheat-btn:hover{border-color:var(--a);color:var(--a);}
+  .t-3l{--ta:#7c8cff;--tb:#56d4ff}
+  .t-3r{--ta:#6cf0e0;--tb:#56d4ff}
+  .t-2w{--ta:#a78bfa;--tb:#7c8cff}
+  .t-1t{--ta:#fbbf24;--tb:#f472b6}
 
-/* Score OK button */
-.score-ok{
-  display:block;width:100%;margin-top:12px;padding:9px 0;
-  background:var(--a-dim);border:1px solid var(--a-brd);border-radius:8px;
-  color:var(--a);font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:700;
-  letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:all .2s;
-}
-.score-ok:hover{background:var(--a);color:#000;box-shadow:0 0 14px var(--a-glo);}
-.score-ok-hint{
-  font-size:.72rem;color:var(--mu);margin-top:7px;text-align:center;
-  font-family:'Share Tech Mono',monospace;letter-spacing:.3px;
-}
+  /* Analytics + Leaderboard grid */
+  .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+  @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+  .an{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:640px){.an{grid-template-columns:1fr}}
+  .an .full{grid-column:1/-1}
 
-/* ═══════════════════════════════════════════════════════════════
-   SEARCH + FILTERS
-   ═══════════════════════════════════════════════════════════════ */
-.search-row{display:flex;gap:10px;margin:22px 0 12px;}
-.s-wrap{position:relative;flex:1;}
-.s-ico{
-  position:absolute;left:13px;top:50%;transform:translateY(-50%);
-  color:var(--mu);font-size:.95rem;pointer-events:none;
-  font-family:'Share Tech Mono',monospace;
-}
-.s-in{
-  width:100%;padding:10px 36px 10px 38px;min-height:44px;
-  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);
-  color:var(--tx);font-size:.93rem;font-family:'Rajdhani',sans-serif;
-  outline:none;transition:border-color .2s;
-}
-.s-in:focus{border-color:var(--a-brd);}
-.s-in::placeholder{color:var(--mu);}
-.s-clr{
-  position:absolute;right:11px;top:50%;transform:translateY(-50%);
-  background:none;border:none;color:var(--mu);cursor:pointer;
-  font-size:1rem;line-height:1;padding:2px;display:none;
-  transition:color .2s;
-}
-.s-clr.vis{display:block;}
-.s-clr:hover{color:var(--tx);}
+  .stat{padding:22px;display:flex;flex-direction:column;gap:14px;min-height:200px}
+  .stat h4{margin:0;font-size:14px;font-weight:700}
+  .stat .sub-l{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:4px}
+  .stat .row{display:flex;align-items:baseline;gap:10px}
+  .num-58{color:rgba(255,255,255,.75);font-size:36px;font-weight:800}
+  .num-76{font-size:36px;font-weight:800;background:linear-gradient(90deg,#a5b4fc,#67e8f9,#6ee7b7);-webkit-background-clip:text;background-clip:text;color:transparent}
 
-/* Category filter pills */
-.cats{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;}
-.cat-btn{
-  padding:5px 13px;min-height:34px;
-  background:var(--bg2);border:1px solid var(--bd);border-radius:100px;
-  color:var(--mu);font-family:'Rajdhani',sans-serif;font-size:.76rem;font-weight:700;
-  cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.2px;
-}
-.cat-btn:hover:not(.on){border-color:rgba(255,255,255,.14);color:var(--tx);}
-.cat-btn.on{background:var(--a-dim);border-color:var(--a-brd);color:var(--a);}
+  /* Bars */
+  .bars{display:flex;align-items:flex-end;gap:6px;height:64px;margin-top:2px}
+  .bars b{flex:1;background:linear-gradient(180deg,#6cf0e0,#7c8cff);border-radius:6px 6px 2px 2px;display:block}
 
-.res-count{font-size:.74rem;color:var(--mu);margin-bottom:14px;font-family:'Share Tech Mono',monospace;}
+  /* Gauge */
+  .gauge{display:flex;align-items:center;justify-content:center;position:relative;height:170px}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .val{position:absolute;font-size:30px;font-weight:800}
 
-/* ═══════════════════════════════════════════════════════════════
-   TOPIC GRID
-   ═══════════════════════════════════════════════════════════════ */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
-  gap:12px;
-}
+  /* Line chart svg */
+  .line-wrap{height:170px;position:relative}
+  .line-wrap svg{width:100%;height:100%;overflow:visible}
+  .lbl{fill:rgba(255,255,255,.4);font-size:11px;font-family:inherit}
 
-/* ── Card ── */
-.card{
-  position:relative;overflow:hidden;
-  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
-  padding:18px 18px 16px;
-  display:flex;flex-direction:column;gap:11px;
-  transition:border-color .22s,box-shadow .22s,transform .22s;
-}
-/* Ambient gradient on idle */
-.card::before{
-  content:'';position:absolute;inset:0;border-radius:var(--r2);
-  background:linear-gradient(130deg,var(--a-dim),transparent 60%);
-  opacity:0;transition:opacity .25s;pointer-events:none;
-}
-/* Slow scan-line */
-.card.c-on::after{
-  content:'';position:absolute;left:0;right:0;top:-100%;height:50%;
-  background:linear-gradient(to bottom,transparent,rgba(191,255,0,0.025),transparent);
-  animation:scan 4s linear infinite;pointer-events:none;
-}
-@keyframes scan{to{top:200%;}}
+  /* Leaderboard */
+  .lb{padding:22px;display:flex;flex-direction:column;gap:14px;min-height:520px}
+  .lb-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .lb-title{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+  .lb-hero{padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(124,140,255,.12),rgba(108,240,224,.06));border:1px solid rgba(124,140,255,.25);display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .lb-hero .l small{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+  .lb-hero .l b{display:block;font-size:30px;font-weight:800;margin-top:4px}
+  .lb-hero .l span{color:rgba(255,255,255,.5);font-size:14px;margin-left:6px;font-weight:500}
+  .lb-hero .r small{display:block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);text-align:right}
+  .lb-hero .r b{display:block;font-size:24px;font-weight:800;color:var(--cyan);text-align:right}
 
-.card.c-on{cursor:pointer;}
-.card.c-on:hover{
-  border-color:var(--a);transform:translateY(-2px);
-  box-shadow:0 0 0 1px var(--a),0 10px 36px rgba(0,0,0,.45),0 0 24px var(--a-dim);
-}
-.card.c-on:hover::before{opacity:1;}
-.card.c-off{opacity:.38;cursor:not-allowed;pointer-events:none;}
+  .lb-list{display:flex;flex-direction:column;gap:6px;flex:1}
+  .lb-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px}
+  .lb-row.me{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+  .lb-row .rank{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.7)}
+  .lb-row.i0 .rank{background:linear-gradient(135deg,#fcd34d,#f59e0b);color:#0b0b12}
+  .lb-row.i1 .rank{background:linear-gradient(135deg,#e2e8f0,#94a3b8);color:#0b0b12}
+  .lb-row.i2 .rank{background:linear-gradient(135deg,#fdba74,#f97316);color:#0b0b12}
+  .lb-row .who{flex:1;min-width:0}
+  .lb-row .who b{display:block;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lb-row .who small{color:rgba(255,255,255,.45);font-size:11px}
+  .lb-row .val{font-size:14px;font-weight:700}
+  .lb-row .val small{color:rgba(255,255,255,.4);font-size:11px;margin-left:4px;font-weight:500}
 
-/* Card internals */
-.card-top{display:flex;justify-content:space-between;align-items:center;}
-.card-num{
-  font-family:'Share Tech Mono',monospace;font-size:.68rem;
-  color:var(--mu);letter-spacing:1px;
-}
-.bdg{
-  padding:2px 8px;border-radius:100px;
-  font-family:'Rajdhani',sans-serif;font-size:.63rem;font-weight:700;
-  letter-spacing:.5px;text-transform:uppercase;
-}
-.bdg-on  {background:var(--a-dim);color:var(--a);border:1px solid var(--a-brd);}
-.bdg-off {background:rgba(255,255,255,.04);color:var(--mu);border:1px solid var(--bd);}
+  .btn-ghost{background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:999px;padding:10px 16px;font-weight:600;font-size:14px;color:var(--t);display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,border-color .2s}
+  .btn-ghost:hover{background:rgba(255,255,255,.06);border-color:var(--bdh)}
 
-.card-title{
-  font-family:'Orbitron',monospace;font-size:.82rem;font-weight:700;
-  line-height:1.45;flex:1;
-}
-.c-on .card-title{color:var(--tx);}
-.c-off .card-title{color:var(--mu);}
+  /* Footer */
+  footer{margin-top:56px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(255,255,255,.4)}
 
-.card-bot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;}
-.cat-tag{
-  padding:3px 9px;border-radius:6px;
-  background:var(--bg3);border:1px solid var(--bd);
-  color:var(--mu);font-size:.68rem;font-weight:600;
-  max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
-.card-cta{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:5px 12px;border-radius:8px;
-  background:var(--a-dim);border:1px solid var(--a-brd);
-  color:var(--a);font-size:.74rem;font-weight:700;
-  font-family:'Rajdhani',sans-serif;
-  transition:background .2s,color .2s;white-space:nowrap;
-}
-.c-on:hover .card-cta{background:var(--a);color:#000;border-color:var(--a);}
-.card-lock{
-  display:inline-flex;align-items:center;gap:4px;
-  color:var(--mu);font-size:.7rem;font-weight:600;
-}
+  /* Modal */
+  .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+  .backdrop.open{display:flex;animation:fade .2s}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal{background:#0d0d13;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:24px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;animation:pop .25s cubic-bezier(.2,.7,.2,1)}
+  @keyframes pop{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal h3{margin:0 0 16px;font-size:17px;display:flex;align-items:center;gap:8px;font-weight:700}
+  .modal .close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:999px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7)}
+  .modal-wrap{position:relative}
 
-/* Empty state */
-.empty{
-  grid-column:1/-1;text-align:center;padding:56px 20px;
-}
-.empty-ico{font-size:2.2rem;opacity:.35;margin-bottom:10px;}
-.empty-txt{color:var(--mu);font-size:.92rem;}
+  .hr{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.08),transparent);border:0;margin:10px 0}
 
-/* ═══════════════════════════════════════════════════════════════
-   EXAM COUNTDOWN
-   ═══════════════════════════════════════════════════════════════ */
-.countdown{
-  margin:16px 0;
-  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
-  padding:16px 20px;
-}
-.countdown-lbl{
-  font-family:'Share Tech Mono',monospace;font-size:.7rem;
-  letter-spacing:2px;color:var(--a);font-weight:700;margin-bottom:10px;
-}
-.countdown-row{display:flex;gap:10px;flex-wrap:wrap;}
-.countdown-unit{
-  flex:1;min-width:60px;text-align:center;
-  background:var(--bg3);border-radius:10px;padding:8px 4px;
-}
-.countdown-num{
-  font-family:'Orbitron',monospace;font-weight:900;font-size:1.4rem;
-  color:var(--a);line-height:1;display:block;
-}
-.countdown-unit-lbl{font-size:.62rem;color:var(--mu);letter-spacing:.5px;text-transform:uppercase;}
+  .prof{display:flex;align-items:center;gap:14px;margin-top:8px}
+  .prof .a{width:56px;height:56px;border-radius:999px;background:var(--grad);color:#0b0b12;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center}
+  .prof .n{font-weight:700}
+  .prof .m{color:rgba(255,255,255,.5);font-size:12px;margin-top:2px}
+  .badge{display:inline-block;margin-top:10px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(108,240,224,.85);border:1px solid rgba(108,240,224,.25);border-radius:999px;padding:4px 10px}
+  .hint{color:rgba(255,255,255,.6);font-size:13.5px;margin:12px 0 0}
 
-/* ═══════════════════════════════════════════════════════════════
-   LEADERBOARD
-   ═══════════════════════════════════════════════════════════════ */
-.lboard{
-  margin:16px 0;
-  background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);
-  padding:16px 20px;
-}
-.lboard-top{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:12px;flex-wrap:wrap;gap:6px;
-}
-.lboard-lbl{
-  font-family:'Share Tech Mono',monospace;font-size:.7rem;
-  letter-spacing:2px;color:var(--a);font-weight:700;
-}
-.lboard-period{font-size:.68rem;color:var(--mu);}
-.lboard-list{display:flex;flex-direction:column;gap:6px;}
-.lboard-row{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 10px;border-radius:10px;
-  background:rgba(255,255,255,.02);border:1px solid transparent;
-  transition:background .2s,border-color .2s;
-}
-.lboard-row.me{
-  background:var(--a-dim);border-color:var(--a-brd);
-}
-.lboard-rank{
-  font-family:'Orbitron',monospace;font-weight:900;font-size:.9rem;
-  color:var(--mu);width:26px;text-align:center;flex-shrink:0;
-}
-.lboard-row:nth-child(1) .lboard-rank{color:#ffd700;}
-.lboard-row:nth-child(2) .lboard-rank{color:#c0c0c0;}
-.lboard-row:nth-child(3) .lboard-rank{color:#cd7f32;}
-.lboard-name{flex:1;font-size:.83rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.lboard-row.me .lboard-name{color:var(--a);}
-.lboard-count{
-  font-family:'Orbitron',monospace;font-weight:700;font-size:.8rem;
-  color:var(--a);flex-shrink:0;
-}
-.lboard-sep{
-  text-align:center;color:var(--mu);font-size:.7rem;padding:2px 0;letter-spacing:2px;
-}
-.lboard-empty{text-align:center;color:var(--mu);font-size:.8rem;padding:16px 0;}
-.lboard-badge{
-  font-family:'Share Tech Mono',monospace;font-size:.58rem;font-weight:700;
-  letter-spacing:.5px;padding:2px 7px;border-radius:100px;flex-shrink:0;
-  background:linear-gradient(90deg,#ffd700,#ffed4e);color:#3a2a00;
-  text-transform:uppercase;
-}
-.lboard-myrank{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  background:var(--a-dim);border:1px solid var(--a-brd);border-radius:10px;
-  padding:10px 14px;margin-bottom:12px;
-}
-.lboard-myrank-lbl{font-size:.72rem;color:var(--mu);}
-.lboard-myrank-val{
-  font-family:'Orbitron',monospace;font-weight:900;font-size:1.1rem;color:var(--a);
-}
-.lboard-myrank-val span{font-size:.7rem;font-weight:600;color:var(--mu);}
+  ::selection{background:rgba(108,240,224,.35);color:#fff}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:10px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16)}
 
-/* ═══════════════════════════════════════════════════════════════
-   RESPONSIVE
-   ═══════════════════════════════════════════════════════════════ */
-@media(max-width:640px){
-  .page{padding:0 12px 60px;}
-  header{padding:0 12px;}
-  .hero-h{font-size:1.25rem;}
-  .score-val{font-size:1.7rem;}
-  .grid{grid-template-columns:1fr;}
-  .h-mid{gap:7px;}
-}
+  /* Utility icons — SVG size */
+  .i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .i-lg{width:20px;height:20px}
+  .i-md{width:14px;height:14px}
+  .i-sm{width:12px;height:12px}
 </style>
 </head>
 <body>
 
-<!-- ═══════════ HEADER ═══════════ -->
+<div class="ambient"></div>
+<div class="grain"></div>
+
+<!-- ================ HEADER ================ -->
 <header>
-  <div class="h-logo">OL<em>·</em>MAT</div>
-
-  <div class="h-mid">
-    <!-- Streak -->
-    <div class="streak">
-      <span class="s-fire off" id="fireIcon">🔥</span>
-      <span class="s-num"    id="streakNum">0</span>
+  <div class="wrap hd">
+    <div class="logo">
+      <div class="logo-b">
+        <svg class="i i-lg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <div>
+        <div class="logo-t">English <span>OL</span></div>
+        <div class="logo-s">Dashboard</div>
+      </div>
     </div>
-    <!-- Lang -->
-    <div class="lsw">
-      <button class="lbtn on" data-lang="lv">LV</button>
-      <button class="lbtn"    data-lang="ru">RU</button>
-      <button class="lbtn"    data-lang="en">EN</button>
-    </div>
-  </div>
 
-  <div class="h-right">
-    <a href="/main/account.html" class="btn-account" title="Mans konts">👤</a>
-    <a href="#" class="btn-back" id="backBtn" onclick="handleLogout(event)">
-      ← <span class="btn-lbl" id="backLbl">Uz galveno izvēlni</span>
-    </a>
+    <div class="cluster">
+      <div class="chip">
+        <svg class="i i-md flame" viewBox="0 0 24 24" style="color:#fbbf24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        <span class="mono">5</span>
+        <span style="color:rgba(255,255,255,.6)" data-i="streak">dienu straiks</span>
+      </div>
+      <div class="chip">
+        <svg class="i i-md" viewBox="0 0 24 24" style="color:#6cf0e0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="mono" id="timer">04:13</span>
+      </div>
+
+      <div class="seg" role="tablist">
+        <div class="seg-item active" data-lang="lv">LV</div>
+        <div class="seg-item" data-lang="ru">RU</div>
+      </div>
+
+      <button class="avatar" id="profileBtn" aria-label="Profile">R</button>
+      <button class="ghost" id="logoutBtn" aria-label="Logout">
+        <svg class="i" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
   </div>
 </header>
 
-<!-- ═══════════ PAGE ═══════════ -->
-<div class="page">
+<!-- ================ MAIN ================ -->
+<main>
+  <div class="wrap">
+    <!-- Greeting -->
+    <section class="rise">
+      <div class="eyebrow" id="today"></div>
+      <h1 data-i="greeting">Sveiks, Rihards!</h1>
+      <p class="sub" data-i="subGreeting">Kuru uzdevumu izvēlēsimies šodien?</p>
+    </section>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-eye" id="eyebrow">VISC CE · OPTIMĀLAIS LĪMENIS</div>
-    <h1 class="hero-h"><em id="heroTitleAcc">Izvēlies</em> <span id="heroTitleRest">tēmu</span></h1>
+    <!-- Task cards -->
+    <section class="tasks rise" style="animation-delay:60ms">
+      <button class="card glow task t-3l">
+        <div class="icon-b"><svg class="i i-lg" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 18 0v6a2 2 0 0 1-2 2h-2v-8h4"/><path d="M3 18v-6h4v8H5a2 2 0 0 1-2-2z"/></svg></div>
+        <div>
+          <h3 data-i="t3l">Klausīšanās</h3>
+          <div class="count"><b class="mono" data-i="t3lc">3</b> <span data-i="t3lu">uzdevumi</span></div>
+        </div>
+        <div class="foot">
+          <span class="cta"><span data-i="start">Sākt</span>
+            <svg class="i i-md" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+          <span class="arr"><svg class="i i-md" viewBox="0 0 24 24" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </div>
+      </button>
 
-    <!-- Score slider -->
-    <div class="score-box">
-      <div class="score-row">
-        <span class="score-lbl" id="scoreLbl">Mans CE mērķis</span>
-        <span class="score-val" id="scoreVal">90%</span>
+      <button class="card glow task t-3r">
+        <div class="icon-b"><svg class="i i-lg" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></div>
+        <div>
+          <h3 data-i="t3r">Lasīšana</h3>
+          <div class="count"><b class="mono" data-i="t3rc">3</b> <span data-i="t3ru">uzdevumi</span></div>
+        </div>
+        <div class="foot">
+          <span class="cta"><span data-i="start">Sākt</span>
+            <svg class="i i-md" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+          <span class="arr"><svg class="i i-md" viewBox="0 0 24 24" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </div>
+      </button>
+
+      <button class="card glow task t-2w">
+        <div class="icon-b"><svg class="i i-lg" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+        <div>
+          <h3 data-i="t2w">Rakstīšana</h3>
+          <div class="count"><b class="mono" data-i="t2wc">2</b> <span data-i="t2wu">uzdevumi</span></div>
+        </div>
+        <div class="foot">
+          <span class="cta"><span data-i="start">Sākt</span>
+            <svg class="i i-md" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+          <span class="arr"><svg class="i i-md" viewBox="0 0 24 24" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </div>
+      </button>
+
+      <button class="card glow task t-1t">
+        <div class="icon-b"><svg class="i i-lg" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10a7 7 0 0 1-14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg></div>
+        <div>
+          <h3 data-i="t1t">Runāšana</h3>
+          <div class="count"><b class="mono" data-i="t1tc">1</b> <span data-i="t1tu">uzdevums</span></div>
+        </div>
+        <div class="foot">
+          <span class="cta"><span data-i="start">Sākt</span>
+            <svg class="i i-md" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+          <span class="arr"><svg class="i i-md" viewBox="0 0 24 24" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </div>
+      </button>
+    </section>
+
+    <!-- Analytics + Leaderboard -->
+    <section class="grid rise" style="animation-delay:140ms">
+      <div class="an">
+        <!-- Forecast -->
+        <div class="card stat">
+          <div>
+            <h4 data-i="forecast">Vērtējuma prognoze</h4>
+            <div class="sub-l" data-i="forecastSub">6 nedēļu prognoze</div>
+          </div>
+          <div class="row">
+            <span class="mono num-58">58</span>
+            <svg class="i i-md" viewBox="0 0 24 24" style="color:#6cf0e0"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <span class="mono num-76">76</span>
+          </div>
+          <div class="bars">
+            <b style="height:34%"></b><b style="height:42%"></b><b style="height:52%"></b>
+            <b style="height:64%"></b><b style="height:78%"></b><b style="height:88%"></b><b style="height:100%"></b>
+          </div>
+        </div>
+
+        <!-- Gauge -->
+        <div class="card stat">
+          <div>
+            <h4 data-i="acc">Precizitāte</h4>
+            <div class="sub-l" data-i="accSub">vidējais uzdevumu rādītājs</div>
+          </div>
+          <div class="gauge">
+            <svg width="150" height="150" viewBox="0 0 150 150">
+              <defs>
+                <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#7c8cff"/>
+                  <stop offset="60%" stop-color="#56d4ff"/>
+                  <stop offset="100%" stop-color="#6cf0e0"/>
+                </linearGradient>
+              </defs>
+              <circle cx="75" cy="75" r="60" stroke="rgba(255,255,255,.06)" stroke-width="12" fill="none"/>
+              <!-- 2πr = 376.99; 84% => offset = 60.32 -->
+              <circle cx="75" cy="75" r="60" stroke="url(#gGrad)" stroke-width="12" stroke-linecap="round" fill="none" stroke-dasharray="376.99" stroke-dashoffset="60.32"/>
+            </svg>
+            <span class="mono val">84%</span>
+          </div>
+        </div>
+
+        <!-- Weekly line -->
+        <div class="card stat full">
+          <div>
+            <h4 data-i="weekly">Nedēļas aktivitāte</h4>
+            <div class="sub-l" data-i="weeklySub">punkti pa dienām</div>
+          </div>
+          <div class="line-wrap">
+            <svg viewBox="0 0 700 170" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="lGrad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#7c8cff"/>
+                  <stop offset="60%" stop-color="#56d4ff"/>
+                  <stop offset="100%" stop-color="#6cf0e0"/>
+                </linearGradient>
+              </defs>
+              <!-- Grid -->
+              <line x1="0" y1="30" x2="700" y2="30" stroke="rgba(255,255,255,.05)"/>
+              <line x1="0" y1="70" x2="700" y2="70" stroke="rgba(255,255,255,.05)"/>
+              <line x1="0" y1="110" x2="700" y2="110" stroke="rgba(255,255,255,.05)"/>
+              <!-- Polyline. 7 points at x=50,150,250,350,450,550,650  -->
+              <!-- values 32,48,41,62,55,78,86 => y = 130 - (v-30)*1.4 clipped -->
+              <polyline points="50,120 150,100 250,110 350,80 450,90 550,55 650,40"
+                        fill="none" stroke="url(#lGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Dots -->
+              <g fill="#56d4ff">
+                <circle cx="50" cy="120" r="4"/>
+                <circle cx="150" cy="100" r="4"/>
+                <circle cx="250" cy="110" r="4"/>
+                <circle cx="350" cy="80" r="4"/>
+                <circle cx="450" cy="90" r="4"/>
+                <circle cx="550" cy="55" r="4"/>
+                <circle cx="650" cy="40" r="5" fill="#6cf0e0"/>
+              </g>
+              <!-- Labels -->
+              <g class="lbl" text-anchor="middle">
+                <text x="50" y="160" data-d="0">Pr</text>
+                <text x="150" y="160" data-d="1">Ot</text>
+                <text x="250" y="160" data-d="2">Tr</text>
+                <text x="350" y="160" data-d="3">Ce</text>
+                <text x="450" y="160" data-d="4">Pk</text>
+                <text x="550" y="160" data-d="5">Se</text>
+                <text x="650" y="160" data-d="6">Sv</text>
+              </g>
+            </svg>
+          </div>
+        </div>
       </div>
-      <input type="range" id="scoreSlider" min="40" max="100" value="90" step="5"/>
-      <div class="score-hint" id="scoreHint">Tiek ieteikts apgūt visas aktīvās tēmas</div>
-      <button class="score-ok" id="scoreOkBtn">OK</button>
-      <div class="score-ok-hint" id="scoreOkHint"></div>
-    </div>
-  </div>
 
-  <!-- DAILY GOAL -->
-  <div class="daily">
-    <div class="daily-top">
-      <span class="daily-lbl" id="goalLbl">DIENAS MĒRĶIS</span>
-      <span class="daily-cnt">
-        <b id="doneNum">0</b>&nbsp;/&nbsp;<b id="goalNum">15</b>
-        <span id="taskWrd"> uzdevumi</span>
-      </span>
-    </div>
-    <div class="prog-track">
-      <div class="prog-fill" id="progFill" style="width:0%"></div>
-    </div>
-    <div class="daily-bot">
-      <span class="daily-hint" id="goalHint"></span>
-      <button class="cheat-btn" id="cheatBtn" title="Dev: simulē +1 uzdevumu" style="display:none">＋ TEST</button>
-    </div>
-  </div>
+      <!-- Leaderboard -->
+      <div class="card lb">
+        <div class="lb-hd">
+          <div>
+            <div class="lb-title">
+              <svg class="i i-md" viewBox="0 0 24 24" style="color:#fcd34d"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 4h4v3a4 4 0 0 1-4 4"/><path d="M7 4H3v3a4 4 0 0 0 4 4"/></svg>
+              <span data-i="lbTitle">Nedēļas līderu tabula</span>
+            </div>
+            <div class="sub-l" data-i="lbSub">Top skolēni pēc XP šonedēļ</div>
+          </div>
+          <div class="seg">
+            <div class="seg-item active" data-lb="xp"><svg class="i i-sm" viewBox="0 0 24 24"><polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 9 8.5"/></svg><span data-i="lbXp">Nedēļas XP</span></div>
+            <div class="seg-item" data-lb="global"><svg class="i i-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z"/></svg><span data-i="lbGlobal">Prognozes rangs</span></div>
+          </div>
+        </div>
 
-  <!-- EXAM COUNTDOWN -->
-  <div class="countdown">
-    <div class="countdown-lbl" id="countdownLbl">LĪDZ EKSĀMENAM</div>
-    <div class="countdown-row">
-      <div class="countdown-unit">
-        <span class="countdown-num" id="cdDays">--</span>
-        <span class="countdown-unit-lbl" id="cdDaysLbl">dienas</span>
+        <div class="lb-hero">
+          <div class="l">
+            <small data-i="yourPlace">Tava vieta</small>
+            <b class="mono">#<span id="myRank">23</span><span data-i="of">no</span> 1,240</b>
+          </div>
+          <div class="r">
+            <small id="lbUnitHead">XP</small>
+            <b class="mono" id="myVal">1980</b>
+          </div>
+        </div>
+
+        <div class="lb-list" id="lbList"></div>
+
+        <button class="btn-ghost" id="viewAll">
+          <span data-i="viewAll">Skatīt visu</span>
+          <svg class="i i-md" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </button>
       </div>
-      <div class="countdown-unit">
-        <span class="countdown-num" id="cdHours">--</span>
-        <span class="countdown-unit-lbl" id="cdHoursLbl">stundas</span>
+    </section>
+
+    <footer>
+      <div style="display:flex;align-items:center;gap:6px">
+        <svg class="i i-sm" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span><span class="mono">1,240</span> <span data-i="active">aktīvi skolēni</span></span>
       </div>
-      <div class="countdown-unit">
-        <span class="countdown-num" id="cdMinutes">--</span>
-        <span class="countdown-unit-lbl" id="cdMinutesLbl">minūtes</span>
+      <div>© 2026 English OL</div>
+    </footer>
+  </div>
+</main>
+
+<!-- ================ MODALS ================ -->
+<div class="backdrop" id="lbModal">
+  <div class="modal modal-wrap">
+    <button class="close" data-close><svg class="i i-md" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h3><svg class="i i-md" viewBox="0 0 24 24" style="color:#fcd34d"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/></svg><span data-i="fullLb">Pilna līderu tabula</span></h3>
+    <div id="lbFull"></div>
+  </div>
+</div>
+
+<div class="backdrop" id="profileModal">
+  <div class="modal modal-wrap">
+    <button class="close" data-close><svg class="i i-md" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    <h3><svg class="i i-md" viewBox="0 0 24 24" style="color:#6cf0e0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span data-i="profileTitle">Personīgais profils</span></h3>
+    <div class="prof">
+      <div class="a">R</div>
+      <div>
+        <div class="n">Rihards Bērziņš</div>
+        <div class="m">11. klase · Rīga</div>
       </div>
-      <div class="countdown-unit">
-        <span class="countdown-num" id="cdSeconds">--</span>
-        <span class="countdown-unit-lbl" id="cdSecondsLbl">sekundes</span>
-      </div>
     </div>
+    <p class="hint" data-i="profileHint">Šeit drīz parādīsies tavu iepriekšējo uzdevumu vēsture, saglabātās esejas un iestatījumi.</p>
+    <span class="badge" data-i="upcoming">Drīzumā</span>
   </div>
+</div>
 
-  <!-- LEADERBOARD -->
-  <div class="lboard">
-    <div class="lboard-top">
-      <span class="lboard-lbl" id="lboardLbl">MĒNEŠA LĪDERI</span>
-      <span class="lboard-period" id="lboardPeriod">Pēc atrisināto uzdevumu skaita</span>
-    </div>
-    <div class="lboard-myrank" id="lboardMyRank" style="display:none;">
-      <span class="lboard-myrank-lbl" id="lboardMyRankLbl">Tava vieta</span>
-      <span class="lboard-myrank-val" id="lboardMyRankVal">— <span id="lboardMyRankOf"></span></span>
-    </div>
-    <div class="lboard-list" id="lboardList">
-      <div class="lboard-empty" id="lboardEmpty">Ielādē...</div>
-    </div>
-  </div>
-
-  <!-- SEARCH -->
-  <div class="search-row">
-    <div class="s-wrap">
-      <span class="s-ico">⌕</span>
-      <input class="s-in" id="searchInput" type="text" autocomplete="off"/>
-      <button class="s-clr" id="searchClear">✕</button>
-    </div>
-  </div>
-
-  <!-- CATEGORY FILTERS -->
-  <div class="cats" id="catFilters"></div>
-
-  <!-- RESULTS INFO -->
-  <div class="res-count" id="resCnt"></div>
-
-  <!-- GRID -->
-  <div class="grid" id="topicGrid"></div>
-
-</div><!-- /page -->
-
-<!-- ═══════════════════════════════════════════════════════════
-     JAVASCRIPT
-     ═══════════════════════════════════════════════════════════ -->
 <script>
-"use strict";
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 1 — KONFIG
-   ════════════════════════════════════════════════════════════
-   GITHUB_BASE_URL — bāzes URL repozitorijam ar uzdevumiem.
-   ID no tēmas (github_folder) tiek automātiski pievienots ceļam:
-     GITHUB_BASE_URL + topic.github_folder + "/task.json"
-   Maršrutēšana uz prakses lapu: PRACTICE_PAGE?topic=<folder>
-   ──────────────────────────────────────────────────────────── */
-const GITHUB_BASE_URL = "https://notreteams-boop.github.io/tasks/";
-const PRACTICE_PAGE   = "/main/practice.html";
-let DAILY_GOAL        = 15;          // dienas mērķis — dinamiski no CE rezultāta
-const STREAK_MIN_PCT  = 0.10;        // 10% no normas = minimums strikam
-const LS_KEY          = "olmat_v1"; // localStorage atslēga
-
-/** Aprēķina dienas uzdevumu mērķi no CE rezultāta %.
- *  40% → 5 uzd, 100% → 35 uzd (lineāri) */
-function scoreToGoal(score) {
-  return Math.round(5 + (score - 40) / 60 * 30);
-}
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 2 — TULKOJUMI  (LV / RU / EN)
-   ════════════════════════════════════════════════════════════ */
-const I18N = {
-lv:{
-  eyebrow:"VISC CE · OPTIMĀLAIS LĪMENIS",
-  heroAcc:"Izvēlies", heroRest:"tēmu",
-  scoreLbl:"Mans CE mērķis",
-  scoreHint:"Tiek ieteikts apgūt visas aktīvās tēmas",
-  goalLbl:"DIENAS MĒRĶIS", taskWrd:" uzdevumi",
-  countdownLbl:"LĪDZ EKSĀMENAM", cdDaysLbl:"dienas", cdHoursLbl:"stundas", cdMinutesLbl:"minūtes", cdSecondsLbl:"sekundes",
-  lboardLbl:"MĒNEŠA LĪDERI", lboardPeriod:"Pēc atrisināto uzdevumu skaita",
-  lboardMyRankLbl:"Tava vieta", lboardOf:"no", lboardBadge:"Līderis",
-  goalHint:"Pabeidz ${G} uzdevumus, lai saglabātu savu sēriju!",
-  search:"Meklēt tēmu vai atslēgvārdu...",
-  catAll:"Visas tēmas",
-  bdgOn:"Aktīvs", bdgOff:"Drīzumā",
-  cta:"Sākt →", lock:"Drīzumā",
-  back:"Uz galveno izvēlni",
-  empty:"Nekas netika atrasts. Mēģini citu atslēgvārdu.",
-  resTpl:"{n} tēmas",
-  perDay:"uzd./dienā"
-},
-ru:{
-  eyebrow:"VISC CE · OPTIMĀLAIS LĪMENIS",
-  heroAcc:"Выбери", heroRest:"тему",
-  scoreLbl:"Мой целевой результат CE",
-  scoreHint:"Рекомендуется освоить все активные темы",
-  goalLbl:"ДНЕВНАЯ ЦЕЛЬ", taskWrd:" задания",
-  countdownLbl:"ДО ЭКЗАМЕНА", cdDaysLbl:"дней", cdHoursLbl:"часов", cdMinutesLbl:"минут", cdSecondsLbl:"секунд",
-  lboardLbl:"ЛИДЕРЫ МЕСЯЦА", lboardPeriod:"По количеству решённых заданий",
-  lboardMyRankLbl:"Твоё место", lboardOf:"из", lboardBadge:"Лидер",
-  goalHint:"Реши ${G} заданий, чтобы не потерять серию!",
-  search:"Поиск темы или ключевого слова...",
-  catAll:"Все темы",
-  bdgOn:"Активна", bdgOff:"Скоро",
-  cta:"Начать →", lock:"Скоро",
-  back:"В главное меню",
-  empty:"Ничего не найдено. Попробуй другой запрос.",
-  resTpl:"{n} темы",
-  perDay:"зад./день"
-},
-en:{
-  eyebrow:"VISC CE · OPTIMĀLAIS LĪMENIS",
-  heroAcc:"Choose", heroRest:"a topic",
-  scoreLbl:"My CE Target Score",
-  scoreHint:"Recommended: complete all active topics",
-  goalLbl:"DAILY GOAL", taskWrd:" tasks",
-  countdownLbl:"UNTIL THE EXAM", cdDaysLbl:"days", cdHoursLbl:"hours", cdMinutesLbl:"minutes", cdSecondsLbl:"seconds",
-  lboardLbl:"MONTHLY LEADERS", lboardPeriod:"By number of solved tasks",
-  lboardMyRankLbl:"Your rank", lboardOf:"of", lboardBadge:"Leader",
-  goalHint:"Complete ${G} tasks to keep your streak!",
-  search:"Search topics or keywords...",
-  catAll:"All topics",
-  bdgOn:"Active", bdgOff:"Soon",
-  cta:"Start →", lock:"Soon",
-  back:"Back to Menu",
-  empty:"Nothing found. Try a different search.",
-  resTpl:"{n} topics",
-  perDay:"tasks/day"
-}
+/* ============ i18n ============ */
+const dict = {
+  lv:{
+    streak:"dienu straiks", greeting:"Sveiks, Rihards!", subGreeting:"Kuru uzdevumu izvēlēsimies šodien?",
+    t3l:"Klausīšanās", t3lc:"3", t3lu:"uzdevumi",
+    t3r:"Lasīšana",    t3rc:"3", t3ru:"uzdevumi",
+    t2w:"Rakstīšana",  t2wc:"2", t2wu:"uzdevumi",
+    t1t:"Runāšana",    t1tc:"1", t1tu:"uzdevums",
+    start:"Sākt",
+    forecast:"Vērtējuma prognoze", forecastSub:"6 nedēļu prognoze",
+    acc:"Precizitāte", accSub:"vidējais uzdevumu rādītājs",
+    weekly:"Nedēļas aktivitāte", weeklySub:"punkti pa dienām",
+    lbTitle:"Nedēļas līderu tabula", lbSub:"Top skolēni pēc XP šonedēļ",
+    lbXp:"Nedēļas XP", lbGlobal:"Prognozes rangs",
+    yourPlace:"Tava vieta", of:"no", viewAll:"Skatīt visu", fullLb:"Pilna līderu tabula",
+    xp:"XP", score:"Balles", active:"aktīvi skolēni",
+    profileTitle:"Personīgais profils",
+    profileHint:"Šeit drīz parādīsies tavu iepriekšējo uzdevumu vēsture, saglabātās esejas un iestatījumi.",
+    upcoming:"Drīzumā",
+    days:["Pr","Ot","Tr","Ce","Pk","Se","Sv"], locale:"lv-LV"
+  },
+  ru:{
+    streak:"дней подряд", greeting:"Привет, Рихард!", subGreeting:"Какое задание выберем на сегодня?",
+    t3l:"Аудирование", t3lc:"3", t3lu:"задания",
+    t3r:"Чтение",      t3rc:"3", t3ru:"задания",
+    t2w:"Письмо",      t2wc:"2", t2wu:"задания",
+    t1t:"Говорение",   t1tc:"1", t1tu:"задание",
+    start:"Начать",
+    forecast:"Прогноз оценки", forecastSub:"прогноз на 6 недель",
+    acc:"Точность", accSub:"среднее по заданиям",
+    weekly:"Активность за неделю", weeklySub:"очки по дням",
+    lbTitle:"Лидерборд недели", lbSub:"Топ учеников по XP за неделю",
+    lbXp:"XP за неделю", lbGlobal:"Прогноз-ранг",
+    yourPlace:"Твоё место", of:"из", viewAll:"Смотреть весь топ", fullLb:"Полный лидерборд",
+    xp:"XP", score:"балла", active:"активных учеников",
+    profileTitle:"Личный профиль",
+    profileHint:"Здесь скоро появится история твоих прошлых заданий, сохранённые эссе и настройки.",
+    upcoming:"Скоро",
+    days:["Пн","Вт","Ср","Чт","Пт","Сб","Вс"], locale:"ru-RU"
+  }
 };
 
+/* ============ Data ============ */
+const lbXP = [
+  {name:"Elīna V.", city:"Rīga",       val:4820},
+  {name:"Dāvis L.", city:"Liepāja",    val:4610},
+  {name:"Marta K.", city:"Rīga",       val:4380},
+  {name:"Anna B.",  city:"Valmiera",   val:4120},
+  {name:"Roberts P.",city:"Jelgava",   val:3980},
+  {name:"Kate S.",  city:"Cēsis",      val:3720},
+  {name:"Ilja N.",  city:"Daugavpils", val:3510},
+  {name:"Sofija M.",city:"Rīga",       val:3390},
+  {name:"Kārlis Z.",city:"Rēzekne",    val:3240},
+  {name:"Laima R.", city:"Ventspils",  val:3110}
+];
+const lbGL = [
+  {name:"Sofija M.",city:"Rīga",       val:82},
+  {name:"Elīna V.", city:"Rīga",       val:81},
+  {name:"Anna B.",  city:"Valmiera",   val:79},
+  {name:"Dāvis L.", city:"Liepāja",    val:78},
+  {name:"Marta K.", city:"Rīga",       val:76},
+  {name:"Kate S.",  city:"Cēsis",      val:74},
+  {name:"Roberts P.",city:"Jelgava",   val:73},
+  {name:"Kārlis Z.",city:"Rēzekne",    val:71},
+  {name:"Ilja N.",  city:"Daugavpils", val:70},
+  {name:"Laima R.", city:"Ventspils",  val:69}
+];
+const MY = {xp:{rank:23,val:1980}, global:{rank:41,val:68}};
+const TOTAL = 1240;
+
+/* ============ State ============ */
 let lang = "lv";
-const tx = k => (I18N[lang][k] ?? k);
+let lbMode = "xp";
 
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 3 — TĒMU MASĪVS (45 tēmas)
-   ════════════════════════════════════════════════════════════
-   Katrs objekts:
-     id            — unikāls identifikators
-     category      — kategorija {lv, ru, en}
-     title         — nosaukums  {lv, ru, en}
-     github_folder — mapes nosaukums GITHUB_BASE_URL iekš
-     tags          — meklēšanas atslēgvārdi (dažādās valodās)
-     isActive      — vai tēma ir pieejama
-   ────────────────────────────────────────────────────────── */
-const TOPICS = [
+/* ============ Utils ============ */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
 
-/* ── SKAITĻU TEORIJA (1–4) ───────────────────────────────── */
-{id:"topic_01",
- category:{lv:"Skaitļu teorija",ru:"Теория чисел",en:"Number Theory"},
- title:{lv:"Naturālie skaitļi un dalāmība",ru:"Натуральные числа и делимость",en:"Natural Numbers & Divisibility"},
- github_folder:"topic_01",
- tags:["NOD","MKD","НОД","НОК","GCD","LCM","dalītāji","делители","divisors",
-       "pirmskaitļi","простые числа","prime","сито Эратосфена","Eratostenes"],
- isActive:true},
-
-{id:"topic_02",
- category:{lv:"Skaitļu teorija",ru:"Теория чисел",en:"Number Theory"},
- title:{lv:"Racionālie un iracionālie skaitļi",ru:"Рациональные и иррациональные числа",en:"Rational & Irrational Numbers"},
- github_folder:"topic_02",
- tags:["racionāls","irracionāls","irrational","√2","pi","π","daļskaitlis","дробь","fraction",
-       "skaitļu kopas","множества","number sets","reālie","действительные","real"],
- isActive:true},
-
-{id:"topic_03",
- category:{lv:"Skaitļu teorija",ru:"Теория чисел",en:"Number Theory"},
- title:{lv:"Pakāpes un to īpašības",ru:"Степени и их свойства",en:"Powers & Their Properties"},
- github_folder:"topic_03",
- tags:["pakāpe","степень","power","exponent","kāpinātājs","a^n","aⁿ","квадрат","куб",
-       "squared","cubed","reizināšana","умножение","negative exponent"],
- isActive:true},
-
-{id:"topic_04",
- category:{lv:"Skaitļu teorija",ru:"Теория чисел",en:"Number Theory"},
- title:{lv:"Saknes un to īpašības",ru:"Корни и их свойства",en:"Roots & Their Properties"},
- github_folder:"topic_04",
- tags:["sakne","корень","root","kvadrātsakne","квадратный корень","square root","√",
-       "kubsakne","cube root","n-tā pakāpe","nth root","радикал","radikāls"],
- isActive:true},
-
-/* ── ALGEBRISKĀS IZTEIKSMES (5–8) ───────────────────────── */
-{id:"topic_05",
- category:{lv:"Algebriskās izteiksmes",ru:"Алгебраические выражения",en:"Algebraic Expressions"},
- title:{lv:"Polinomi un darbības ar tiem",ru:"Многочлены и действия с ними",en:"Polynomials & Operations"},
- github_folder:"topic_05",
- tags:["polinoms","многочлен","polynomial","monom","monomial","koeficients","коэффициент",
-       "pakāpe","degree","saskaitīšana","reizināšana","добавление","умножение"],
- isActive:true},
-
-{id:"topic_06",
- category:{lv:"Algebriskās izteiksmes",ru:"Алгебраические выражения",en:"Algebraic Expressions"},
- title:{lv:"Algebrisko izteiksmi faktorizēšana",ru:"Разложение на множители",en:"Factoring Expressions"},
- github_folder:"topic_06",
- tags:["faktorizācija","factoring","разложение","множитель","kopīgais reizinātājs","GCF",
-       "diferences kvadrāts","difference of squares","разность квадратов","a²-b²",
-       "pilnā kvadrāts","perfect square","(a+b)²"],
- isActive:true},
-
-{id:"topic_07",
- category:{lv:"Algebriskās izteiksmes",ru:"Алгебраические выражения",en:"Algebraic Expressions"},
- title:{lv:"Algebriskās daļas — vienkāršošana un darbības",ru:"Алгебраические дроби и операции",en:"Algebraic Fractions"},
- github_folder:"topic_07",
- tags:["daļa","дробь","fraction","algebraic fraction","saīsināt","сокращение","simplify",
-       "kopīgais saucējs","общий знаменатель","common denominator","dalīšana","деление"],
- isActive:true},
-
-{id:"topic_08",
- category:{lv:"Algebriskās izteiksmes",ru:"Алгебраические выражения",en:"Algebraic Expressions"},
- title:{lv:"Logaritmi un to īpašības",ru:"Логарифмы и их свойства",en:"Logarithms & Properties"},
- github_folder:"topic_08",
- tags:["log","ln","logaritms","логарифм","logarithm","natural log","dabiskais logaritms",
-       "основание","base","log₂","log₁₀","bāzes maiņa","смена основания","change of base",
-       "log(ab)","log(a/b)"],
- isActive:true},
-
-/* ── VIENĀDOJUMI (9–15) ──────────────────────────────────── */
-{id:"topic_09",
- category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
- title:{lv:"Lineāri vienādojumi",ru:"Линейные уравнения",en:"Linear Equations"},
- github_folder:"topic_09",
- tags:["lineārs","linear","линейное","ax+b=0","proporcija","proportion","пропорция",
-       "x atrašana","найти x","solve for x"],
- isActive:true},
-
-{id:"topic_10",
- category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
- title:{lv:"Kvadrātvienādojumi",ru:"Квадратные уравнения",en:"Quadratic Equations"},
- github_folder:"topic_10",
- tags:["kvadrātvienādojums","квадратное уравнение","quadratic","diskriminants","дискриминант",
-       "discriminant","D=b²-4ac","Vjeta","Виета","Vieta","x²","x2","ax²+bx+c=0",
-       "saknes","корни","roots","формула дискриминанта","kvadrāta formula"],
- isActive:true},
-
-{id:"topic_11",
- category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
- title:{lv:"Vienādojumu sistēmas — 2 mainīgie",ru:"Системы уравнений — 2 переменные",en:"Systems of Equations (2 Variables)"},
- github_folder:"topic_11",
- tags:["sistēma","system","система","substitūcija","подстановка","substitution",
-       "saskaitīšana","elimination","линейная система","grafiskā metode","graphical method",
-       "x un y","xy"],
- isActive:true},
-
-{id:"topic_12",
- category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
- title:{lv:"Eksponenciālie vienādojumi",ru:"Показательные уравнения",en:"Exponential Equations"},
- github_folder:"topic_12",
- tags:["eksponenciāls","exponential","показательное","2^x","a^x","pakāpe","степень",
-       "bāze","основание","pārveidošana uz vienādu bāzi","одно основание"],
- isActive:true},
-
-{id:"topic_13",
- category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
- title:{lv:"Logaritmiskie vienādojumi",ru:"Логарифмические уравнения",en:"Logarithmic Equations"},
- github_folder:"topic_13",
- tags:["log","ln","logaritms","логарифмическое уравнение","logarithmic equation",
-       "log x=a","ODZ","область допустимых","definīcijas apgabals","base","основание"],
- isActive:true},
-
-{id:"topic_14",
- category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
- title:{lv:"Iracionālie vienādojumi",ru:"Иррациональные уравнения",en:"Irrational Equations"},
- github_folder:"topic_14",
- tags:["iracionāls","иррациональное","irrational","√x=a","sakne","корень","root",
-       "pārbaude","проверка","check","ODZ","квадрирование","kāpināšana kvadrātā"],
- isActive:true},
-
-{id:"topic_15",
- category:{lv:"Vienādojumi",ru:"Уравнения",en:"Equations"},
- title:{lv:"Vienādojumi ar moduli |x|",ru:"Уравнения с модулем |x|",en:"Absolute Value Equations"},
- github_folder:"topic_15",
- tags:["modulis","|x|","absolute value","модуль","±","absvalue","divi gadījumi","два случая"],
- isActive:true},
-
-/* ── NEVIENĀDĪBAS (16–19) ────────────────────────────────── */
-{id:"topic_16",
- category:{lv:"Nevienādības",ru:"Неравенства",en:"Inequalities"},
- title:{lv:"Lineārās nevienādības",ru:"Линейные неравенства",en:"Linear Inequalities"},
- github_folder:"topic_16",
- tags:["nevienādība","inequality","неравенство","lineārs","<",">","≤","≥",
-       "skaitļu ass","числовая ось","number line","intervāls","interval","risinājumu kopa"],
- isActive:true},
-
-{id:"topic_17",
- category:{lv:"Nevienādības",ru:"Неравенства",en:"Inequalities"},
- title:{lv:"Kvadrātiskās nevienādības",ru:"Квадратные неравенства",en:"Quadratic Inequalities"},
- github_folder:"topic_17",
- tags:["kvadrātiska nevienādība","квадратное неравенство","quadratic inequality",
-       "parabola","x²","x2","diskriminants","intervāls","interval","metode parabolas",
-       "знак квадратного трёхчлена"],
- isActive:true},
-
-{id:"topic_18",
- category:{lv:"Nevienādības",ru:"Неравенства",en:"Inequalities"},
- title:{lv:"Nevienādību sistēmas",ru:"Системы неравенств",en:"Systems of Inequalities"},
- github_folder:"topic_18",
- tags:["sistēma","system","система","kopīgais risinājums","общее решение",
-       "intersections","šķelšanās","risinājumu kopa","объединение","apvienojums"],
- isActive:true},
-
-{id:"topic_19",
- category:{lv:"Nevienādības",ru:"Неравенства",en:"Inequalities"},
- title:{lv:"Nevienādības ar moduli |x|",ru:"Неравенства с модулем |x|",en:"Absolute Value Inequalities"},
- github_folder:"topic_19",
- tags:["modulis","|x|","absolute value","модуль","-a<x<a","x<-a vai x>a",
-       "compound inequality","divkāršā nevienādība"],
- isActive:false},
-
-/* ── FUNKCIJAS (20–25) ───────────────────────────────────── */
-{id:"topic_20",
- category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
- title:{lv:"Funkcijas jēdziens, grafiks, īpašības",ru:"Понятие функции, график, свойства",en:"Function Concept, Graph & Properties"},
- github_folder:"topic_20",
- tags:["funkcija","function","функция","grafiks","график","graph",
-       "definīcijas apgabals","область определения","domain",
-       "vērtību apgabals","область значений","range","monotona","četnie","nečetnie",
-       "even","odd","periodiska","period"],
- isActive:true},
-
-{id:"topic_21",
- category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
- title:{lv:"Lineārā funkcija y = kx + b",ru:"Линейная функция y = kx + b",en:"Linear Function y = kx + b"},
- github_folder:"topic_21",
- tags:["lineārs","linear","линейная","y=kx+b","slope","slīpums","y-intercept",
-       "нуль функции","zero","k koeficients","угловой коэффициент","taisne plaknē"],
- isActive:true},
-
-{id:"topic_22",
- category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
- title:{lv:"Kvadrātfunkcija un parabola",ru:"Квадратичная функция и парабола",en:"Quadratic Function & Parabola"},
- github_folder:"topic_22",
- tags:["parabola","kvadrātfunkcija","квадратичная","vertex","virsotne","вершина",
-       "симметрии ось","simētrijas ass","y=ax²+bx+c","x=-b/2a","f(x)=a(x-m)²+n"],
- isActive:true},
-
-{id:"topic_23",
- category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
- title:{lv:"Eksponenciālā funkcija y = aˣ",ru:"Показательная функция y = aˣ",en:"Exponential Function y = aˣ"},
- github_folder:"topic_23",
- tags:["eksponents","exponential","показательная","a^x","y=2^x","y=e^x","e",
-       "growth","pieaugums","рост","decay","samazināšanās","asimptota","asymptote","y>0"],
- isActive:true},
-
-{id:"topic_24",
- category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
- title:{lv:"Logaritmiskā funkcija y = logₐx",ru:"Логарифмическая функция y = logₐx",en:"Logarithmic Function y = logₐx"},
- github_folder:"topic_24",
- tags:["log","logaritms","логарифм","logarithmic","ln x","log x",
-       "apgrieztā funkcija","обратная функция","inverse","x>0","asimptota"],
- isActive:false},
-
-{id:"topic_25",
- category:{lv:"Funkcijas",ru:"Функции",en:"Functions"},
- title:{lv:"Funkciju transformācijas un grafiku pārmaiņas",ru:"Преобразования графиков функций",en:"Graph Transformations"},
- github_folder:"topic_25",
- tags:["pārvietojums","shift","сдвиг","reflection","simētrija","отражение",
-       "stretching","f(x+a)","f(x)+b","-f(x)","f(-x)","k·f(x)","compress"],
- isActive:false},
-
-/* ── SECĪBAS UN PROGRESIJAS (26–27) ──────────────────────── */
-{id:"topic_26",
- category:{lv:"Secības un progresijas",ru:"Последовательности и прогрессии",en:"Sequences & Progressions"},
- title:{lv:"Aritmētiskā progresija",ru:"Арифметическая прогрессия",en:"Arithmetic Progression"},
- github_folder:"topic_26",
- tags:["aritmētiskā","arithmetic","арифметическая","d starpība","разность","common difference",
-       "Sn","summa","aₙ=a₁+(n-1)d","vidējais aritmētiskais","среднее арифметическое"],
- isActive:true},
-
-{id:"topic_27",
- category:{lv:"Secības un progresijas",ru:"Последовательности и прогрессии",en:"Sequences & Progressions"},
- title:{lv:"Ģeometriskā progresija",ru:"Геометрическая прогрессия",en:"Geometric Progression"},
- github_folder:"topic_27",
- tags:["ģeometriskā","geometric","геометрическая","q kvocients","знаменатель","common ratio",
-       "bₙ=b₁·qⁿ⁻¹","summa","бесконечная сумма","сумма бесконечной","S=b₁/(1-q)","|q|<1"],
- isActive:true},
-
-/* ── KOMBINATORIKA UN VARBŪTĪBA (28–30) ──────────────────── */
-{id:"topic_28",
- category:{lv:"Kombinatorika un varbūtība",ru:"Комбинаторика и вероятность",en:"Combinatorics & Probability"},
- title:{lv:"Kombinatorika — pamatformulas",ru:"Комбинаторика — основные формулы",en:"Combinatorics — Core Formulas"},
- github_folder:"topic_28",
- tags:["kombinācija","combination","комбинация","C(n,k)","Cₙᵏ",
-       "permutācija","permutation","перестановка","P(n)","n!",
-       "izvietojums","размещение","arrangement","A(n,k)","faktoriāls","factorial"],
- isActive:true},
-
-{id:"topic_29",
- category:{lv:"Kombinatorika un varbūtība",ru:"Комбинаторика и вероятность",en:"Combinatorics & Probability"},
- title:{lv:"Varbūtību teorija — pamatjēdzieni",ru:"Теория вероятностей — основные понятия",en:"Probability — Basics"},
- github_folder:"topic_29",
- tags:["varbūtība","probability","вероятность","P(A)","notikums","событие","event",
-       "neatkarīgs","independent","savienojums","объединение","šķelšanās","пересечение",
-       "klasiskā definīcija","favorable outcomes","labvēlīgi iznākumi"],
- isActive:true},
-
-{id:"topic_30",
- category:{lv:"Kombinatorika un varbūtība",ru:"Комбинаторика и вероятность",en:"Combinatorics & Probability"},
- title:{lv:"Statistika un datu analīze",ru:"Статистика и анализ данных",en:"Statistics & Data Analysis"},
- github_folder:"topic_30",
- tags:["statistika","statistics","статистика","vidējais","среднее","mean",
-       "mediāna","median","moda","mode","dispersija","дисперсия","variance",
-       "standartnovirze","стандартное отклонение","std","boxplot","histogramma"],
- isActive:true},
-
-/* ── TRIGONOMETRIJA (31–34) ──────────────────────────────── */
-{id:"topic_31",
- category:{lv:"Trigonometrija",ru:"Тригонометрия",en:"Trigonometry"},
- title:{lv:"Trigonometriskās funkcijas — pamati",ru:"Тригонометрические функции — основы",en:"Trigonometric Functions — Basics"},
- github_folder:"topic_31",
- tags:["sin","cos","tan","cot","sinuss","kosinuss","tangenss","котангенс",
-       "синус","косинус","тангенс","radian","rediāni","grādi","degrees",
-       "единичная окружность","unit circle","leņķis","угол","angle","30-60-90"],
- isActive:true},
-
-{id:"topic_32",
- category:{lv:"Trigonometrija",ru:"Тригонометрия",en:"Trigonometry"},
- title:{lv:"Trigonometriskās identitātes",ru:"Тригонометрические тождества",en:"Trigonometric Identities"},
- github_folder:"topic_32",
- tags:["identitāte","identity","тождество","sin²+cos²=1","основное тождество",
-       "Pitagora trig identitāte","double angle","двойной угол","divkāršais leņķis",
-       "sin 2α","cos 2α","half angle","puse leņķa","sum formula"],
- isActive:true},
-
-{id:"topic_33",
- category:{lv:"Trigonometrija",ru:"Тригонометрия",en:"Trigonometry"},
- title:{lv:"Sinusu un kosinusu teorēma",ru:"Теорема синусов и косинусов",en:"Law of Sines & Cosines"},
- github_folder:"topic_33",
- tags:["sinusu teorēma","sine rule","теорема синусов","a/sinA",
-       "kosinusu teorēma","cosine rule","теорema косинусов","c²=a²+b²-2ab·cosC",
-       "trijstūra laukums","площадь треугольника","S=½ab sinC"],
- isActive:true},
-
-{id:"topic_34",
- category:{lv:"Trigonometrija",ru:"Тригонометрия",en:"Trigonometry"},
- title:{lv:"Trigonometriskie vienādojumi",ru:"Тригонометрические уравнения",en:"Trigonometric Equations"},
- github_folder:"topic_34",
- tags:["trig equation","тригонометрическое уравнение","sin x=a","cos x=a","tan x=a",
-       "arcsin","arccos","arctg","arctan","vispārīgais risinājums","general solution",
-       "x=arcsin(a)+2πn","perioda"],
- isActive:false},
-
-/* ── PLĀNĢEOMETRIJA (35–39) ──────────────────────────────── */
-{id:"topic_35",
- category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
- title:{lv:"Taisnleņķa trijstūris un Pitagora teorēma",ru:"Прямоугольный треугольник и теорема Пифагора",en:"Right Triangle & Pythagorean Theorem"},
- github_folder:"topic_35",
- tags:["Pitagors","Pitagora teorēma","Пифагор","Pythagorean theorem","a²+b²=c²",
-       "hipotenūza","hypotenuse","katetis","leg","katete","30-60-90","45-45-90",
-       "speciālie leņķi","special angles"],
- isActive:true},
-
-{id:"topic_36",
- category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
- title:{lv:"Trijstūri — laukumi, mediānas, bisektrises",ru:"Треугольники — площади, медианы, биссектрисы",en:"Triangles — Areas, Medians, Bisectors"},
- github_folder:"topic_36",
- tags:["trijstūris","triangle","треугольник","laukums","площадь","area",
-       "Herons formula","Gērons","mediana","медиана","bisektrise","биссектриса",
-       "augstums","высота","centrs","centroid","leņķu summa","sum of angles"],
- isActive:true},
-
-{id:"topic_37",
- category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
- title:{lv:"Četrstūri — paralēlogramms, rombs, trapece",ru:"Четырёхугольники — параллелограмм, ромб, трапеция",en:"Quadrilaterals — Parallelogram, Rhombus, Trapezoid"},
- github_folder:"topic_37",
- tags:["četrstūris","quadrilateral","четырёхугольник","paralēlogramms","параллелограмм",
-       "trapece","трапеция","trapezoid","rombs","ромб","rhombus","taisnstūris",
-       "прямоугольник","kvadrāts","квадрат","diagonāle","diagonal"],
- isActive:true},
-
-{id:"topic_38",
- category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
- title:{lv:"Riņķa līnija un aplis",ru:"Окружность и круг",en:"Circle"},
- github_folder:"topic_38",
- tags:["riņķis","circle","окружность","radius","rādiuss","diametrs","diameter",
-       "horda","chord","π","PI","loka garums","arc length","нота","tangent","tangente",
-       "inscribed angle","ierakstītais leņķis","вписанный угол","апофема"],
- isActive:true},
-
-{id:"topic_39",
- category:{lv:"Plānģeometrija",ru:"Планиметрия",en:"Plane Geometry"},
- title:{lv:"Regulārie daudzstūri un to laukumi",ru:"Правильные многоугольники и их площади",en:"Regular Polygons"},
- github_folder:"topic_39",
- tags:["daudzstūris","polygon","многоугольник","regulārs","hexagon","sešstūris",
-       "pentagon","пятиугольник","piecstūris","oktogons","diagonāle","diagonal",
-       "ierakstīts","circumscribed","aprakstīts","апофема","apothem"],
- isActive:false},
-
-/* ── STEREOĢEOMETRIJA (40–41) ────────────────────────────── */
-{id:"topic_40",
- category:{lv:"Stereoģeometrija",ru:"Стереометрия",en:"Solid Geometry"},
- title:{lv:"Daudzskaldņi — prizmas un piramīdas",ru:"Многогранники — призмы и пирамиды",en:"Polyhedra — Prisms & Pyramids"},
- github_folder:"topic_40",
- tags:["prizma","prism","призма","piramīda","pyramid","пирамида","daudzskaldnis",
-       "многогранник","tilpums","объём","volume","V=Sh","sānu virsma",
-       "боковая поверхность","lateral surface","pilnā virsma","full surface"],
- isActive:false},
-
-{id:"topic_41",
- category:{lv:"Stereoģeometrija",ru:"Стереометрия",en:"Solid Geometry"},
- title:{lv:"Cilindrs, konuss un sfēra — tilpumi",ru:"Цилиндр, конус и сфера — объёмы",en:"Cylinder, Cone & Sphere — Volumes"},
- github_folder:"topic_41",
- tags:["cilindrs","cylinder","цилиндр","konuss","cone","конус","sfēra","sphere",
-       "шар","сфера","tilpums","volume","объём","V=πr²h","V=⅓πr²h","V=⁴⁄₃πr³",
-       "surface area","virsmas laukums","площадь поверхности"],
- isActive:false},
-
-/* ── VEKTORI UN KOORDINĀTAS (42–43) ─────────────────────── */
-{id:"topic_42",
- category:{lv:"Vektori un koordinātas",ru:"Векторы и координаты",en:"Vectors & Coordinates"},
- title:{lv:"Vektori — jēdziens un darbības",ru:"Векторы — понятие и операции",en:"Vectors — Concept & Operations"},
- github_folder:"topic_42",
- tags:["vektors","vector","вектор","skalārs","scalar","dot product",
-       "skalārais reizinājums","скалярное произведение","moduļs vektora",
-       "длина вектора","length","направление","direction","AB","pārvietojums"],
- isActive:false},
-
-{id:"topic_43",
- category:{lv:"Vektori un koordinātas",ru:"Векторы и координаты",en:"Vectors & Coordinates"},
- title:{lv:"Koordinātu metode plaknē",ru:"Координатный метод на плоскости",en:"Coordinate Geometry — Plane"},
- github_folder:"topic_43",
- tags:["koordinātas","coordinates","координаты","taisne","line equation",
-       "attālums","distance","расстояние","midpoint","viduspunkts","середина",
-       "slope","slīpums","угловой коэффициент","y=kx+b plaknē"],
- isActive:false},
-
-/* ── MATEMĀTISKĀ ANALĪZE (44–45) ─────────────────────────── */
-{id:"topic_44",
- category:{lv:"Matemātiskā analīze",ru:"Математический анализ",en:"Calculus"},
- title:{lv:"Atvasinājums — jēdziens un aprēķins",ru:"Производная — понятие и вычисление",en:"Derivative — Concept & Computation"},
- github_folder:"topic_44",
- tags:["atvasinājums","derivative","производная","d/dx","f'(x)","f prime",
-       "differentiate","diferenciāt","ātrums","скорость","rate of change",
-       "tangent line","pieskare","касательная","правила дифференцирования","rules"],
- isActive:false},
-
-{id:"topic_45",
- category:{lv:"Matemātiskā analīze",ru:"Математический анализ",en:"Calculus"},
- title:{lv:"Atvasinājuma pielietojums — ekstrēmi",ru:"Производная — экстремумы функции",en:"Derivative Applications — Extrema"},
- github_folder:"topic_45",
- tags:["minimums","minimum","минимум","maksimums","maximum","максимум",
-       "ekstrēms","extremum","критическая точка","critical point","f'(x)=0",
-       "monotone","monotons","pieaugošs","убывающий","inflection point","liekuma punkts"],
- isActive:false},
-
-/* ── FINANŠU MATEMĀTIKA (46) ─────────────────────────────── */
-{id:"topic_46",
- category:{lv:"Finanšu matemātika",ru:"Финансовая математика",en:"Financial Mathematics"},
- title:{lv:"Procenti, kredīti un noguldījumi",ru:"Проценты, кредиты и вклады",en:"Interest, Loans & Deposits"},
- github_folder:"topic_46",
- tags:["procenti","проценты","interest","salikts procents","сложный процент","compound interest",
-       "kredīts","кредит","loan","noguldījums","вклад","deposit","annuitāte","аннуитет","annuity",
-       "banka","банк","bank","aizdevums","займ","borrowing","inflācija","инфляция","inflation"],
- isActive:true},
-
-]; // TOPICS end
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 4 — LAIKS UN STRIKS
-   ════════════════════════════════════════════════════════════
-   DROŠĪBA pret laika manipulācijām:
-   Latvijas datums tiek noteikts TIKAI ar Intl.DateTimeFormat
-   { timeZone: "Europe/Riga" }. Sistēmas pulksteņa maiņa
-   neietekmē rezultātu — tas ir atkarīgs no servera UTC laika
-   un IANA laika joslas datu bāzes pārlūkprogrammā.
-   ──────────────────────────────────────────────────────────── */
-
-/** Atgriež šodienas datumu Latvijas laikā "YYYY-MM-DD" formātā */
-function getRigaDate() {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Riga",
-    year: "numeric", month: "2-digit", day: "2-digit"
-  }).format(new Date());
+function applyLang(){
+  const t = dict[lang];
+  $$('[data-i]').forEach(el=>{
+    const k = el.dataset.i;
+    if(t[k] !== undefined) el.textContent = t[k];
+  });
+  // Days on chart
+  $$('text[data-d]').forEach(el=>{
+    el.textContent = t.days[+el.dataset.d];
+  });
+  // Today eyebrow
+  $('#today').textContent = new Date().toLocaleDateString(t.locale,{weekday:"long",day:"numeric",month:"long"});
+  document.documentElement.lang = lang;
+  renderLb();
 }
 
-function loadAppData() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY)); } catch { return null; }
-}
-function saveAppData(d) {
-  localStorage.setItem(LS_KEY, JSON.stringify(d));
-}
+function renderLb(){
+  const t = dict[lang];
+  const list = lbMode === "xp" ? lbXP : lbGL;
+  const unit = lbMode === "xp" ? t.xp : t.score;
+  const my   = MY[lbMode];
 
-/**
- * Inicializē / migrē datus.
- * Ja jaunā diena (Rīgas laika) — pārbauda, vai striks tika nopelnīts,
- * un atiestata dienas skaitītāju.
- */
-function initAppData() {
-  const today = getRigaDate();
-  let d = loadAppData();
-  if (!d) {
-    d = { date: today, count: 0, streak: 0, score: 90 };
-    saveAppData(d);
-    DAILY_GOAL = scoreToGoal(90);
-    return d;
-  }
-  DAILY_GOAL = scoreToGoal(d.score || 90);
-  if (d.date !== today) {
-    const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
-    d.streak = (d.count >= minOk) ? (d.streak || 0) + 1 : 0;
-    d.date   = today;
-    d.count  = 0;
-    saveAppData(d);
-  }
-  return d;
+  // Preview top-5
+  const preview = list.slice(0,5).map((it,i)=>rowHTML(i,it,unit,false)).join("");
+  $('#lbList').innerHTML = preview;
+
+  // Hero
+  $('#myRank').textContent = my.rank;
+  $('#myVal').textContent  = my.val.toLocaleString();
+  $('#lbUnitHead').textContent = unit;
+  const totalNow = window.TOTAL_OVERRIDE || TOTAL;
+  $('.lb-hero .l b').innerHTML = `#<span id="myRank">${my.rank}</span><span style="color:rgba(255,255,255,.5);font-size:14px;margin-left:6px;font-weight:500">${t.of} ${totalNow.toLocaleString()}</span>`;
+
+  // Full modal
+  const meName = lang==="lv"?"Tu (Rihards)":"Ты (Рихард)";
+  const full = list.map((it,i)=>rowHTML(i,it,unit,false)).join("")
+             + '<div class="hr"></div>'
+             + rowHTML(my.rank-1,{name:meName,city:"Rīga",val:my.val},unit,true);
+  $('#lbFull').innerHTML = full;
 }
-
-let AD = initAppData(); // application data
-
-/** Pievieno 1 uzdevumu, saglabā, atjauno UI */
-function addTask() {
-  AD.count++;
-  saveAppData(AD);
-  renderStreak();
-  renderProgress();
+function rowHTML(i,it,unit,me){
+  const cls = me ? "me" : (i<3 ? "i"+i : "");
+  return `<div class="lb-row ${cls}">
+    <div class="rank">${i+1}</div>
+    <div class="who"><b>${it.name}</b><small>${it.city}</small></div>
+    <div class="val mono">${it.val.toLocaleString()}<small>${unit}</small></div>
+  </div>`;
 }
 
-/** Atjaunina liesmas ikonu un striku skaitītāju */
-function renderStreak() {
-  const minOk = Math.max(2, Math.floor(DAILY_GOAL * STREAK_MIN_PCT));
-  const on    = AD.count >= minOk;
-  document.getElementById("fireIcon").className = "s-fire " + (on ? "on" : "off");
-  document.getElementById("streakNum").textContent = AD.streak;
-}
+/* ============ Session timer ============ */
+let sec = 4*60 + 13;
+setInterval(()=>{
+  sec++;
+  const m = String(Math.floor(sec/60)).padStart(2,"0");
+  const s = String(sec%60).padStart(2,"0");
+  $('#timer').textContent = `${m}:${s}`;
+},1000);
 
-/** Atjaunina dienas mērķa joslu un tekstu */
-function renderProgress() {
-  const pct = Math.min(100, (AD.count / DAILY_GOAL) * 100);
-  document.getElementById("progFill").style.width = pct + "%";
-  document.getElementById("doneNum").textContent  = AD.count;
-  document.getElementById("goalNum").textContent  = DAILY_GOAL;
-  document.getElementById("taskWrd").textContent  = tx("taskWrd");
-  document.getElementById("goalHint").textContent =
-    tx("goalHint").replace("${G}", DAILY_GOAL);
-}
+/* ============ Events ============ */
+$$('.seg-item[data-lang]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    $$('.seg-item[data-lang]').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    lang = el.dataset.lang;
+    applyLang();
+  });
+});
 
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 4B — EKSĀMENA ATSKAITE (COUNTDOWN)
-   ════════════════════════════════════════════════════════════
-   Mērķa datums: 2026. gada 30. septembris, 00:00 pēc Rīgas laika.
-   Tīri klienta puses aprēķins, bez servera pieprasījumiem —
-   atjaunojas katru sekundi.
-   ──────────────────────────────────────────────────────────── */
+$$('.seg-item[data-lb]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    $$('.seg-item[data-lb]').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    lbMode = el.dataset.lb;
+    renderLb();
+  });
+});
 
-var EXAM_DATE = new Date("2026-09-30T00:00:00+03:00"); // Rīgas laika josla (EEST)
+$('#viewAll').addEventListener('click',()=>$('#lbModal').classList.add('open'));
+$('#profileBtn').addEventListener('click',()=>$('#profileModal').classList.add('open'));
 
-function updateCountdown() {
-  var now = new Date();
-  var diff = EXAM_DATE - now;
+$$('[data-close]').forEach(b=>b.addEventListener('click',e=>{
+  e.target.closest('.backdrop').classList.remove('open');
+}));
+$$('.backdrop').forEach(bd=>bd.addEventListener('click',e=>{
+  if(e.target===bd) bd.classList.remove('open');
+}));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') $$('.backdrop').forEach(b=>b.classList.remove('open'));
+});
 
-  if (diff <= 0) {
-    document.getElementById("cdDays").textContent = "0";
-    document.getElementById("cdHours").textContent = "0";
-    document.getElementById("cdMinutes").textContent = "0";
-    document.getElementById("cdSeconds").textContent = "0";
-    return;
-  }
+/* ============ Logout ============ */
+// window.logout() определена в auth.js (уже подключён первой строкой в <head>).
+// Она сама шлёт запрос на auth-worker /logout и чистит localStorage.
+$('#logoutBtn').addEventListener('click', () => {
+  if (typeof window.logout === 'function') window.logout();
+  else { localStorage.removeItem('session_token'); window.location.href = '/'; }
+});
 
-  var days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  var hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+/* ============ Реальный лидерборд с auth-worker ============
+   auth.js уже подключён (первая строка в <head>) и объявляет глобальную
+   переменную AUTH_WORKER_URL — используем её напрямую, чтобы URL воркера
+   настраивался в ОДНОМ месте (auth.js), а не дублировался по файлам. */
 
-  document.getElementById("cdDays").textContent = days;
-  document.getElementById("cdHours").textContent = hours;
-  document.getElementById("cdMinutes").textContent = minutes;
-  document.getElementById("cdSeconds").textContent = seconds;
-}
-
-updateCountdown();
-setInterval(updateCountdown, 1000);
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 4C — LĪDERU SARAKSTS (LEADERBOARD)
-   ════════════════════════════════════════════════════════════
-   Iegūst datus no /leaderboard endpoint. Tā kā auth.js jau
-   pārbaudīja tokenu (citādi šī lapa vispār neielādētos),
-   izmantojam to pašu WORKER_URL un token, kas jau ir localStorage.
-   ──────────────────────────────────────────────────────────── */
-
-var LBOARD_WORKER_URL = "https://floral-tree-d2cb.eusjs56999.workers.dev/";
-
-async function loadLeaderboard() {
-  var listEl = document.getElementById("lboardList");
-  var myRankBox = document.getElementById("lboardMyRank");
+async function loadRealLeaderboard() {
   var token = localStorage.getItem("session_token");
-  if (!token) return; // auth.js jau būtu novirzījis uz login, bet drošības pēc
+  if (!token) return; // auth.js уже должен был увести на /login.html, но на всякий случай
 
   try {
-    var res = await fetch(LBOARD_WORKER_URL + "leaderboard", {
+    var res = await fetch(AUTH_WORKER_URL + "leaderboard", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1230,350 +658,39 @@ async function loadLeaderboard() {
       },
       body: JSON.stringify({})
     });
+    if (!res.ok) return; // тихо остаёмся на demo-данных при ошибке
     var data = await res.json();
 
-    if (!res.ok || !data.top) {
-      listEl.innerHTML = '<div class="lboard-empty">Neizdevās ielādēt.</div>';
-      return;
-    }
-
-    if (data.top.length === 0) {
-      listEl.innerHTML = '<div class="lboard-empty">Vēl nav datu.</div>';
-      return;
-    }
-
-    // Vienmēr rādām "tava vieta" bloku virs saraksta — neatkarīgi no tā,
-    // vai lietotājs ir topā vai nav
-    if (data.myRank > 0) {
-      myRankBox.style.display = "flex";
-      document.getElementById("lboardMyRankVal").innerHTML =
-        "#" + data.myRank + ' <span id="lboardMyRankOf">' + tx("lboardOf") + " " + data.totalUsers + "</span>";
-    }
-
-    var html = "";
-    var myShown = false;
-
-    data.top.forEach(function(u, idx) {
-      var rank = idx + 1;
-      var isMe = (u.username === data.myUsername);
-      if (isMe) myShown = true;
-      var medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
-      var badge = rank <= 3 ? '<span class="lboard-badge">' + tx("lboardBadge") + '</span>' : '';
-      html += '<div class="lboard-row' + (isMe ? ' me' : '') + '">' +
-        '<span class="lboard-rank">' + medal + '</span>' +
-        '<span class="lboard-name">' + escapeHtml(u.displayName || u.username) + '</span>' +
-        badge +
-        '<span class="lboard-count">' + u.solvedCount + '</span>' +
-        '</div>';
+    // Перегоняем реальный ответ auth-worker в формат, который понимает
+    // rowHTML()/renderLb(): { name, city, val }. city у реальных юзеров
+    // не хранится — оставляем пустым, вёрстка это переживает нормально.
+    var real = (data.top || []).map(function(u) {
+      return { name: u.displayName || u.username, city: "", val: u.solvedCount || 0 };
     });
+    if (real.length === 0) return; // пока никто не решал задания — оставляем demo
 
-    // Ja lietotājs nav topā, parādām atsevišķi viņa pozīciju sarakstā
-    if (!myShown && data.myRank > 0) {
-      html += '<div class="lboard-sep">···</div>';
-      html += '<div class="lboard-row me">' +
-        '<span class="lboard-rank">' + data.myRank + '</span>' +
-        '<span class="lboard-name">' + escapeHtml(data.myUsername) + '</span>' +
-        '<span class="lboard-count">—</span>' +
-        '</div>';
+    lbXP.length = 0;
+    Array.prototype.push.apply(lbXP, real);
+    lbGL.length = 0;
+    Array.prototype.push.apply(lbGL, real);
+
+    if (data.myRank && data.myRank > 0) {
+      MY.xp.rank = data.myRank;
+      MY.global.rank = data.myRank;
+    }
+    if (typeof data.totalUsers === "number" && data.totalUsers > 0) {
+      window.TOTAL_OVERRIDE = data.totalUsers;
     }
 
-    listEl.innerHTML = html;
-  } catch(e) {
-    listEl.innerHTML = '<div class="lboard-empty">Neizdevās ielādēt.</div>';
+    renderLb();
+  } catch (e) {
+    console.warn("Leaderboard load failed, showing demo data:", e.message);
   }
 }
 
-function escapeHtml(str) {
-  return String(str).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-loadLeaderboard();
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 5 — GITHUB MARŠRUTĒŠANA
-   ════════════════════════════════════════════════════════════
-   Katrā tēmā ir github_folder. Kad lietotājs noklikšķina uz
-   aktīvas kartītes, viņš tiek novirzīts uz:
-     PRACTICE_PAGE?topic=<github_folder>
-   practice.html pats pieprasa failus no:
-     GITHUB_BASE_URL + github_folder + "/..."
-   ──────────────────────────────────────────────────────────── */
-function getTopicUrl(topic) {
-  return PRACTICE_PAGE + "?topic=" + encodeURIComponent(topic.github_folder);
-}
-function goToTopic(topic) {
-  if (!topic.isActive) return;
-  window.location.href = getTopicUrl(topic);
-}
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 6 — MEKLĒŠANAS LOĢIKA  (fuzzy-style)
-   ════════════════════════════════════════════════════════════
-   Meklēšana notiek pret VISIEM tēmas laukiem:
-     • nosaukums visās valodās
-     • kategorija visās valodās
-     • tags masīvs (daudzvalodu sinonīmi)
-   Vaicājums tiek sadalīts atstarpes-tokenī.
-   Tēma tiek rādīta, ja VISI tokeni atrasti kaut kur
-   norādītajos laukos (case-insensitive substring match).
-   Piemērs: "дискриминант" → atrod topic_10 caur tags[].
-   ──────────────────────────────────────────────────────────── */
-let searchQ  = "";
-let filterCat = null; // null = visas
-
-function topicMatch(topic, q) {
-  if (!q) return true;
-  const tokens = q.toLowerCase().trim().split(/\s+/).filter(Boolean);
-  const hay = [
-    topic.title.lv, topic.title.ru, topic.title.en,
-    topic.category.lv, topic.category.ru, topic.category.en,
-    ...topic.tags
-  ].join(" ").toLowerCase();
-  return tokens.every(tok => hay.includes(tok));
-}
-
-function filtered() {
-  return TOPICS.filter(tp => {
-    const ms = topicMatch(tp, searchQ);
-    const mc = !filterCat || tp.category.lv === filterCat;
-    return ms && mc;
-  });
-}
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 7 — RENDERĒŠANA
-   ════════════════════════════════════════════════════════════ */
-
-/** Kategoriju filtru pogas */
-function renderCats() {
-  const seen = new Set();
-  const cats = [];
-  TOPICS.forEach(tp => {
-    if (!seen.has(tp.category.lv)) { seen.add(tp.category.lv); cats.push(tp.category); }
-  });
-  const wrap = document.getElementById("catFilters");
-  let h = `<button class="cat-btn on" data-c="">${tx("catAll")}</button>`;
-  cats.forEach(c => {
-    h += `<button class="cat-btn" data-c="${c.lv}">${c[lang]||c.lv}</button>`;
-  });
-  wrap.innerHTML = h;
-  wrap.querySelectorAll(".cat-btn").forEach(b => {
-    b.addEventListener("click", () => {
-      wrap.querySelectorAll(".cat-btn").forEach(x=>x.classList.remove("on"));
-      b.classList.add("on");
-      filterCat = b.dataset.c || null;
-      renderGrid();
-    });
-  });
-}
-
-/** Tēmu kartīšu režģis */
-function renderGrid() {
-  const list = filtered();
-  const grid = document.getElementById("topicGrid");
-  const resCnt = document.getElementById("resCnt");
-  resCnt.textContent = list.length < TOPICS.length
-    ? tx("resTpl").replace("{n}", list.length)
-    : "";
-
-  if (!list.length) {
-    grid.innerHTML =
-      `<div class="empty"><div class="empty-ico">🔍</div>` +
-      `<div class="empty-txt">${tx("empty")}</div></div>`;
-    return;
-  }
-
-  grid.innerHTML = list.map(tp => {
-    const num   = tp.id.split("_")[1];
-    const title = tp.title[lang] || tp.title.lv;
-    const cat   = tp.category[lang] || tp.category.lv;
-    const on    = tp.isActive;
-    const badge = on
-      ? `<span class="bdg bdg-on">${tx("bdgOn")}</span>`
-      : `<span class="bdg bdg-off">${tx("bdgOff")}</span>`;
-    const action = on
-      ? `<span class="card-cta">${tx("cta")}</span>`
-      : `<span class="card-lock">🔒 ${tx("lock")}</span>`;
-
-    return `<div class="card ${on?"c-on":"c-off"}"
-              data-id="${tp.id}" ${on?'role="button" tabindex="0"':""}>
-      <div class="card-top">
-        ${badge}
-        <span class="card-num"># ${num}</span>
-      </div>
-      <div class="card-title">${title}</div>
-      <div class="card-bot">
-        <span class="cat-tag">${cat}</span>
-        ${action}
-      </div>
-    </div>`;
-  }).join("");
-
-  /* Klikšķu apstrādātāji */
-  grid.querySelectorAll(".c-on").forEach(el => {
-    const id = el.dataset.id;
-    const tp = TOPICS.find(x => x.id === id);
-    el.addEventListener("click", () => goToTopic(tp));
-    el.addEventListener("keydown", e => { if (e.key==="Enter") goToTopic(tp); });
-  });
-}
-
-/** Visi statiskie teksti */
-function renderTexts() {
-  document.getElementById("eyebrow").textContent     = tx("eyebrow");
-  document.getElementById("heroTitleAcc").textContent = tx("heroAcc");
-  document.getElementById("heroTitleRest").textContent= tx("heroRest");
-  document.getElementById("scoreLbl").textContent     = tx("scoreLbl");
-  document.getElementById("scoreHint").textContent    = tx("scoreHint");
-  document.getElementById("goalLbl").textContent      = tx("goalLbl");
-  document.getElementById("backLbl").textContent      = tx("back");
-  document.getElementById("searchInput").placeholder  = tx("search");
-  document.getElementById("scoreOkHint").textContent  =
-    "→ " + scoreToGoal(AD.score || 90) + " " + tx("perDay");
-  document.getElementById("countdownLbl").textContent = tx("countdownLbl");
-  document.getElementById("cdDaysLbl").textContent    = tx("cdDaysLbl");
-  document.getElementById("cdHoursLbl").textContent   = tx("cdHoursLbl");
-  document.getElementById("cdMinutesLbl").textContent = tx("cdMinutesLbl");
-  document.getElementById("cdSecondsLbl").textContent = tx("cdSecondsLbl");
-  document.getElementById("lboardLbl").textContent    = tx("lboardLbl");
-  document.getElementById("lboardPeriod").textContent = tx("lboardPeriod");
-  document.getElementById("lboardMyRankLbl").textContent = tx("lboardMyRankLbl");
-}
-
-/** Pilna UI atjaunināšana */
-function renderAll() {
-  renderTexts();
-  renderProgress();
-  renderStreak();
-  renderCats();
-  renderGrid();
-}
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 8 — SCORE SLIDERS
-   ════════════════════════════════════════════════════════════ */
-function initSlider() {
-  const sl     = document.getElementById("scoreSlider");
-  const dv     = document.getElementById("scoreVal");
-  const okBtn  = document.getElementById("scoreOkBtn");
-  const okHint = document.getElementById("scoreOkHint");
-
-  sl.value = AD.score || 90;
-
-  const updPreview = () => {
-    const v = parseInt(sl.value);
-    dv.textContent = v + "%";
-    const p = ((v - 40) / 60 * 100).toFixed(1) + "%";
-    sl.style.setProperty("--p", p);
-    okHint.textContent = "→ " + scoreToGoal(v) + " " + tx("perDay");
-  };
-
-  const applyGoal = () => {
-    const v    = parseInt(sl.value);
-    AD.score   = v;
-    DAILY_GOAL = scoreToGoal(v);
-    saveAppData(AD);
-    renderProgress();
-    renderStreak();
-    /* Визуальное подтверждение */
-    okBtn.textContent = "✓";
-    setTimeout(() => { okBtn.textContent = "OK"; }, 900);
-  };
-
-  updPreview();
-  sl.addEventListener("input", updPreview);
-  okBtn.addEventListener("click", applyGoal);
-}
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 9 — VALODAS PĀRSLĒDZĒJS
-   ════════════════════════════════════════════════════════════ */
-function initLang() {
-  document.querySelectorAll(".lbtn").forEach(b => {
-    b.addEventListener("click", () => {
-      lang = b.dataset.lang;
-      document.querySelectorAll(".lbtn").forEach(x=>x.classList.remove("on"));
-      b.classList.add("on");
-      document.documentElement.lang = lang;
-      renderAll();
-    });
-  });
-}
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 10 — MEKLĒŠANAS LAUKS
-   ════════════════════════════════════════════════════════════ */
-function initSearch() {
-  const inp = document.getElementById("searchInput");
-  const clr = document.getElementById("searchClear");
-  inp.addEventListener("input", () => {
-    searchQ = inp.value;
-    clr.classList.toggle("vis", !!searchQ);
-    renderGrid();
-  });
-  clr.addEventListener("click", () => {
-    inp.value = searchQ = "";
-    clr.classList.remove("vis");
-    inp.focus(); renderGrid();
-  });
-}
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 11 — CHEAT / DEV POGA
-   ════════════════════════════════════════════════════════════
-   Simulē 1 atrisinātu uzdevumu. Tikai priekš testēšanas.
-   Ražošanā šo pogu var noņemt vai paslēpt.
-   ──────────────────────────────────────────────────────────── */
-function initCheat() {
-  document.getElementById("cheatBtn").addEventListener("click", addTask);
-}
-
-/* ════════════════════════════════════════════════════════════
-   █  SEKCIJA 12 — IZIET NO KONTA (LOGOUT)
-   ════════════════════════════════════════════════════════════
-   Tiek izsaukts, kad lietotājs nospiež "Uz galveno izvēlni".
-   Mēģina izsaukt auth.js logout funkciju, pēc tam pāriet uz /.
-   ──────────────────────────────────────────────────────────── */
-async function handleLogout(e) {
-  if (e) e.preventDefault();
-  try {
-    if      (typeof window.logout    === "function") await window.logout();
-    else if (typeof window.signOut   === "function") await window.signOut();
-    else if (window.firebase?.auth)                  await window.firebase.auth().signOut();
-  } catch (err) { console.warn("Logout:", err); }
-  window.location.href = "/main/";
-}
-
-/* Auto-atjauninājums, ja practice.html maina localStorage
-   (uzdevumu skaits tiek ņemts automātiski bez pogas)        */
-window.addEventListener("storage", (e) => {
-  if (e.key === LS_KEY) {
-    const fresh = loadAppData();
-    if (fresh) { AD = fresh; renderProgress(); renderStreak(); }
-  }
-});
-
-/* ════════════════════════════════════════════════════════════
-   █  INICIALIZĀCIJA
-   ════════════════════════════════════════════════════════════ */
-(function init() {
-  initLang();
-  initSlider();
-  initSearch();
-  initCheat();
-  renderAll();
-})();
-
-/*
-  PIEZĪME PAR window.callGemini():
-  ──────────────────────────────────────────────────────────────
-  Šajā lapā (dashboard) AI netiek izsaukts — tā ir navigācijas lapa.
-  window.callGemini() no auth.js ir pieejams un tiek izmantots
-  practice.html, kur tiek ģenerēti uzdevumi un atrisinājumi.
-  Piemērs (practice.html):
-    const raw = await window.callGemini(PROMPT, { temperature: 0.8 });
-  ──────────────────────────────────────────────────────────────
-*/
+/* ============ Init ============ */
+applyLang();
+loadRealLeaderboard();
 </script>
 </body>
 </html>
